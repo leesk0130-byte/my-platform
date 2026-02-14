@@ -87,8 +87,23 @@ body {
 .intro-desc { font-size: var(--text-sm); line-height: 1.75; color: var(--color-text-muted); margin: 0; }
 .intro-desc strong { color: var(--color-text); }
 
-/* 히어로 하단 힌트 */
-.hero-hint { font-size: var(--text-sm); opacity: 0.9; margin-top: var(--space-2); margin-bottom: 0; position: relative; }
+/* 히어로 하단 힌트: 보라/다크 배너에서도 잘 보이게 */
+.hero-hint {
+  font-size: var(--text-sm);
+  margin-top: var(--space-2);
+  margin-bottom: 0;
+  position: relative;
+  color: #fff !important;
+  opacity: 1;
+  text-shadow: 0 1px 2px rgba(0,0,0,0.2);
+}
+.hero-hint a {
+  color: #fff !important;
+  text-decoration: underline;
+  text-underline-offset: 2px;
+  font-weight: 600;
+}
+.hero-hint a:hover { opacity: 0.9; }
 
 /* 폼 동의 (약관 링크) */
 .form-agree label { font-weight: 500; }
@@ -454,7 +469,8 @@ a.ad-slot:hover { background: #cbd5e1; }
 }
 .post-detail-meta {
   font-size: var(--text-sm);
-  color: var(--color-text-subtle);
+  color: #475569;
+  font-weight: 500;
 }
 .post-body-wrap {
   padding: var(--space-6) var(--space-8) var(--space-8);
@@ -476,9 +492,10 @@ a.ad-slot:hover { background: #cbd5e1; }
 .post-body-wrap .post-body {
   white-space: pre-wrap;
   line-height: 1.85;
-  color: var(--color-text);
-  font-size: var(--text-base);
+  color: #0f172a;
+  font-size: 1.0625rem;
   margin: 0;
+  font-weight: 400;
 }
 .comment-section {
   margin-top: 0;
