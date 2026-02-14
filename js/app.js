@@ -1,6 +1,25 @@
 (function () {
   'use strict';
 
+  var firebaseAuth = null;
+  if (window.FIREBASE_CONFIG && window.firebase) {
+    try {
+      if (!firebase.apps.length) firebase.initializeApp(window.FIREBASE_CONFIG);
+      firebaseAuth = firebase.auth();
+      firebaseAuth.onAuthStateChanged(function (user) {
+        if (user) {
+          user.getIdToken().then(function (token) {
+            setToken(token);
+            setUser({ name: user.displayName || user.email || '', email: user.email || '', uid: user.uid });
+          });
+        } else {
+          setToken(null);
+          setUser(null);
+        }
+      });
+    } catch (e) { firebaseAuth = null; }
+  }
+
   var BASE = typeof apiUrl === 'function' ? apiUrl : function (path) {
     var b = (window.API_BASE_URL || '').replace(/\/$/, '');
     var p = (path || '').replace(/^\//, '');
@@ -275,6 +294,22 @@
     },
 
     login: function (email, password, callback) {
+      if (firebaseAuth) {
+        firebaseAuth.signInWithEmailAndPassword(email, password)
+          .then(function (userCred) {
+            var user = userCred.user;
+            return user.getIdToken().then(function (token) {
+              setToken(token);
+              setUser({ name: user.displayName || user.email || '', email: user.email || '', uid: user.uid });
+              if (callback) callback(null, { user: { name: user.displayName || user.email, email: user.email } });
+            });
+          })
+          .catch(function (err) {
+            var msg = err.code === 'auth/user-not-found' ? '등록되지 않은 이메일이에요.' : err.code === 'auth/wrong-password' ? '비밀번호가 틀려요.' : err.code === 'auth/invalid-email' ? '이메일 형식을 확인해 주세요.' : (err.message || '로그인 실패');
+            if (callback) callback(msg);
+          });
+        return;
+      }
       fetch(BASE('api/auth/login'), {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
@@ -293,6 +328,24 @@
     },
 
     signup: function (name, email, password, callback) {
+      if (firebaseAuth) {
+        firebaseAuth.createUserWithEmailAndPassword(email, password)
+          .then(function (userCred) {
+            var user = userCred.user;
+            return user.updateProfile({ displayName: name }).then(function () {
+              return user.getIdToken();
+            }).then(function (token) {
+              setToken(token);
+              setUser({ name: name, email: user.email || email, uid: user.uid });
+              if (callback) callback(null, { user: { name: name, email: user.email } });
+            });
+          })
+          .catch(function (err) {
+            var msg = err.code === 'auth/email-already-in-use' ? '이미 사용 중인 이메일이에요.' : err.code === 'auth/weak-password' ? '비밀번호는 6자 이상이에요.' : err.code === 'auth/invalid-email' ? '이메일 형식을 확인해 주세요.' : (err.message || '가입 실패');
+            if (callback) callback(msg);
+          });
+        return;
+      }
       fetch(BASE('api/auth/signup'), {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
