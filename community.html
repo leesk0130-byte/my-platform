@@ -38,7 +38,7 @@
     <nav class="breadcrumb" aria-label="breadcrumb"><a href="index.html">홈</a> <span class="bc-sep">/</span> <strong>커뮤니티</strong></nav>
     <div class="hero">
       <h2>온라인 가맹점 커뮤니티</h2>
-      <p><strong>온라인 쇼핑몰·가맹점</strong>을 위한 게시판입니다. 수수료·정산·운영 정보를 나누고 질문해 보세요.</p>
+      <p>PG사마다 흩어진 정보 없이, <strong>쇼핑몰·가맹점주</strong>만을 위한 게시판입니다. 수수료·정산·운영 꿀팁을 나누고 질문해 보세요.</p>
       <p class="hero-hint"><a href="verify.html">인증된 아이디</a>로 이용하려면 4대보험 가입이력을 <a href="mailto:leesk0130@naver.com">leesk0130@naver.com</a>으로 보내 주세요.</p>
     </div>
     <section class="section community-section">
@@ -90,34 +90,46 @@
           <p class="empty-state-desc">요청하신 글을 찾을 수 없어요. 목록에서 다시 확인해 주세요.</p>
           <a href="community.html" class="btn btn-primary">목록으로</a>
         </div>
-        <div id="post-detail" class="card post-detail" style="display:none;padding:1.5rem 2rem;margin-top:1rem;">
-          <p style="margin-bottom:1rem;"><a href="community.html" class="btn btn-outline">← 목록으로</a></p>
-          <h3 id="post-detail-title" style="margin-bottom:0.5rem;"></h3>
-          <div id="post-detail-meta" class="post-meta"></div>
-          <div id="post-detail-body" class="post-body"></div>
-          <div class="comment-section" id="comment-section">
-            <h4 class="comment-section-title" id="comment-section-title">댓글 (0)</h4>
-            <ul class="comment-list" id="comment-list"></ul>
-            <form id="comment-form" class="comment-form" onsubmit="return false;">
-              <div class="form-group comment-nickname-row" id="comment-nickname-row">
-                <span class="comment-nickname-label">닉네임</span>
-                <span class="comment-nickname-value" id="comment-nickname-value">—</span>
-              </div>
-              <div class="form-group form-group-checkbox">
-                <label><input type="checkbox" id="comment-anonymous" name="comment-anonymous"> 익명으로 작성</label>
-              </div>
-              <div class="form-group">
-                <label for="comment-body">댓글</label>
-                <textarea id="comment-body" placeholder="댓글을 입력하세요" required rows="3"></textarea>
-              </div>
-              <div id="comment-error" class="msg-error" style="display:none;"></div>
-              <div class="form-actions">
-                <button type="submit" class="btn btn-primary">댓글 등록</button>
-              </div>
-            </form>
+        <div id="post-detail" class="post-detail-wrap" style="display:none;margin-top:1rem;">
+          <div class="post-detail-nav">
+            <a href="community.html" class="btn btn-outline btn-back">← 목록으로</a>
           </div>
-          <div style="margin-top:1.5rem;">
-            <a href="community.html" class="btn btn-outline">목록으로</a>
+          <article class="post-detail-card" aria-label="글 본문">
+            <header class="post-detail-header">
+              <h1 id="post-detail-title" class="post-detail-title"></h1>
+              <div id="post-detail-meta" class="post-detail-meta"></div>
+            </header>
+            <div class="post-body-wrap" aria-label="본문 내용">
+              <p class="post-body-label">본문</p>
+              <div id="post-detail-body" class="post-body"></div>
+            </div>
+          </article>
+          <section class="comment-section" id="comment-section" aria-label="댓글">
+            <h2 class="comment-section-title" id="comment-section-title">댓글 <span class="comment-count" id="comment-count">0</span></h2>
+            <ul class="comment-list" id="comment-list"></ul>
+            <div class="comment-form-wrap">
+              <p class="comment-form-label">댓글 작성</p>
+              <form id="comment-form" class="comment-form" onsubmit="return false;">
+                <div class="form-group comment-nickname-row" id="comment-nickname-row">
+                  <span class="comment-nickname-label">닉네임</span>
+                  <span class="comment-nickname-value" id="comment-nickname-value">—</span>
+                </div>
+                <div class="form-group form-group-checkbox">
+                  <label><input type="checkbox" id="comment-anonymous" name="comment-anonymous"> 익명으로 작성</label>
+                </div>
+                <div class="form-group">
+                  <label for="comment-body" class="sr-only">댓글 내용</label>
+                  <textarea id="comment-body" placeholder="댓글을 입력하세요" required rows="3"></textarea>
+                </div>
+                <div id="comment-error" class="msg-error" style="display:none;"></div>
+                <div class="form-actions">
+                  <button type="submit" class="btn btn-primary">댓글 등록</button>
+                </div>
+              </form>
+            </div>
+          </section>
+          <div class="post-detail-nav post-detail-nav-bottom">
+            <a href="community.html" class="btn btn-outline btn-back">← 목록으로</a>
           </div>
         </div>
       </div>
@@ -176,8 +188,8 @@
           var currentPostId = postId;
           window.app.getComments(currentPostId, function(err, comments) {
             window.app.renderComments('comment-list', comments);
-            var titleEl = document.getElementById('comment-section-title');
-            if (titleEl) titleEl.textContent = '댓글 (' + (comments ? comments.length : 0) + ')';
+            var countEl = document.getElementById('comment-count');
+            if (countEl) countEl.textContent = (comments ? comments.length : 0);
           });
           var commentForm = document.getElementById('comment-form');
           var nicknameEl = document.getElementById('comment-nickname-value');
@@ -208,8 +220,8 @@
                 document.getElementById('comment-body').value = '';
                 window.app.getComments(currentPostId, function(_, comments) {
                   window.app.renderComments('comment-list', comments);
-                  var titleEl = document.getElementById('comment-section-title');
-                  if (titleEl) titleEl.textContent = '댓글 (' + (comments ? comments.length : 0) + ')';
+                  var countEl = document.getElementById('comment-count');
+                  if (countEl) countEl.textContent = (comments ? comments.length : 0);
                 });
               });
             };
