@@ -80,6 +80,7 @@
       author: data.author || '익명',
       date: formatRelativeDate(new Date()),
       board: data.board || 'free',
+      hits: 0,
       verified: false,
       createdAt: new Date().toISOString()
     };
@@ -213,7 +214,7 @@
         .catch(function () {
           var local = getLocalPosts();
           var mock = MOCK_POSTS.map(function (p) { return { id: p.id, title: p.title, author: p.author, date: p.date, board: p.board || 'free', hits: p.hits, verified: p.verified }; });
-          var combined = local.map(function (p) { return { id: p.id, title: p.title, author: p.author, date: p.date, board: p.board || 'free', verified: p.verified }; }).concat(mock);
+          var combined = local.map(function (p) { return { id: p.id, title: p.title, author: p.author, date: p.date, board: p.board || 'free', hits: p.hits != null ? p.hits : 0, body: p.body, verified: p.verified }; }).concat(mock);
           var filtered = (board && board !== 'all') ? combined.filter(function (p) { return p.board === board; }) : combined;
           callback(null, filtered.slice(0, limit || 20), filtered.length);
         });
@@ -258,6 +259,13 @@
       }).join('');
     },
 
+    getNoticePosts: function (board, callback) {
+      var notices = [
+        { id: '4', title: '결제 오류 시 PG사 대응 팁 공유합니다', board: 'info', notice: true }
+      ];
+      var filtered = (!board || board === 'all') ? notices : notices.filter(function (n) { return n.board === board; });
+      if (callback) callback(null, filtered);
+    },
     getComments: getComments,
     addComment: addComment,
     addLocalComment: addLocalComment,
