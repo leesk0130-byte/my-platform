@@ -305,7 +305,8 @@
             });
           })
           .catch(function (err) {
-            var msg = err.code === 'auth/user-not-found' ? '등록되지 않은 이메일이에요.' : err.code === 'auth/wrong-password' ? '비밀번호가 틀려요.' : err.code === 'auth/invalid-email' ? '이메일 형식을 확인해 주세요.' : (err.message || '로그인 실패');
+            var code = err.code || '';
+            var msg = code === 'auth/user-not-found' ? '등록되지 않은 이메일이에요.' : code === 'auth/wrong-password' ? '비밀번호가 틀려요.' : code === 'auth/invalid-email' ? '이메일 형식을 확인해 주세요.' : code === 'auth/too-many-requests' ? '잠시 후 다시 시도해 주세요.' : code === 'auth/operation-not-allowed' ? '이메일 로그인이 설정되지 않았어요. Firebase 콘솔에서 이메일/비밀번호 사용을 켜 주세요.' : code === 'auth/unauthorized-domain' ? '이 사이트 도메인이 Firebase 허용 목록에 없어요. Firebase 콘솔 → Authentication → 설정 → 승인된 도메인에 이 주소를 추가해 주세요.' : (err.message || '로그인 실패');
             if (callback) callback(msg);
           });
         return;
@@ -341,7 +342,8 @@
             });
           })
           .catch(function (err) {
-            var msg = err.code === 'auth/email-already-in-use' ? '이미 사용 중인 이메일이에요.' : err.code === 'auth/weak-password' ? '비밀번호는 6자 이상이에요.' : err.code === 'auth/invalid-email' ? '이메일 형식을 확인해 주세요.' : (err.message || '가입 실패');
+            var code = err.code || '';
+            var msg = code === 'auth/email-already-in-use' ? '이미 사용 중인 이메일이에요.' : code === 'auth/weak-password' ? '비밀번호는 6자 이상이에요.' : code === 'auth/invalid-email' ? '이메일 형식을 확인해 주세요.' : code === 'auth/operation-not-allowed' ? '이메일 가입이 설정되지 않았어요. Firebase 콘솔에서 이메일/비밀번호 사용을 켜 주세요.' : code === 'auth/unauthorized-domain' ? '이 사이트 도메인이 Firebase 허용 목록에 없어요. Firebase 콘솔 → Authentication → 설정 → 승인된 도메인에 이 주소를 추가해 주세요.' : (err.message || '가입 실패');
             if (callback) callback(msg);
           });
         return;

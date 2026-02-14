@@ -152,8 +152,9 @@
             <label><input type="checkbox" name="remember"> 로그인 유지</label>
             <a href="mailto:leesk0130@naver.com?subject=가맹점숲 비밀번호 찾기">비밀번호 찾기</a>
           </div>
+          <div id="login-error" class="msg-error" style="display:none;"></div>
           <div class="modal-footer">
-            <button type="submit" class="btn btn-primary">로그인</button>
+            <button type="submit" class="btn btn-primary" id="login-submit-btn">로그인</button>
           </div>
         </form>
         <p class="modal-switch">아직 회원이 아니신가요? <a href="javascript:void(0)" onclick="closeModal('loginModal'); openModal('signupModal');">회원가입</a></p>
@@ -190,8 +191,9 @@
             <label><input type="checkbox" required> <a href="terms.html" target="_blank" rel="noopener">이용약관</a> 및 <a href="privacy.html" target="_blank" rel="noopener">개인정보처리방침</a>에 동의합니다.</label>
           </div>
           <div id="signup-error" class="msg-error" style="display:none;"></div>
+          <div id="signup-success" class="msg-success" style="display:none;"></div>
           <div class="modal-footer">
-            <button type="submit" class="btn btn-primary">가입하기</button>
+            <button type="submit" class="btn btn-primary" id="signup-submit-btn">가입하기</button>
           </div>
         </form>
         <p class="modal-switch">이미 회원이신가요? <a href="javascript:void(0)" onclick="closeModal('signupModal'); openModal('loginModal');">로그인</a></p>
@@ -251,18 +253,34 @@
       el.addEventListener('click', function(e) { if (e.target === el) closeModal(el.id); });
     });
     var loginForm = document.querySelector('#loginModal form');
+    var loginErrorEl = document.getElementById('login-error');
+    var loginBtn = document.getElementById('login-submit-btn');
     if (loginForm) {
       loginForm.addEventListener('submit', function(e) {
         e.preventDefault();
-        var email = document.getElementById('login-email').value;
+        var email = document.getElementById('login-email').value.trim();
         var pw = document.getElementById('login-pw').value;
+        if (loginErrorEl) { loginErrorEl.style.display = 'none'; loginErrorEl.textContent = ''; }
+        if (!email || !pw) {
+          if (loginErrorEl) { loginErrorEl.textContent = '이메일과 비밀번호를 입력해 주세요.'; loginErrorEl.style.display = 'block'; }
+          return;
+        }
+        if (loginBtn) { loginBtn.disabled = true; loginBtn.textContent = '로그인 중...'; }
         window.app.login(email, pw, function(err) {
-          if (err) { alert(err); return; }
+          if (loginBtn) { loginBtn.disabled = false; loginBtn.textContent = '로그인'; }
+          if (err) {
+            if (loginErrorEl) { loginErrorEl.textContent = err; loginErrorEl.style.display = 'block'; }
+            return;
+          }
           closeModal('loginModal');
+          if (loginErrorEl) loginErrorEl.style.display = 'none';
         });
       });
     }
     var signupForm = document.getElementById('signupForm');
+    var signupErrorEl = document.getElementById('signup-error');
+    var signupSuccessEl = document.getElementById('signup-success');
+    var signupBtn = document.getElementById('signup-submit-btn');
     if (signupForm) {
       signupForm.addEventListener('submit', function(e) {
         e.preventDefault();
@@ -270,15 +288,30 @@
         var email = document.getElementById('signup-email').value.trim();
         var pw = document.getElementById('signup-pw').value;
         var pw2 = document.getElementById('signup-pw2').value;
-        var errEl = document.getElementById('signup-error');
-        if (!name) { errEl.textContent = '이름 또는 닉네임을 입력해 주세요.'; errEl.style.display = 'block'; return; }
-        if (!email) { errEl.textContent = '이메일을 입력해 주세요.'; errEl.style.display = 'block'; return; }
-        if (pw.length < 8) { errEl.textContent = '비밀번호는 8자 이상이어야 해요.'; errEl.style.display = 'block'; return; }
-        if (pw !== pw2) { errEl.textContent = '비밀번호가 일치하지 않아요.'; errEl.style.display = 'block'; return; }
-        errEl.style.display = 'none';
+        if (signupErrorEl) signupErrorEl.style.display = 'none';
+        if (signupSuccessEl) signupSuccessEl.style.display = 'none';
+        if (!name) { if (signupErrorEl) { signupErrorEl.textContent = '이름 또는 닉네임을 입력해 주세요.'; signupErrorEl.style.display = 'block'; } return; }
+        if (!email) { if (signupErrorEl) { signupErrorEl.textContent = '이메일을 입력해 주세요.'; signupErrorEl.style.display = 'block'; } return; }
+        if (pw.length < 8) { if (signupErrorEl) { signupErrorEl.textContent = '비밀번호는 8자 이상이어야 해요.'; signupErrorEl.style.display = 'block'; } return; }
+        if (pw !== pw2) { if (signupErrorEl) { signupErrorEl.textContent = '비밀번호가 일치하지 않아요.'; signupErrorEl.style.display = 'block'; } return; }
+        if (signupBtn) { signupBtn.disabled = true; signupBtn.textContent = '가입 중...'; }
         window.app.signup(name, email, pw, function(err) {
-          if (err) { errEl.textContent = err; errEl.style.display = 'block'; return; }
-          closeModal('signupModal'); errEl.style.display = 'none';
+          if (signupBtn) { signupBtn.disabled = false; signupBtn.textContent = '가입하기'; }
+          if (err) {
+            if (signupErrorEl) { signupErrorEl.textContent = err; signupErrorEl.style.display = 'block'; }
+            return;
+          }
+          if (signupSuccessEl) {
+            signupSuccessEl.textContent = '회원가입이 완료되었어요. 잠시 후 로그인 화면으로 이동합니다.';
+            signupSuccessEl.style.display = 'block';
+          }
+          setTimeout(function() {
+            closeModal('signupModal');
+            if (signupErrorEl) signupErrorEl.style.display = 'none';
+            if (signupSuccessEl) signupSuccessEl.style.display = 'none';
+            openModal('loginModal');
+            if (document.getElementById('login-email')) document.getElementById('login-email').value = email;
+          }, 1800);
         });
       });
     }

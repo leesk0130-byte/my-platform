@@ -173,6 +173,8 @@ Enter 누름.
 3. **Sign-in method** 탭에서 **이메일/비밀번호** 한 줄 클릭  
 4. **사용** 켜기 → **저장**  
 
+5. **승인된 도메인** (필수): 사이트를 **my-platform.pages.dev** 로 배포했다면, Firebase **Authentication** → **설정** 탭 → **승인된 도메인**에 `my-platform.pages.dev` 를 추가해 두어야 로그인/회원가입이 됩니다.
+
 → 이렇게 해 두면 나중에 코드에서 “Firebase 로그인 쓰자”고 바꿀 때, 백엔드 준비는 된 상태입니다.
 
 **Firestore(DB)** 나 **실제 코드 연동**은 “Firebase 연동 코드 작성해줘”라고 하시면 그때 단계별로 도와드리겠습니다.
