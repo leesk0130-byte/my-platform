@@ -157,7 +157,8 @@ header h1 a:hover { text-decoration: none; opacity: 0.9; }
 }
 .header-nav a:hover { color: #fff; }
 .header-nav a.active { color: #fff; border-bottom-color: var(--color-primary); }
-.header-auth { display: flex; gap: var(--space-2); }
+.header-auth { display: flex; align-items: center; gap: var(--space-2); }
+.header-user { font-size: var(--text-sm); font-weight: 600; color: var(--color-text); margin-right: var(--space-1); }
 .btn {
   display: inline-block;
   padding: var(--space-3) var(--space-5);

@@ -11,10 +11,12 @@
           user.getIdToken().then(function (token) {
             setToken(token);
             setUser({ name: user.displayName || user.email || '', email: user.email || '', uid: user.uid });
+            try { window.dispatchEvent(new CustomEvent('authStateChanged', { detail: { user: user } })); } catch (e) {}
           });
         } else {
           setToken(null);
           setUser(null);
+          try { window.dispatchEvent(new CustomEvent('authStateChanged')); } catch (e) {}
         }
       });
     } catch (e) { firebaseAuth = null; }
@@ -176,6 +178,12 @@
     } catch (e) { return null; }
   }
 
+  function logout() {
+    if (firebaseAuth) firebaseAuth.signOut();
+    setToken(null);
+    setUser(null);
+  }
+
   window.app = {
     apiUrl: BASE,
     getToken: getToken,
@@ -183,6 +191,7 @@
     setUser: setUser,
     getUser: getUser,
     isLoggedIn: function () { return !!getToken(); },
+    logout: logout,
 
     fetchNews: function (limit, offset, callback) {
       var url = BASE('api/news') + '?limit=' + (limit || 10) + '&offset=' + (offset || 0);

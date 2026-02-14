@@ -18,9 +18,11 @@
       <a href="must-know.html" title="꼭 알아야 할 것">꼭 알아야 할 것</a>
       <a href="community.html" title="커뮤니티">커뮤니티</a>
     </nav>
-    <div class="header-auth">
-      <button type="button" class="btn btn-outline" onclick="openModal('loginModal')">로그인</button>
-      <button type="button" class="btn btn-primary" onclick="openModal('signupModal')">회원가입</button>
+    <div class="header-auth" id="headerAuth">
+      <span class="header-user" id="headerUser" style="display:none;"></span>
+      <button type="button" class="btn btn-outline" id="headerLoginBtn" onclick="openModal('loginModal')">로그인</button>
+      <button type="button" class="btn btn-primary" id="headerSignupBtn" onclick="openModal('signupModal')">회원가입</button>
+      <button type="button" class="btn btn-outline" id="headerLogoutBtn" style="display:none;" onclick="if(window.app&&window.app.logout)window.app.logout();if(typeof updateHeaderAuth==='function')updateHeaderAuth();">로그아웃</button>
     </div>
   </header>
 
@@ -153,6 +155,7 @@
             <a href="mailto:leesk0130@naver.com?subject=가맹점숲 비밀번호 찾기">비밀번호 찾기</a>
           </div>
           <div id="login-error" class="msg-error" style="display:none;"></div>
+          <div id="login-success" class="msg-success" style="display:none;"></div>
           <div class="modal-footer">
             <button type="submit" class="btn btn-primary" id="login-submit-btn">로그인</button>
           </div>
@@ -220,7 +223,30 @@
   <script src="js/config.js"></script>
   <script src="js/app.js"></script>
   <script>
+    function updateHeaderAuth() {
+      var auth = document.getElementById('headerAuth');
+      var userEl = document.getElementById('headerUser');
+      var loginBtn = document.getElementById('headerLoginBtn');
+      var signupBtn = document.getElementById('headerSignupBtn');
+      var logoutBtn = document.getElementById('headerLogoutBtn');
+      if (!auth) return;
+      var loggedIn = window.app && window.app.isLoggedIn && window.app.isLoggedIn();
+      var user = window.app && window.app.getUser && window.app.getUser();
+      if (loggedIn && user && (userEl || loginBtn)) {
+        if (userEl) { userEl.textContent = (user.name || user.email || '회원') + '님'; userEl.style.display = 'inline'; }
+        if (loginBtn) loginBtn.style.display = 'none';
+        if (signupBtn) signupBtn.style.display = 'none';
+        if (logoutBtn) logoutBtn.style.display = 'inline-block';
+      } else {
+        if (userEl) userEl.style.display = 'none';
+        if (loginBtn) loginBtn.style.display = 'inline-block';
+        if (signupBtn) signupBtn.style.display = 'inline-block';
+        if (logoutBtn) logoutBtn.style.display = 'none';
+      }
+    }
     (function() {
+      if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', updateHeaderAuth); else updateHeaderAuth();
+      window.addEventListener('authStateChanged', updateHeaderAuth);
       if (window.app && document.getElementById('news-list')) {
         window.app.fetchNews(5, 0, function(err, items) {
           if (items && items.length) window.app.renderNews('news-list', items);
@@ -266,14 +292,24 @@
           return;
         }
         if (loginBtn) { loginBtn.disabled = true; loginBtn.textContent = '로그인 중...'; }
-        window.app.login(email, pw, function(err) {
+        window.app.login(email, pw, function(err, data) {
           if (loginBtn) { loginBtn.disabled = false; loginBtn.textContent = '로그인'; }
           if (err) {
             if (loginErrorEl) { loginErrorEl.textContent = err; loginErrorEl.style.display = 'block'; }
             return;
           }
-          closeModal('loginModal');
           if (loginErrorEl) loginErrorEl.style.display = 'none';
+          var loginSuccessEl = document.getElementById('login-success');
+          if (loginSuccessEl) {
+            var userName = (data && data.user && data.user.name) ? data.user.name : (window.app.getUser && window.app.getUser() && window.app.getUser().name) ? window.app.getUser().name : '';
+            loginSuccessEl.textContent = userName ? userName + '님, 로그인되었습니다. 환영해요!' : '로그인되었습니다. 환영해요!';
+            loginSuccessEl.style.display = 'block';
+          }
+          setTimeout(function() {
+            closeModal('loginModal');
+            if (loginSuccessEl) loginSuccessEl.style.display = 'none';
+            if (typeof updateHeaderAuth === 'function') updateHeaderAuth();
+          }, 1500);
         });
       });
     }

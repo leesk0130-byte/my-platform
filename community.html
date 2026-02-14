@@ -18,9 +18,11 @@
       <a href="must-know.html">꼭 알아야 할 것</a>
       <a href="community.html" class="active">커뮤니티</a>
     </nav>
-    <div class="header-auth">
-      <button type="button" class="btn btn-outline" onclick="openModal('loginModal')">로그인</button>
-      <button type="button" class="btn btn-primary" onclick="openModal('signupModal')">회원가입</button>
+    <div class="header-auth" id="headerAuth">
+      <span class="header-user" id="headerUser" style="display:none;"></span>
+      <button type="button" class="btn btn-outline" id="headerLoginBtn" onclick="openModal('loginModal')">로그인</button>
+      <button type="button" class="btn btn-primary" id="headerSignupBtn" onclick="openModal('signupModal')">회원가입</button>
+      <button type="button" class="btn btn-outline" id="headerLogoutBtn" style="display:none;" onclick="if(window.app&&window.app.logout)window.app.logout();if(typeof updateHeaderAuth==='function')updateHeaderAuth();">로그아웃</button>
     </div>
   </header>
 
@@ -96,7 +98,7 @@
     </section>
   </main>
 
-  <div class="modal-overlay" id="loginModal"><div class="modal"><div class="modal-header"><h3>로그인</h3><button type="button" class="modal-close" onclick="closeModal('loginModal')">&times;</button></div><div class="modal-body"><form id="loginForm" onsubmit="return false;"><div class="form-group"><label>이메일</label><input type="email" id="login-email" required></div><div class="form-group"><label>비밀번호</label><input type="password" id="login-pw" required></div><div id="login-error" class="msg-error" style="display:none;"></div><div class="modal-footer"><button type="submit" class="btn btn-primary">로그인</button></div></form><p class="modal-switch">아직 회원이 아니신가요? <a href="#" onclick="closeModal('loginModal');openModal('signupModal');">회원가입</a></p></div></div></div>
+  <div class="modal-overlay" id="loginModal"><div class="modal"><div class="modal-header"><h3>로그인</h3><button type="button" class="modal-close" onclick="closeModal('loginModal')">&times;</button></div><div class="modal-body"><form id="loginForm" onsubmit="return false;"><div class="form-group"><label>이메일</label><input type="email" id="login-email" required></div><div class="form-group"><label>비밀번호</label><input type="password" id="login-pw" required></div><div id="login-error" class="msg-error" style="display:none;"></div><div id="login-success" class="msg-success" style="display:none;"></div><div class="modal-footer"><button type="submit" class="btn btn-primary" id="login-submit-btn">로그인</button></div></form><p class="modal-switch">아직 회원이 아니신가요? <a href="#" onclick="closeModal('loginModal');openModal('signupModal');">회원가입</a></p></div></div></div>
   <div class="modal-overlay" id="signupModal"><div class="modal"><div class="modal-header"><h3>회원가입</h3><button type="button" class="modal-close" onclick="closeModal('signupModal')">&times;</button></div><div class="modal-body"><form id="signupForm" onsubmit="return false;"><div class="form-group"><label>이름</label><input type="text" id="signup-name" required></div><div class="form-group"><label>이메일</label><input type="email" id="signup-email" required></div><div class="form-group"><label>비밀번호</label><input type="password" id="signup-pw" required minlength="8"></div><div class="form-group"><label>비밀번호 확인</label><input type="password" id="signup-pw2" required></div><div class="form-group form-agree"><label><input type="checkbox" required> <a href="terms.html" target="_blank" rel="noopener">이용약관</a>·<a href="privacy.html" target="_blank" rel="noopener">개인정보처리방침</a>에 동의</label></div><div id="signup-error" class="msg-error" style="display:none;"></div><div id="signup-success" class="msg-success" style="display:none;"></div><div class="modal-footer"><button type="submit" class="btn btn-primary" id="signup-submit-btn">가입하기</button></div></form><p class="modal-switch">이미 회원이신가요? <a href="#" onclick="closeModal('signupModal');openModal('loginModal');">로그인</a></p></div></div></div>
 
   <footer>
@@ -248,18 +250,56 @@
     document.querySelectorAll('.modal-overlay').forEach(function(el) {
       el.addEventListener('click', function(e) { if (e.target === el) closeModal(el.id); });
     });
+    function updateHeaderAuth() {
+      var auth = document.getElementById('headerAuth');
+      var userEl = document.getElementById('headerUser');
+      var loginBtn = document.getElementById('headerLoginBtn');
+      var signupBtn = document.getElementById('headerSignupBtn');
+      var logoutBtn = document.getElementById('headerLogoutBtn');
+      if (!auth) return;
+      var loggedIn = window.app && window.app.isLoggedIn && window.app.isLoggedIn();
+      var user = window.app && window.app.getUser && window.app.getUser();
+      if (loggedIn && user && (userEl || loginBtn)) {
+        if (userEl) { userEl.textContent = (user.name || user.email || '회원') + '님'; userEl.style.display = 'inline'; }
+        if (loginBtn) loginBtn.style.display = 'none';
+        if (signupBtn) signupBtn.style.display = 'none';
+        if (logoutBtn) logoutBtn.style.display = 'inline-block';
+      } else {
+        if (userEl) userEl.style.display = 'none';
+        if (loginBtn) loginBtn.style.display = 'inline-block';
+        if (signupBtn) signupBtn.style.display = 'inline-block';
+        if (logoutBtn) logoutBtn.style.display = 'none';
+      }
+    }
+    window.addEventListener('authStateChanged', updateHeaderAuth);
+    if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', updateHeaderAuth); else updateHeaderAuth();
     var loginForm = document.getElementById('loginForm');
     var loginErrorEl = document.getElementById('login-error');
+    var loginSuccessEl = document.getElementById('login-success');
+    var loginBtn = document.getElementById('login-submit-btn');
     if (loginForm) {
       loginForm.addEventListener('submit', function(e) {
         e.preventDefault();
         var email = document.getElementById('login-email').value.trim();
         var pw = document.getElementById('login-pw').value;
         if (loginErrorEl) { loginErrorEl.style.display = 'none'; loginErrorEl.textContent = ''; }
+        if (loginSuccessEl) loginSuccessEl.style.display = 'none';
         if (!email || !pw) { if (loginErrorEl) { loginErrorEl.textContent = '이메일과 비밀번호를 입력해 주세요.'; loginErrorEl.style.display = 'block'; } return; }
-        window.app.login(email, pw, function(err) {
+        if (loginBtn) { loginBtn.disabled = true; loginBtn.textContent = '로그인 중...'; }
+        window.app.login(email, pw, function(err, data) {
+          if (loginBtn) { loginBtn.disabled = false; loginBtn.textContent = '로그인'; }
           if (err) { if (loginErrorEl) { loginErrorEl.textContent = err; loginErrorEl.style.display = 'block'; } return; }
-          closeModal('loginModal'); if (loginErrorEl) loginErrorEl.style.display = 'none';
+          if (loginErrorEl) loginErrorEl.style.display = 'none';
+          if (loginSuccessEl) {
+            var userName = (data && data.user && data.user.name) ? data.user.name : (window.app.getUser && window.app.getUser() && window.app.getUser().name) ? window.app.getUser().name : '';
+            loginSuccessEl.textContent = userName ? userName + '님, 로그인되었습니다. 환영해요!' : '로그인되었습니다. 환영해요!';
+            loginSuccessEl.style.display = 'block';
+          }
+          setTimeout(function() {
+            closeModal('loginModal');
+            if (loginSuccessEl) loginSuccessEl.style.display = 'none';
+            updateHeaderAuth();
+          }, 1500);
         });
       });
     }
