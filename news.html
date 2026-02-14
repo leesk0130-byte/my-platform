@@ -1,0 +1,147 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>온라인 쇼핑몰 뉴스 | 가맹점숲</title>
+  <link rel="stylesheet" href="css/common.css">
+</head>
+<body>
+  <a href="#main" class="skip-link">본문으로 건너뛰기</a>
+  <header>
+    <h1><a href="index.html">가맹점숲</a></h1>
+    <button type="button" class="nav-toggle" aria-label="메뉴 열기" aria-expanded="false" onclick="toggleNav()"><span></span><span></span><span></span></button>
+    <nav class="header-nav" id="headerNav" aria-label="메인 메뉴">
+      <a href="news.html" class="active">뉴스</a>
+      <a href="pg.html">PG 수수료</a>
+      <a href="calculator.html">수수료 계산기</a>
+      <a href="must-know.html">꼭 알아야 할 것</a>
+      <a href="community.html">커뮤니티</a>
+    </nav>
+    <div class="header-auth">
+      <button type="button" class="btn btn-outline" onclick="openModal('loginModal')">로그인</button>
+      <button type="button" class="btn btn-primary" onclick="openModal('signupModal')">회원가입</button>
+    </div>
+  </header>
+
+  <main id="main" class="container page-news">
+    <nav class="breadcrumb" aria-label="breadcrumb"><a href="index.html">홈</a> <span class="bc-sep">/</span> <strong>뉴스</strong></nav>
+    <div class="hero">
+      <h2>온라인 쇼핑몰 · 가맹점 뉴스</h2>
+      <p><strong>쇼핑몰·결제(PG)·전자상거래</strong> 관련 뉴스만 모은 코너예요. 수수료 정책, 법·제도, 가맹점 지원 소식 등을 확인하세요.</p>
+    </div>
+    <section class="section">
+      <div class="card">
+        <h3 class="section-title">최신 뉴스</h3>
+        <div id="news-loading" class="loading" style="display:none;">뉴스를 불러오는 중이에요...</div>
+        <div id="news-detail" class="news-detail" style="display:none;">
+          <h2 id="news-detail-title" class="news-detail-title"></h2>
+          <div id="news-detail-meta" class="news-detail-meta"></div>
+          <div id="news-detail-body" class="news-detail-body"></div>
+          <p style="margin-top:1.5rem;"><a href="news.html" class="btn btn-outline">목록으로</a></p>
+        </div>
+        <ul class="news-list" id="news-list"></ul>
+      </div>
+    </section>
+  </main>
+
+  <div class="modal-overlay" id="loginModal"><div class="modal"><div class="modal-header"><h3>로그인</h3><button type="button" class="modal-close" onclick="closeModal('loginModal')">&times;</button></div><div class="modal-body"><form onsubmit="return false;"><div class="form-group"><label>이메일</label><input type="email" id="login-email" required></div><div class="form-group"><label>비밀번호</label><input type="password" id="login-pw" required></div><div class="modal-footer"><button type="submit" class="btn btn-primary">로그인</button></div></form><p class="modal-switch">아직 회원이 아니신가요? <a href="#" onclick="closeModal('loginModal');openModal('signupModal');">회원가입</a></p></div></div></div>
+  <div class="modal-overlay" id="signupModal"><div class="modal"><div class="modal-header"><h3>회원가입</h3><button type="button" class="modal-close" onclick="closeModal('signupModal')">&times;</button></div><div class="modal-body"><form onsubmit="return false;"><div class="form-group"><label>이름</label><input type="text" id="signup-name" required></div><div class="form-group"><label>이메일</label><input type="email" id="signup-email" required></div><div class="form-group"><label>비밀번호</label><input type="password" id="signup-pw" required minlength="8"></div><div class="form-group"><label>비밀번호 확인</label><input type="password" id="signup-pw2" required></div><div class="form-group"><label><input type="checkbox" required> 이용약관 동의</label></div><div class="modal-footer"><button type="submit" class="btn btn-primary">가입하기</button></div></form><p class="modal-switch">이미 회원이신가요? <a href="#" onclick="closeModal('signupModal');openModal('loginModal');">로그인</a></p></div></div></div>
+
+  <footer>
+    <div class="footer-inner">
+      <p><a href="terms.html">이용약관</a> | <a href="privacy.html">개인정보처리방침</a> | <a href="verify.html">인증 안내</a></p>
+      <p>© 2025 가맹점숲. 온라인 가맹점 정보 & 커뮤니티. All rights reserved.</p>
+      <div class="footer-contact">
+        <h4>문의하기</h4>
+        <p><a href="tel:010-9694-4336">010-9694-4336</a></p>
+        <p>이수광</p>
+        <p><a href="mailto:leesk0130@naver.com">leesk0130@naver.com</a></p>
+        <p>서울특별시 동대문구 이문동 317-16 201호</p>
+      </div>
+    </div>
+  </footer>
+
+  <script src="js/config.js"></script>
+  <script src="js/app.js"></script>
+  <script>
+    (function() {
+      var params = new URLSearchParams(location.search);
+      var id = params.get('id');
+      var listEl = document.getElementById('news-list');
+      var loadingEl = document.getElementById('news-loading');
+      var detailEl = document.getElementById('news-detail');
+      if (id && window.app.getNewsById(id)) {
+        var article = window.app.getNewsById(id);
+        if (article && detailEl) {
+          document.getElementById('news-detail-title').textContent = article.title;
+          document.getElementById('news-detail-meta').textContent = (article.date || '') + (article.source ? ' · ' + article.source : '');
+          var bodyEl = document.getElementById('news-detail-body');
+          bodyEl.innerHTML = (article.body || '(내용 없음)').split(/\n\n+/).map(function(p) { return '<p class="news-detail-p">' + p.replace(/\n/g, '<br>') + '</p>'; }).join('');
+          detailEl.style.display = 'block';
+          if (listEl) listEl.style.display = 'none';
+          if (loadingEl) loadingEl.style.display = 'none';
+          return;
+        }
+      }
+      if (!listEl) return;
+      loadingEl.style.display = 'block';
+      window.app.fetchNews(20, 0, function(err, items) {
+        loadingEl.style.display = 'none';
+        if (items && items.length) {
+          window.app.renderNews('news-list', items);
+        } else {
+          listEl.innerHTML = '<li class="empty">아직 뉴스가 없어요. 서버에서 네이버 뉴스 API를 연동하면 여기에 실시간 뉴스가 표시돼요.</li>';
+        }
+      });
+    })();
+    function openModal(id) {
+      document.getElementById(id).classList.add('is-open');
+      document.body.style.overflow = 'hidden';
+    }
+    function closeModal(id) {
+      document.getElementById(id).classList.remove('is-open');
+      document.body.style.overflow = '';
+    }
+    document.querySelectorAll('.modal-overlay').forEach(function(el) {
+      el.addEventListener('click', function(e) { if (e.target === el) closeModal(el.id); });
+    });
+    var loginForm = document.querySelector('#loginModal form');
+    if (loginForm) {
+      loginForm.addEventListener('submit', function(e) {
+        e.preventDefault();
+        var email = loginForm.querySelector('input[type=email]').value;
+        var pw = loginForm.querySelector('input[type=password]').value;
+        window.app.login(email, pw, function(err) {
+          if (err) { alert(err); return; }
+          closeModal('loginModal');
+        });
+      });
+    }
+    var signupForm = document.querySelector('#signupModal form');
+    if (signupForm) {
+      signupForm.addEventListener('submit', function(e) {
+        e.preventDefault();
+        var inputs = signupForm.querySelectorAll('input');
+        var name = inputs[0].value;
+        var email = inputs[1].value;
+        var pw = inputs[2].value;
+        var pw2 = inputs[3].value;
+        if (pw !== pw2) { alert('비밀번호가 일치하지 않아요.'); return; }
+        window.app.signup(name, email, pw, function(err) {
+          if (err) { alert(err); return; }
+          closeModal('signupModal');
+        });
+      });
+    }
+    function toggleNav() {
+      var nav = document.getElementById('headerNav');
+      var btn = document.querySelector('.nav-toggle');
+      if (!nav || !btn) return;
+      var open = nav.classList.toggle('is-open');
+      btn.setAttribute('aria-expanded', open);
+      btn.setAttribute('aria-label', open ? '메뉴 닫기' : '메뉴 열기');
+    }
+  </script>
+</body>
+</html>

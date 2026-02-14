@@ -1,0 +1,333 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>결제수수료 계산기 | 가맹점숲</title>
+  <link rel="stylesheet" href="css/common.css">
+  <style>
+    /* common.css 로드 실패 시 계산기 페이지만이라도 보이도록 필수 스타일 */
+    body { font-family: 'Pretendard', -apple-system, sans-serif; line-height: 1.65; color: #0f172a; background: #f8fafc; margin: 0; }
+    a { color: #0d9488; text-decoration: none; }
+    .container { max-width: 1200px; margin: 0 auto; padding: 0 1.5rem 2rem; }
+    header { background: #0f172a; color: #fff; padding: 1rem 1.5rem; display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 1rem; }
+    header h1 { font-size: 1.25rem; margin: 0; }
+    header h1 a { color: #fff; }
+    .header-nav { display: flex; gap: 2rem; }
+    .header-nav a { color: #94a3b8; font-weight: 500; }
+    .header-nav a:hover, .header-nav a.active { color: #fff; }
+    .header-auth { display: flex; gap: 0.5rem; }
+    .btn { display: inline-block; padding: 0.5rem 1rem; border-radius: 12px; font-size: 0.9rem; font-weight: 600; cursor: pointer; border: none; }
+    .btn-outline { background: transparent; color: #94a3b8; border: 1px solid #475569; }
+    .btn-outline:hover { background: #334155; color: #fff; }
+    .btn-primary { background: linear-gradient(135deg, #0d9488, #0f766e); color: #fff; }
+    .btn-primary:hover { opacity: 0.95; }
+    .breadcrumb { font-size: 0.875rem; color: #64748b; margin-bottom: 0.75rem; }
+    .breadcrumb a { color: #64748b; }
+    .bc-sep { margin: 0 0.25rem; color: #94a3b8; }
+    .hero { background: linear-gradient(135deg, #0d9488 0%, #0f766e 50%, #115e59 100%); color: #fff; padding: 2.5rem 2rem; border-radius: 20px; text-align: center; margin-bottom: 2rem; }
+    .hero h2 { font-size: 1.75rem; margin-bottom: 0.5rem; }
+    .hero p { opacity: 0.95; font-size: 1.05rem; margin: 0; }
+    .card { background: #fff; border-radius: 16px; box-shadow: 0 4px 20px rgba(0,0,0,0.06); overflow: hidden; }
+    .card-content { padding: 1.5rem 2rem; }
+    .section { margin-bottom: 2rem; }
+    .section-title { font-size: 1.1rem; font-weight: 700; padding: 1rem 1.25rem; border-bottom: 1px solid #f1f5f9; border-left: 4px solid #0d9488; margin: 0; }
+    .form-group { margin-bottom: 1rem; }
+    .form-group label { display: block; font-size: 0.875rem; font-weight: 600; margin-bottom: 0.35rem; color: #475569; }
+    .form-group input, .form-group select { width: 100%; padding: 0.6rem 0.85rem; border: 1px solid #e2e8f0; border-radius: 12px; font-size: 1rem; box-sizing: border-box; }
+    .form-row { display: grid; grid-template-columns: 1fr 1fr; gap: 1rem; }
+    @media (max-width: 600px) { .form-row { grid-template-columns: 1fr; } }
+    .calc-mode-tabs { display: flex; margin-bottom: 1.25rem; }
+    .calc-mode-btn { padding: 0.75rem 1.25rem; border: 1px solid #e2e8f0; background: #f8fafc; font-size: 0.875rem; font-weight: 600; cursor: pointer; border-radius: 0; }
+    .calc-mode-btn:first-child { border-radius: 12px 0 0 12px; }
+    .calc-mode-btn:last-child { border-radius: 0 12px 12px 0; border-left: none; }
+    .calc-mode-btn.active { background: #0d9488; color: #fff; border-color: #0d9488; }
+    .calc-desc { font-size: 0.875rem; color: #64748b; margin-bottom: 1rem; }
+    .calc-panel { margin-bottom: 1.5rem; }
+    .calc-fee-rates { margin-bottom: 1.5rem; padding-top: 1rem; border-top: 1px solid #f1f5f9; }
+    .calc-actions { margin-bottom: 1.5rem; }
+    .calc-result { padding: 1.5rem; background: #f0fdfa; border: 1px solid #99f6e4; border-radius: 12px; }
+    .calc-result-title { font-size: 1.1rem; font-weight: 700; margin-bottom: 1rem; color: #0f766e; }
+    .calc-result-list { display: grid; grid-template-columns: auto 1fr; gap: 0.5rem 1.5rem; align-items: baseline; }
+    .calc-result-list dt { font-weight: 600; color: #475569; }
+    .calc-result-list dd { margin: 0; font-weight: 600; color: #0f172a; }
+    .calc-result-list dt.calc-result-total, .calc-result-list dd.calc-result-total { font-size: 1.1rem; margin-top: 0.5rem; padding-top: 0.5rem; border-top: 1px solid #99f6e4; color: #0f766e; }
+    .calc-result-list dd .calc-result-kr { display: block; font-size: 0.875rem; font-weight: 500; color: #64748b; margin-top: 0.25rem; }
+    footer { background: #0f172a; color: #94a3b8; padding: 2rem 1.5rem; margin-top: 2.5rem; font-size: 0.875rem; }
+    .footer-inner { max-width: 1200px; margin: 0 auto; text-align: center; }
+    .footer-inner a { color: #cbd5e1; }
+    .footer-contact { margin-top: 2rem; padding-top: 1.5rem; border-top: 1px solid #334155; }
+    .footer-contact h4 { font-size: 0.875rem; font-weight: 700; color: #fff; margin-bottom: 1rem; }
+    .footer-contact p { margin: 0.25rem 0; font-size: 0.875rem; }
+    /* 입력창 안에 숫자 오른쪽에 한글 금액 (같은 창으로 보이게) */
+    .input-with-kr {
+      display: flex;
+      align-items: center;
+      border: 1px solid #e2e8f0;
+      border-radius: 12px;
+      background: #fff;
+      padding: 0 1rem;
+      min-height: 2.75rem;
+      box-sizing: border-box;
+    }
+    .input-with-kr input {
+      flex: 1;
+      min-width: 0;
+      border: none;
+      background: none;
+      padding: 0.65rem 0;
+      font-size: 1rem;
+    }
+    .input-with-kr input:focus { outline: none; }
+    .calc-input-kr {
+      font-size: 0.875rem;
+      color: #64748b;
+      opacity: 0.7;
+      white-space: nowrap;
+      margin-left: 0.5rem;
+    }
+  </style>
+</head>
+<body>
+  <a href="#main" class="skip-link">본문으로 건너뛰기</a>
+  <header>
+    <h1><a href="index.html">가맹점숲</a></h1>
+    <button type="button" class="nav-toggle" aria-label="메뉴 열기" aria-expanded="false" onclick="toggleNav()"><span></span><span></span><span></span></button>
+    <nav class="header-nav" id="headerNav" aria-label="메인 메뉴">
+      <a href="news.html">뉴스</a>
+      <a href="pg.html">PG 수수료</a>
+      <a href="calculator.html" class="active">수수료 계산기</a>
+      <a href="must-know.html">꼭 알아야 할 것</a>
+      <a href="community.html">커뮤니티</a>
+    </nav>
+    <div class="header-auth">
+      <button type="button" class="btn btn-outline" onclick="openModal('loginModal')">로그인</button>
+      <button type="button" class="btn btn-primary" onclick="openModal('signupModal')">회원가입</button>
+    </div>
+  </header>
+
+  <main id="main" class="container page-calculator">
+    <nav class="breadcrumb" aria-label="breadcrumb"><a href="index.html">홈</a> <span class="bc-sep">/</span> <strong>결제수수료 계산기</strong></nav>
+    <div class="hero">
+      <h2>결제수수료 계산기</h2>
+      <p>총 거래액과 <strong>카드/현금 비율</strong> 또는 <strong>카드·현금 금액</strong>을 넣으면 PG 수수료를 바로 계산해 드려요.</p>
+      <p class="hero-hint">월 매출에서 카드·현금 비율과 수수료율만 입력하면 예상 수수료가 나옵니다. PG사 비교할 때 참고하세요.</p>
+    </div>
+
+    <section class="section">
+      <div class="card card-content">
+        <div class="calc-mode-tabs">
+          <button type="button" class="calc-mode-btn active" data-mode="ratio">비율로 입력</button>
+          <button type="button" class="calc-mode-btn" data-mode="amount">금액으로 입력</button>
+        </div>
+
+        <div id="calc-ratio" class="calc-panel">
+          <p class="calc-desc">총 거래액과 카드·현금 비율(%)을 입력하세요. (비율 합 100%)</p>
+          <div class="form-group">
+            <label for="total-amount">총 거래액 (원)</label>
+            <div class="input-with-kr">
+              <input type="text" id="total-amount" inputmode="numeric" placeholder="예: 10,000,000" autocomplete="off">
+              <span class="calc-input-kr" id="total-amount-kr" aria-hidden="true"></span>
+            </div>
+          </div>
+          <div class="form-row">
+            <div class="form-group">
+              <label for="card-ratio">카드 비율 (%)</label>
+              <input type="number" id="card-ratio" placeholder="예: 70" min="0" max="100" step="0.1" value="70">
+            </div>
+            <div class="form-group">
+              <label for="cash-ratio">현금·실시간이체 비율 (%)</label>
+              <input type="number" id="cash-ratio" placeholder="예: 30" min="0" max="100" step="0.1" value="30">
+            </div>
+          </div>
+        </div>
+
+        <div id="calc-amount" class="calc-panel" style="display:none;">
+          <p class="calc-desc">카드 거래액과 현금(실시간이체 등) 거래액을 직접 입력하세요.</p>
+          <div class="form-row">
+            <div class="form-group">
+              <label for="card-amount">카드 거래액 (원)</label>
+              <div class="input-with-kr">
+                <input type="text" id="card-amount" inputmode="numeric" placeholder="예: 7,000,000" autocomplete="off">
+                <span class="calc-input-kr" id="card-amount-kr" aria-hidden="true"></span>
+              </div>
+            </div>
+            <div class="form-group">
+              <label for="cash-amount">현금·실시간이체 거래액 (원)</label>
+              <div class="input-with-kr">
+                <input type="text" id="cash-amount" inputmode="numeric" placeholder="예: 3,000,000" autocomplete="off">
+                <span class="calc-input-kr" id="cash-amount-kr" aria-hidden="true"></span>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div class="calc-fee-rates">
+          <p class="calc-desc">본인 PG 계약 조건에 맞는 수수료율(%)을 입력하세요. <a href="pg.html">PG 수수료 참고</a></p>
+          <div class="form-row">
+            <div class="form-group">
+              <label for="card-rate">카드 수수료율 (%)</label>
+              <input type="number" id="card-rate" placeholder="예: 3.2" min="0" max="100" step="0.01" value="3.2">
+            </div>
+            <div class="form-group">
+              <label for="cash-rate">현금·실시간이체 수수료율 (%)</label>
+              <input type="number" id="cash-rate" placeholder="예: 2" min="0" max="100" step="0.01" value="2">
+            </div>
+          </div>
+        </div>
+
+        <div class="calc-actions">
+          <button type="button" class="btn btn-primary" id="calc-do">수수료 계산하기</button>
+        </div>
+
+        <div id="calc-result" class="calc-result" style="display:none;">
+          <h4 class="calc-result-title">계산 결과</h4>
+          <dl class="calc-result-list">
+            <dt>총 거래액</dt>
+            <dd id="result-total-amount">0원</dd>
+            <dt>카드 거래액</dt>
+            <dd id="result-card-amount">0원</dd>
+            <dt>현금·실시간이체 거래액</dt>
+            <dd id="result-cash-amount">0원</dd>
+            <dt>카드 수수료</dt>
+            <dd id="result-card-fee">0원</dd>
+            <dt>현금 수수료</dt>
+            <dd id="result-cash-fee">0원</dd>
+            <dt class="calc-result-total">총 수수료</dt>
+            <dd class="calc-result-total" id="result-total-fee">0원</dd>
+            <dt>실 수령 예상</dt>
+            <dd id="result-net">0원</dd>
+          </dl>
+        </div>
+      </div>
+    </section>
+  </main>
+
+  <footer>
+    <div class="footer-inner">
+      <p><a href="terms.html">이용약관</a> | <a href="privacy.html">개인정보처리방침</a> | <a href="verify.html">인증 안내</a></p>
+      <p>© 2025 가맹점숲. All rights reserved.</p>
+      <div class="footer-contact">
+        <h4>문의하기</h4>
+        <p><a href="tel:010-9694-4336">010-9694-4336</a></p>
+        <p>이수광</p>
+        <p><a href="mailto:leesk0130@naver.com">leesk0130@naver.com</a></p>
+        <p>서울특별시 동대문구 이문동 317-16 201호</p>
+      </div>
+    </div>
+  </footer>
+
+  <script src="js/config.js"></script>
+  <script src="js/app.js"></script>
+  <script>
+    (function() {
+      var btns = document.querySelectorAll('.calc-mode-btn');
+      btns.forEach(function(btn) {
+        btn.addEventListener('click', function() {
+          var mode = btn.getAttribute('data-mode');
+          btns.forEach(function(b) { b.classList.remove('active'); });
+          btn.classList.add('active');
+          document.getElementById('calc-ratio').style.display = mode === 'ratio' ? 'block' : 'none';
+          document.getElementById('calc-amount').style.display = mode === 'amount' ? 'block' : 'none';
+        });
+      });
+
+      function toNum(val) {
+        var n = parseFloat(String(val).replace(/,/g, ''), 10);
+        return isNaN(n) ? 0 : n;
+      }
+      function formatWithComma(val) {
+        var digits = String(val).replace(/\D/g, '');
+        if (digits === '') return '';
+        var n = parseInt(digits, 10);
+        return isNaN(n) ? '' : n.toLocaleString('ko-KR');
+      }
+      function toKoreanAmount(n) {
+        n = Math.floor(n);
+        if (n >= 1e8) {
+          var eok = Math.floor(n / 1e8);
+          var man = Math.floor((n % 1e8) / 1e4);
+          var rest = n % 1e4;
+          var s = eok + '억';
+          if (man > 0) s += ' ' + man.toLocaleString('ko-KR') + '만';
+          if (rest > 0) s += ' ' + rest.toLocaleString('ko-KR');
+          return s + '원';
+        }
+        if (n >= 1e4) {
+          var man = Math.floor(n / 1e4);
+          var rest = n % 1e4;
+          var s = man.toLocaleString('ko-KR') + '만';
+          if (rest > 0) s += ' ' + rest.toLocaleString('ko-KR');
+          return s + '원';
+        }
+        return n.toLocaleString('ko-KR') + '원';
+      }
+
+      function updateAmountKr(inputId) {
+        var el = document.getElementById(inputId);
+        var krEl = document.getElementById(inputId + '-kr');
+        if (!el || !krEl) return;
+        var n = toNum(el.value);
+        krEl.textContent = n > 0 ? toKoreanAmount(n) : '';
+      }
+      var amountInputIds = ['total-amount', 'card-amount', 'cash-amount'];
+      amountInputIds.forEach(function(id) {
+        var el = document.getElementById(id);
+        if (!el) return;
+        el.addEventListener('input', function() {
+          this.value = formatWithComma(this.value);
+          this.setSelectionRange(this.value.length, this.value.length);
+          updateAmountKr(id);
+        });
+        updateAmountKr(id);
+      });
+
+      document.getElementById('calc-do').addEventListener('click', function() {
+        var isRatio = document.querySelector('.calc-mode-btn.active').getAttribute('data-mode') === 'ratio';
+        var totalAmount = 0, cardAmount = 0, cashAmount = 0;
+        if (isRatio) {
+          totalAmount = toNum(document.getElementById('total-amount').value);
+          var cardRatio = toNum(document.getElementById('card-ratio').value);
+          var cashRatio = toNum(document.getElementById('cash-ratio').value);
+          if (totalAmount <= 0) { alert('총 거래액을 입력해 주세요.'); return; }
+          if (Math.abs(cardRatio + cashRatio - 100) > 0.01) { alert('카드 비율과 현금 비율의 합이 100%가 되어야 해요.'); return; }
+          cardAmount = Math.round(totalAmount * cardRatio / 100);
+          cashAmount = totalAmount - cardAmount;
+        } else {
+          cardAmount = toNum(document.getElementById('card-amount').value);
+          cashAmount = toNum(document.getElementById('cash-amount').value);
+          totalAmount = cardAmount + cashAmount;
+          if (totalAmount <= 0) { alert('카드 또는 현금 거래액을 입력해 주세요.'); return; }
+        }
+        var cardRate = toNum(document.getElementById('card-rate').value) / 100;
+        var cashRate = toNum(document.getElementById('cash-rate').value) / 100;
+        var cardFee = Math.round(cardAmount * cardRate);
+        var cashFee = Math.round(cashAmount * cashRate);
+        var totalFee = cardFee + cashFee;
+        var net = totalAmount - totalFee;
+        function fmt(n) { return n.toLocaleString('ko-KR') + '원'; }
+        function setResult(id, n) {
+          var el = document.getElementById(id);
+          el.innerHTML = fmt(n) + '<span class="calc-result-kr">' + toKoreanAmount(n) + '</span>';
+        }
+        setResult('result-total-amount', totalAmount);
+        setResult('result-card-amount', cardAmount);
+        setResult('result-cash-amount', cashAmount);
+        setResult('result-card-fee', cardFee);
+        setResult('result-cash-fee', cashFee);
+        setResult('result-total-fee', totalFee);
+        setResult('result-net', net);
+        document.getElementById('calc-result').style.display = 'block';
+      });
+    })();
+    function toggleNav() {
+      var nav = document.getElementById('headerNav');
+      var btn = document.querySelector('.nav-toggle');
+      if (!nav || !btn) return;
+      var open = nav.classList.toggle('is-open');
+      btn.setAttribute('aria-expanded', open);
+      btn.setAttribute('aria-label', open ? '메뉴 닫기' : '메뉴 열기');
+    }
+  </script>
+</body>
+</html>

@@ -1,0 +1,293 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>가맹점숲 | 온라인 가맹점 정보 & 커뮤니티</title>
+  <link rel="stylesheet" href="css/common.css">
+</head>
+<body>
+  <a href="#main" class="skip-link">본문으로 건너뛰기</a>
+  <header>
+    <h1><a href="index.html" title="홈으로">가맹점숲</a></h1>
+    <button type="button" class="nav-toggle" aria-label="메뉴 열기" aria-expanded="false" onclick="toggleNav()"><span></span><span></span><span></span></button>
+    <nav class="header-nav" id="headerNav" aria-label="메인 메뉴">
+      <a href="news.html" title="온라인 쇼핑몰 뉴스">뉴스</a>
+      <a href="pg.html" title="PG 수수료 안내">PG 수수료</a>
+      <a href="calculator.html" title="결제수수료 계산기">수수료 계산기</a>
+      <a href="must-know.html" title="꼭 알아야 할 것">꼭 알아야 할 것</a>
+      <a href="community.html" title="커뮤니티">커뮤니티</a>
+    </nav>
+    <div class="header-auth">
+      <button type="button" class="btn btn-outline" onclick="openModal('loginModal')">로그인</button>
+      <button type="button" class="btn btn-primary" onclick="openModal('signupModal')">회원가입</button>
+    </div>
+  </header>
+
+  <!-- 상단 배너: 클릭 시 해당 페이지로 이동. 광고 배치 시 href를 광고주 URL로 변경하세요. -->
+  <a href="#" class="ad-slot ad-banner" target="_blank" rel="noopener noreferrer" id="top-banner" title="배너 클릭 시 연결 페이지로 이동">
+    광고 영역 (728×90 권장) · 클릭 시 연결 페이지로 이동
+  </a>
+  <a href="calculator.html" class="promo-banner" title="결제수수료 계산기">
+    <span class="promo-banner-label">사장님 필수</span>
+    <strong>결제수수료 계산기</strong> — 카드/현금 비율·금액 넣으면 수수료 한 번에 계산
+  </a>
+
+  <main id="main" class="container">
+    <section class="intro-block" aria-label="가맹점숲 소개">
+      <h2 class="intro-title">가맹점숲이란?</h2>
+      <p class="intro-desc">온라인 쇼핑몰·스토어를 운영하시나요? <strong>가맹점숲</strong>은 결제 수수료(PG) 정보, 쇼핑몰 뉴스, 꼭 알아야 할 법·제도, 그리고 같은 고민을 나누는 <strong>커뮤니티</strong>를 한곳에 모아 둔 곳이에요. 회원가입 없이도 뉴스·수수료·계산기를 이용할 수 있고, 커뮤니티 글쓰기는 닉네임만 입력하면 됩니다.</p>
+    </section>
+    <div class="hero">
+      <h2>온라인 가맹점을 위한 정보 플랫폼</h2>
+      <p>PG 수수료, 쇼핑몰 뉴스, 필수 정보를 한곳에서. 온라인 가맹점 커뮤니티와 함께하세요.</p>
+      <div class="hero-cta">
+        <a href="news.html" class="btn btn-hero">뉴스 보기</a>
+        <a href="pg.html" class="btn btn-hero">PG 수수료</a>
+        <a href="calculator.html" class="btn btn-hero">수수료 계산기</a>
+        <a href="must-know.html" class="btn btn-hero">꼭 알아야 할 것</a>
+        <a href="community.html" class="btn btn-hero">커뮤니티</a>
+      </div>
+    </div>
+
+    <div class="main-layout">
+      <div class="main-content">
+        <!-- 메인: 최신 뉴스 (온라인 쇼핑몰 관련) -->
+        <section class="section" id="news">
+          <div class="card">
+            <h3 class="section-title">
+              최신 뉴스 <span class="section-title-sub">온라인 쇼핑몰 · 가맹점</span>
+              <a href="news.html">더보기</a>
+            </h3>
+            <ul class="news-list" id="news-list"></ul>
+          </div>
+        </section>
+
+        <!-- 메인: 커뮤니티 최신글 -->
+        <section class="section" id="community-preview">
+          <div class="card">
+            <h3 class="section-title">
+              커뮤니티 최신글
+              <a href="community.html">전체보기</a>
+            </h3>
+            <ul class="feed-list" id="community-list"></ul>
+          </div>
+        </section>
+
+        <!-- 본문 중간 광고 슬롯 -->
+        <div class="ad-slot ad-banner" style="margin: 1.5rem 0;">광고 영역 (728×90)</div>
+
+        <!-- 꼭 알아야 할 것 -->
+        <section class="section" id="must-know">
+          <div class="card">
+            <h3 class="section-title">온라인 쇼핑몰이 꼭 알아야 할 것</h3>
+            <ul class="must-know-list">
+              <li><a href="must-know.html">전자상거래법 준수 사항 (표시의무, 청약철회 등)</a></li>
+              <li><a href="must-know.html">전자세금계산서·현금영수증 의무 발행</a></li>
+              <li><a href="pg.html">PG 계약 시 확인할 수수료·정산 주기</a></li>
+              <li><a href="must-know.html">개인정보처리방침·이용약관 필수 게시</a></li>
+              <li><a href="must-know.html">결제 보안(PCI-DSS, SSL) 기본 개념</a></li>
+              <li><a href="must-know.html">소상공인 결제 수수료 지원 제도</a></li>
+            </ul>
+          </div>
+        </section>
+
+        <!-- 커뮤니티 칸 (게시판 탭 + 로그인 유도) -->
+        <section class="section community-section" id="community">
+          <div class="card">
+            <div class="board-tabs">
+              <a href="community.html" class="active">전체</a>
+              <a href="community.html?board=free">자유게시판</a>
+              <a href="community.html?board=fee">수수료/정산</a>
+              <a href="community.html?board=qna">질문답변</a>
+              <a href="community.html?board=info">정보공유</a>
+            </div>
+            <ul class="feed-list" id="community-list-main"></ul>
+            <div class="board-actions">
+              <a href="write.html" class="btn btn-primary">글쓰기</a>
+              <span class="board-actions-divider">|</span>
+              <button type="button" class="btn btn-outline" onclick="openModal('loginModal')">로그인</button>
+              <button type="button" class="btn btn-outline" onclick="openModal('signupModal')">회원가입</button>
+            </div>
+          </div>
+        </section>
+      </div>
+
+      <!-- 사이드바: 광고 + 빠른 링크 -->
+      <aside>
+        <div class="ad-slot ad-sidebar" style="margin-bottom: 1.5rem;">광고 영역 (300×250)</div>
+        <div class="card sidebar-card">
+          <h3 class="section-title section-title-plain">바로가기</h3>
+          <ul class="must-know-list" style="padding: 0;">
+            <li><a href="news.html">최신 뉴스</a></li>
+            <li><a href="pg.html">PG 수수료</a></li>
+            <li><a href="calculator.html">수수료 계산기</a></li>
+            <li><a href="must-know.html">꼭 알아야 할 것</a></li>
+            <li><a href="community.html">커뮤니티</a></li>
+          </ul>
+        </div>
+        <div class="ad-slot ad-sidebar" style="margin-top: 1.5rem;">광고 영역 (300×250)</div>
+      </aside>
+    </div>
+  </main>
+
+  <!-- 로그인 모달 -->
+  <div class="modal-overlay" id="loginModal" aria-hidden="true">
+    <div class="modal">
+      <div class="modal-header">
+        <h3>로그인</h3>
+        <button type="button" class="modal-close" onclick="closeModal('loginModal')" aria-label="닫기">&times;</button>
+      </div>
+      <div class="modal-body">
+        <form onsubmit="return false;">
+          <div class="form-group">
+            <label for="login-email">이메일</label>
+            <input type="email" id="login-email" placeholder="example@email.com" required>
+          </div>
+          <div class="form-group">
+            <label for="login-pw">비밀번호</label>
+            <input type="password" id="login-pw" placeholder="비밀번호" required>
+          </div>
+          <div class="form-options">
+            <label><input type="checkbox" name="remember"> 로그인 유지</label>
+            <a href="mailto:leesk0130@naver.com?subject=가맹점숲 비밀번호 찾기">비밀번호 찾기</a>
+          </div>
+          <div class="modal-footer">
+            <button type="submit" class="btn btn-primary">로그인</button>
+          </div>
+        </form>
+        <p class="modal-switch">아직 회원이 아니신가요? <a href="javascript:void(0)" onclick="closeModal('loginModal'); openModal('signupModal');">회원가입</a></p>
+      </div>
+    </div>
+  </div>
+
+  <!-- 회원가입 모달 -->
+  <div class="modal-overlay" id="signupModal" aria-hidden="true">
+    <div class="modal">
+      <div class="modal-header">
+        <h3>회원가입</h3>
+        <button type="button" class="modal-close" onclick="closeModal('signupModal')" aria-label="닫기">&times;</button>
+      </div>
+      <div class="modal-body">
+        <form id="signupForm" onsubmit="return false;">
+          <div class="form-group">
+            <label for="signup-name">이름 또는 닉네임</label>
+            <input type="text" id="signup-name" placeholder="커뮤니티에 표시될 이름" required autocomplete="name">
+          </div>
+          <div class="form-group">
+            <label for="signup-email">이메일</label>
+            <input type="email" id="signup-email" placeholder="example@email.com" required autocomplete="email">
+          </div>
+          <div class="form-group">
+            <label for="signup-pw">비밀번호</label>
+            <input type="password" id="signup-pw" placeholder="8자 이상 입력" required minlength="8" autocomplete="new-password">
+          </div>
+          <div class="form-group">
+            <label for="signup-pw2">비밀번호 확인</label>
+            <input type="password" id="signup-pw2" placeholder="비밀번호 다시 입력" required autocomplete="new-password">
+          </div>
+          <div class="form-group form-agree">
+            <label><input type="checkbox" required> <a href="terms.html" target="_blank" rel="noopener">이용약관</a> 및 <a href="privacy.html" target="_blank" rel="noopener">개인정보처리방침</a>에 동의합니다.</label>
+          </div>
+          <div id="signup-error" class="msg-error" style="display:none;"></div>
+          <div class="modal-footer">
+            <button type="submit" class="btn btn-primary">가입하기</button>
+          </div>
+        </form>
+        <p class="modal-switch">이미 회원이신가요? <a href="javascript:void(0)" onclick="closeModal('signupModal'); openModal('loginModal');">로그인</a></p>
+      </div>
+    </div>
+  </div>
+
+  <footer>
+    <div class="footer-inner">
+      <p><a href="terms.html">이용약관</a> | <a href="privacy.html">개인정보처리방침</a> | <a href="verify.html">인증 안내</a></p>
+      <p>© 2025 가맹점숲. 온라인 가맹점 정보 & 커뮤니티. All rights reserved.</p>
+      <div class="footer-contact">
+        <h4>문의하기</h4>
+        <p><a href="tel:010-9694-4336">010-9694-4336</a></p>
+        <p>이수광</p>
+        <p><a href="mailto:leesk0130@naver.com">leesk0130@naver.com</a></p>
+        <p>서울특별시 동대문구 이문동 317-16 201호</p>
+      </div>
+    </div>
+  </footer>
+
+  <script src="js/config.js"></script>
+  <script src="js/app.js"></script>
+  <script>
+    (function() {
+      if (window.app && document.getElementById('news-list')) {
+        window.app.fetchNews(5, 0, function(err, items) {
+          if (items && items.length) window.app.renderNews('news-list', items);
+        });
+      }
+      if (window.app && document.getElementById('community-list')) {
+        window.app.fetchPosts('all', 5, 0, function(err, items) {
+          var listEl = document.getElementById('community-list');
+          var mainEl = document.getElementById('community-list-main');
+          if (items && items.length) {
+            window.app.renderPosts('community-list', items, 'community.html?id=');
+            if (mainEl) mainEl.innerHTML = listEl.innerHTML;
+          } else {
+            var emptyHtml = '<li class="empty"><span class="empty-inline">아직 글이 없어요.</span> <a href="write.html">첫 글 쓰기</a></li>';
+            listEl.innerHTML = emptyHtml;
+            if (mainEl) mainEl.innerHTML = emptyHtml;
+          }
+        });
+      }
+    })();
+    function openModal(id) {
+      document.getElementById(id).classList.add('is-open');
+      document.body.style.overflow = 'hidden';
+    }
+    function closeModal(id) {
+      document.getElementById(id).classList.remove('is-open');
+      document.body.style.overflow = '';
+    }
+    document.querySelectorAll('.modal-overlay').forEach(function(el) {
+      el.addEventListener('click', function(e) { if (e.target === el) closeModal(el.id); });
+    });
+    var loginForm = document.querySelector('#loginModal form');
+    if (loginForm) {
+      loginForm.addEventListener('submit', function(e) {
+        e.preventDefault();
+        var email = document.getElementById('login-email').value;
+        var pw = document.getElementById('login-pw').value;
+        window.app.login(email, pw, function(err) {
+          if (err) { alert(err); return; }
+          closeModal('loginModal');
+        });
+      });
+    }
+    var signupForm = document.getElementById('signupForm');
+    if (signupForm) {
+      signupForm.addEventListener('submit', function(e) {
+        e.preventDefault();
+        var name = document.getElementById('signup-name').value.trim();
+        var email = document.getElementById('signup-email').value.trim();
+        var pw = document.getElementById('signup-pw').value;
+        var pw2 = document.getElementById('signup-pw2').value;
+        var errEl = document.getElementById('signup-error');
+        if (!name) { errEl.textContent = '이름 또는 닉네임을 입력해 주세요.'; errEl.style.display = 'block'; return; }
+        if (!email) { errEl.textContent = '이메일을 입력해 주세요.'; errEl.style.display = 'block'; return; }
+        if (pw.length < 8) { errEl.textContent = '비밀번호는 8자 이상이어야 해요.'; errEl.style.display = 'block'; return; }
+        if (pw !== pw2) { errEl.textContent = '비밀번호가 일치하지 않아요.'; errEl.style.display = 'block'; return; }
+        errEl.style.display = 'none';
+        window.app.signup(name, email, pw, function(err) {
+          if (err) { errEl.textContent = err; errEl.style.display = 'block'; return; }
+          closeModal('signupModal'); errEl.style.display = 'none';
+        });
+      });
+    }
+    function toggleNav() {
+      var nav = document.getElementById('headerNav');
+      var btn = document.querySelector('.nav-toggle');
+      if (!nav || !btn) return;
+      var open = nav.classList.toggle('is-open');
+      btn.setAttribute('aria-expanded', open);
+      btn.setAttribute('aria-label', open ? '메뉴 닫기' : '메뉴 열기');
+    }
+  </script>
+</body>
+</html>

@@ -1,0 +1,77 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>커뮤니티 인증 안내 | 가맹점숲</title>
+  <link rel="stylesheet" href="css/common.css">
+</head>
+<body>
+  <a href="#main" class="skip-link">본문으로 건너뛰기</a>
+  <header>
+    <h1><a href="index.html">가맹점숲</a></h1>
+    <button type="button" class="nav-toggle" aria-label="메뉴 열기" aria-expanded="false" onclick="toggleNav()"><span></span><span></span><span></span></button>
+    <nav class="header-nav" id="headerNav" aria-label="메인 메뉴">
+      <a href="news.html">뉴스</a>
+      <a href="pg.html">PG 수수료</a>
+      <a href="calculator.html">수수료 계산기</a>
+      <a href="must-know.html">꼭 알아야 할 것</a>
+      <a href="community.html">커뮤니티</a>
+    </nav>
+    <div class="header-auth">
+      <button type="button" class="btn btn-outline" onclick="openModal('loginModal')">로그인</button>
+      <button type="button" class="btn btn-primary" onclick="openModal('signupModal')">회원가입</button>
+    </div>
+  </header>
+
+  <main id="main" class="container page-community">
+    <nav class="breadcrumb" aria-label="breadcrumb"><a href="index.html">홈</a> <span class="bc-sep">/</span> <a href="community.html">커뮤니티</a> <span class="bc-sep">/</span> <strong>인증 안내</strong></nav>
+    <div class="hero">
+      <h2>커뮤니티 인증 안내</h2>
+      <p>인증된 회원은 아이디 옆에 <span class="verified-badge-inline" aria-hidden="true">인증</span> 마크가 표시됩니다.</p>
+    </div>
+
+    <section class="section">
+      <div class="card card-content verify-card">
+        <h3 class="section-title">인증된 아이디로 이용하고 싶다면</h3>
+        <p class="verify-desc">가맹점숲 커뮤니티에서 <strong>인증 마크</strong>를 받으려면, 아래 이메일로 <strong>4대보험 가입이력</strong>을 보내 주세요. 검토 후 해당 계정에 인증이 부여되며, 글·댓글 작성 시 아이디 옆에 인증 마크가 표시됩니다.</p>
+        <div class="verify-email-block">
+          <p class="verify-label">인증 신청 이메일</p>
+          <p class="verify-email"><a href="mailto:leesk0130@naver.com?subject=가맹점숲 인증 신청 (4대보험 가입이력)">leesk0130@naver.com</a></p>
+          <p class="verify-note">제목에 「가맹점숲 인증 신청」을 넣어 주시면 처리에 도움이 됩니다. 보내 주실 자료: 4대보험 가입이력(사업자·근로자 공통 가능). 개인정보는 인증 목적으로만 사용하며 검토 후 삭제할 수 있습니다.</p>
+        </div>
+        <p class="verify-footer-note">인증 마크는 실제 사업·근로 활동을 확인한 회원에게만 부여됩니다. 오르비 등 타 커뮤니티의 대학 서류 인증과 유사한 방식으로 운영됩니다.</p>
+      </div>
+    </section>
+  </main>
+
+  <footer>
+    <div class="footer-inner">
+      <p><a href="terms.html">이용약관</a> | <a href="privacy.html">개인정보처리방침</a> | <a href="verify.html">인증 안내</a></p>
+      <p>© 2025 가맹점숲. 온라인 가맹점 정보 & 커뮤니티. All rights reserved.</p>
+      <div class="footer-contact">
+        <h4>문의하기</h4>
+        <p><a href="tel:010-9694-4336">010-9694-4336</a></p>
+        <p>이수광</p>
+        <p><a href="mailto:leesk0130@naver.com">leesk0130@naver.com</a></p>
+        <p>서울특별시 동대문구 이문동 317-16 201호</p>
+      </div>
+    </div>
+  </footer>
+
+  <script src="js/config.js"></script>
+  <script src="js/app.js"></script>
+  <script>
+    function openModal(id) { document.getElementById(id).classList.add('is-open'); document.body.style.overflow = 'hidden'; }
+    function closeModal(id) { document.getElementById(id).classList.remove('is-open'); document.body.style.overflow = ''; }
+    function toggleNav() {
+      var nav = document.getElementById('headerNav');
+      var btn = document.querySelector('.nav-toggle');
+      if (!nav || !btn) return;
+      var open = nav.classList.toggle('is-open');
+      btn.setAttribute('aria-expanded', open);
+      btn.setAttribute('aria-label', open ? '메뉴 닫기' : '메뉴 열기');
+    }
+  </script>
+</body>
+</html>
