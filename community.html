@@ -181,7 +181,7 @@
           document.getElementById('post-detail-title').textContent = post.title;
           var metaEl = document.getElementById('post-detail-meta');
           var verified = (post.verified === true || (window.app && window.app.isAuthorVerified && window.app.isAuthorVerified(post.author)));
-          var badgeHtml = (window.app && window.app.verifiedBadgeHtml) ? window.app.verifiedBadgeHtml(verified) : '';
+          var badgeHtml = (window.app && window.app.verifiedBadgeHtml) ? window.app.verifiedBadgeHtml(verified, post.author) : '';
           metaEl.innerHTML = (post.author || '익명') + badgeHtml + ' · ' + (post.date || '');
           document.getElementById('post-detail-body').textContent = post.body || '(내용 없음)';
           detailEl.style.display = 'block';

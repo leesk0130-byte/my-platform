@@ -145,8 +145,9 @@
       });
   }
   function isAuthorVerified(author) { return VERIFIED_AUTHORS[author] === true; }
-  function verifiedBadgeHtml(verified) {
+  function verifiedBadgeHtml(verified, author) {
     if (!verified) return '';
+    if (author === '운영자') return ' <span class="operator-badge" aria-label="운영자">운영자</span>';
     return ' <span class="verified-badge" aria-label="인증된 회원">인증</span>';
   }
 
@@ -258,7 +259,7 @@
         var href = base + (p.id || '');
         var board = p.board || 'free';
         var badge = showBoardBadge ? '<span class="feed-board-badge">' + (boardLabels[board] || board) + '</span>' : '';
-        var verified = (p.verified === true || isAuthorVerified(p.author)) ? verifiedBadgeHtml(true) : '';
+        var verified = (p.verified === true || isAuthorVerified(p.author)) ? verifiedBadgeHtml(true, p.author) : '';
         var meta = (p.author ? p.author + ' · ' : '') + (p.date || '') + (p.hits != null ? ' · 조회 ' + p.hits : '') + verified;
         return '<li class="feed-item"><a href="' + href + '" class="feed-title">' + badge + (p.title || '') + '</a><span class="feed-meta">' + meta + '</span></li>';
       }).join('');
@@ -282,7 +283,7 @@
         return;
       }
       el.innerHTML = list.map(function (c) {
-        var verified = (c.verified === true || isAuthorVerified(c.author)) ? verifiedBadgeHtml(true) : '';
+        var verified = (c.verified === true || isAuthorVerified(c.author)) ? verifiedBadgeHtml(true, c.author) : '';
         return '<li class="comment-item"><div class="comment-meta">' + (c.author || '익명') + verified + ' · ' + (c.date || '') + '</div><div class="comment-body">' + (c.body || '').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/\n/g, '<br>') + '</div></li>';
       }).join('');
     },
