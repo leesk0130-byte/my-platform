@@ -10,7 +10,8 @@
         if (user) {
           user.getIdToken().then(function (token) {
             setToken(token);
-            setUser({ name: user.displayName || user.email || '', email: user.email || '', uid: user.uid });
+            var name = (user.email === OPERATOR_EMAIL) ? '운영자' : (user.displayName || user.email || '');
+            setUser({ name: name, email: user.email || '', uid: user.uid });
             try { window.dispatchEvent(new CustomEvent('authStateChanged', { detail: { user: user } })); } catch (e) {}
           });
         } else {
@@ -53,6 +54,7 @@
   };
   var COMMENTS_STORAGE_PREFIX = 'merchant_plus_comments_';
   var VERIFIED_AUTHORS = { '운영자': true };
+  var OPERATOR_EMAIL = 'leesk0130@point3.team';
 
   var STORAGE_KEY = 'merchant_plus_posts';
 
@@ -170,12 +172,15 @@
     if (t) localStorage.setItem('token', t); else localStorage.removeItem('token');
   }
   function setUser(u) {
+    if (u && u.email === OPERATOR_EMAIL) { u = Object.assign({}, u, { name: '운영자' }); }
     if (u) localStorage.setItem('user', JSON.stringify(u)); else localStorage.removeItem('user');
   }
   function getUser() {
     try {
       var u = localStorage.getItem('user');
-      return u ? JSON.parse(u) : null;
+      u = u ? JSON.parse(u) : null;
+      if (u && u.email === OPERATOR_EMAIL) { u = Object.assign({}, u, { name: '운영자' }); }
+      return u;
     } catch (e) { return null; }
   }
 

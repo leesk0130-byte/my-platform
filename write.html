@@ -109,6 +109,12 @@
         var sel = document.getElementById('write-board');
         if (sel) sel.value = board;
       }
+      var user = window.app && window.app.getUser && window.app.getUser();
+      var nicknameInput = document.getElementById('write-nickname');
+      if (user && user.name && nicknameInput && !nicknameInput.value.trim()) {
+        nicknameInput.placeholder = user.name + ' (로그인됨)';
+        nicknameInput.value = user.name;
+      }
       var form = document.getElementById('writeForm');
       var errEl = document.getElementById('write-error');
       form.addEventListener('submit', function(e) {
