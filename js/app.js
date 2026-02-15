@@ -282,7 +282,7 @@
   // 조회수 관리 함수들
   var POST_VIEWS_KEY = 'post_views_map';
   var LAST_VIEWED_KEY = 'last_viewed_map';
-  var VIEW_COOLDOWN = 30 * 60 * 1000; // 30분
+  var VIEW_COOLDOWN = 5 * 60 * 1000; // 5분으로 변경 (또는 완전 제거)
 
   function getPostViews() {
     try {
@@ -303,23 +303,10 @@
   function incrementPostViews(postId) {
     if (!postId) return false;
     
-    var now = Date.now();
-    var lastViewed = getLastViewed();
-    var lastViewTime = lastViewed[postId] || 0;
-    
-    // 쿨다운 체크 (30분 이내면 조회수 증가 안 함)
-    if (now - lastViewTime < VIEW_COOLDOWN) {
-      return false;
-    }
-    
-    // 조회수 증가
+    // 쿨다운 없이 매번 조회수 증가
     var views = getPostViews();
     views[postId] = (views[postId] || 0) + 1;
     localStorage.setItem(POST_VIEWS_KEY, JSON.stringify(views));
-    
-    // 마지막 조회 시간 업데이트
-    lastViewed[postId] = now;
-    localStorage.setItem(LAST_VIEWED_KEY, JSON.stringify(lastViewed));
     
     return true;
   }
