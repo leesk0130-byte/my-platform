@@ -1829,3 +1829,116 @@ button:focus-visible, input:focus-visible, select:focus-visible, textarea:focus-
     max-width: 280px;
   }
 }
+
+/* ===== 아코디언 컴포넌트 ===== */
+
+.accordion {
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-lg);
+  overflow: hidden;
+  background: var(--color-surface);
+}
+
+.accordion-item {
+  border-bottom: 1px solid var(--color-border-soft);
+}
+
+.accordion-item:last-child {
+  border-bottom: none;
+}
+
+.accordion-header {
+  width: 100%;
+  padding: var(--space-4) var(--space-6);
+  background: var(--color-surface);
+  border: none;
+  text-align: left;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  transition: background-color 0.2s ease;
+  font-family: inherit;
+}
+
+.accordion-header:hover {
+  background: var(--color-border-soft);
+}
+
+.accordion-header:focus {
+  outline: 2px solid var(--color-primary);
+  outline-offset: -2px;
+}
+
+.accordion-title {
+  font-size: var(--text-base);
+  font-weight: 600;
+  color: var(--color-text);
+  line-height: var(--lh-title);
+  flex: 1;
+  margin-right: var(--space-4);
+}
+
+.accordion-icon {
+  font-size: var(--text-sm);
+  color: var(--color-text-muted);
+  transition: transform 0.2s ease;
+  flex-shrink: 0;
+}
+
+.accordion-header[aria-expanded="true"] .accordion-icon {
+  transform: rotate(180deg);
+}
+
+.accordion-content {
+  max-height: 0;
+  overflow: hidden;
+  transition: max-height 0.3s ease;
+}
+
+.accordion-content.is-open {
+  max-height: 1000px; /* 충분히 큰 값 */
+}
+
+.accordion-body {
+  padding: var(--space-6);
+  background: var(--color-border-soft);
+  border-top: 1px solid var(--color-border);
+}
+
+.accordion-body p {
+  margin-bottom: var(--space-4);
+  line-height: var(--lh-body);
+  color: var(--color-text);
+}
+
+.accordion-body p:last-child {
+  margin-bottom: 0;
+}
+
+.accordion-body .btn {
+  margin-top: var(--space-4);
+}
+
+/* 섹션 설명 */
+.section-desc {
+  color: var(--color-text-muted);
+  font-size: var(--text-base);
+  margin-bottom: var(--space-6);
+  text-align: center;
+}
+
+/* 모바일 반응형 */
+@media (max-width: 768px) {
+  .accordion-header {
+    padding: var(--space-3) var(--space-4);
+  }
+  
+  .accordion-title {
+    font-size: var(--text-sm);
+  }
+  
+  .accordion-body {
+    padding: var(--space-4);
+  }
+}
