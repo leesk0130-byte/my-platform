@@ -77,11 +77,13 @@
   function addLocalPost(data) {
     var list = getLocalPosts();
     var id = 'local_' + Date.now();
+    var u = getUser();
     var post = {
       id: id,
       title: data.title || '',
       body: data.body || '',
       author: data.author || '익명',
+      authorId: data.authorId != null ? data.authorId : (u ? u.uid : null),
       date: formatRelativeDate(new Date()),
       board: data.board || 'free',
       hits: 0,
@@ -92,6 +94,37 @@
     list.unshift(post);
     saveLocalPosts(list);
     return post;
+  }
+
+  function canEditPost(post) {
+    if (!post) return false;
+    var u = getUser();
+    if (!u || !u.uid) return false;
+    if (isOperator()) return true;
+    return post.authorId === u.uid;
+  }
+
+  function deletePost(postId, callback) {
+    var post = getLocalPostById(postId);
+    if (!post) { if (callback) callback('글을 찾을 수 없어요.'); return; }
+    if (!canEditPost(post)) { if (callback) callback('수정 권한이 없습니다.'); return; }
+    var list = getLocalPosts().filter(function (p) { return p.id !== postId; });
+    saveLocalPosts(list);
+    if (callback) callback(null);
+  }
+
+  function updatePost(postId, data, callback) {
+    var list = getLocalPosts();
+    var idx = list.findIndex(function (p) { return p.id === postId; });
+    if (idx === -1) { if (callback) callback('글을 찾을 수 없어요.'); return; }
+    var post = list[idx];
+    if (!canEditPost(post)) { if (callback) callback('수정 권한이 없습니다.'); return; }
+    if (data.title != null) list[idx].title = data.title;
+    if (data.body != null) list[idx].body = data.body;
+    if (data.board != null) list[idx].board = data.board;
+    list[idx].date = formatRelativeDate(new Date());
+    saveLocalPosts(list);
+    if (callback) callback(null, list[idx]);
   }
 
   function togglePostNotice(postId, callback) {
@@ -449,10 +482,15 @@
           } else if (callback) callback(result.error || result.message || '등록 실패');
         })
         .catch(function () {
-          var post = addLocalPost(data);
+          var u = getUser();
+          var post = addLocalPost({ title: data.title, body: data.body, author: data.author, board: data.board, notice: data.notice, authorId: u ? u.uid : null });
           if (callback) callback(null, post);
         });
     },
+
+    canEditPost: canEditPost,
+    deletePost: deletePost,
+    updatePost: updatePost,
 
     login: function (email, password, callback) {
       if (firebaseAuth) {

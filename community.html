@@ -108,6 +108,7 @@
                   <p class="post-detail-title-label" aria-hidden="true">제목</p>
                   <h1 id="post-detail-title" class="post-detail-title"></h1>
                   <div id="post-detail-meta" class="post-detail-meta"></div>
+                  <div id="post-detail-actions" class="post-detail-actions" style="display:none;margin-top:0.5rem;"></div>
                 </header>
                 <div class="post-body-wrap" aria-label="본문 내용">
                   <p class="post-body-label">본문</p>
@@ -238,6 +239,20 @@
           }
           return;
         }
+        var postDeleteBtn = e.target && e.target.closest && e.target.closest('.post-delete-btn');
+        if (postDeleteBtn) {
+          e.preventDefault();
+          e.stopPropagation();
+          var id = postDeleteBtn.getAttribute('data-post-id');
+          if (id && window.app && window.app.deletePost) {
+            if (!confirm('정말 삭제할까요?')) return;
+            window.app.deletePost(id, function(err) {
+              if (err) { alert(err); return; }
+              location.href = 'community.html';
+            });
+          }
+          return;
+        }
         var btn = e.target && e.target.closest && e.target.closest('.comment-delete-btn');
         if (!btn) return;
         e.preventDefault();
@@ -350,6 +365,11 @@
           var badgeHtml = (window.app && window.app.verifiedBadgeHtml) ? window.app.verifiedBadgeHtml(verified, post.author) : '';
           metaEl.innerHTML = (post.author || '익명') + badgeHtml + ' · ' + (post.date || '');
           document.getElementById('post-detail-body').textContent = post.body || '(내용 없음)';
+          var actionsEl = document.getElementById('post-detail-actions');
+          if (actionsEl && window.app.canEditPost && window.app.canEditPost(post)) {
+            actionsEl.style.display = 'block';
+            actionsEl.innerHTML = '<a href="edit.html?id=' + encodeURIComponent(postId) + '" class="btn btn-outline btn-sm">수정</a> <button type="button" class="post-delete-btn btn btn-outline btn-sm text-red-600 border-red-200" data-post-id="' + (postId || '').replace(/"/g, '&quot;') + '">삭제</button>';
+          } else if (actionsEl) { actionsEl.style.display = 'none'; actionsEl.innerHTML = ''; }
           
           currentDetailPostId = postId;
           var currentPostId = postId;
