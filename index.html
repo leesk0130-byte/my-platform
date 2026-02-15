@@ -126,12 +126,19 @@
   <script>
     // 홈페이지 미리보기 데이터 로드
     (function() {
-      // 뉴스 미리보기 (5개)
+      // 뉴스 미리보기 (5개) — API만 사용, 비면 EmptyState
       if (window.app && document.getElementById('news-list')) {
+        var newsListEl = document.getElementById('news-list');
         window.app.fetchNews(5, 0, function(err, items) {
-          if (items && items.length) {
-            window.app.renderNews('news-list', items);
+          if (err) {
+            newsListEl.innerHTML = '<li class="news-item"><span class="news-meta">뉴스를 불러오지 못했어요.</span></li>';
+            return;
           }
+          if (!items || items.length === 0) {
+            newsListEl.innerHTML = '<li class="empty-state-inline"><p class="empty-state-desc">등록된 뉴스가 없습니다.</p></li>';
+            return;
+          }
+          window.app.renderNews('news-list', items);
         });
       }
       

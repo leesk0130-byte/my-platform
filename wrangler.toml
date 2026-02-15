@@ -1,0 +1,14 @@
+# Cloudflare Pages + D1
+# 배포 후 Dashboard에서 D1 DB 생성 후 database_id 입력하세요.
+# npx wrangler d1 create my-platform-db --binding DB  (로컬에서 생성 시)
+name = "my-platform"
+compatibility_date = "2024-01-01"
+pages_build_output_dir = "."
+
+[[d1_databases]]
+binding = "DB"
+database_name = "my-platform-db"
+database_id = "YOUR_D1_DATABASE_ID"
+
+# 환경 변수(비밀값)는 Cloudflare Dashboard → Pages → 설정 → 환경 변수에서 설정하세요.
+# ADMIN_EMAIL, ADMIN_PASSWORD, ADMIN_SECRET(쿠키 서명용 32자 이상)

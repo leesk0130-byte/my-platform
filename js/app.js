@@ -29,16 +29,7 @@
     return b ? b + '/' + p : '/' + p;
   };
 
-  var MOCK_NEWS = [
-    { id: '1', title: '2025년 PG사 수수료 인하 동향, 가맹점 부담 완화 기대', link: 'news.html', date: '2025-02-11', badge: '뉴스', source: '가맹점숲', body: '정부가 소상공인·영세 가맹점 결제 부담을 줄이기 위해 2025년 카드수수료 환급제를 운영 중입니다. 영세가맹점(연매출 3억 원 이하) 0.8% 환급·연 최대 150만 원, 중소가맹점(연매출 30억 원 이하) 0.5% 환급·연 최대 100만 원을 소상공인마당(www.sbiz.or.kr/sup/)에서 신청할 수 있습니다. PG사별 일반·영세·중소 우대 수수료는 국세청 연매출 기준으로 적용되므로, 계약 갱신 시 PG사에 문의해 보시는 것이 좋습니다.\n\n실제 적용 시점과 조건은 PG사·카드사·공단 정책에 따라 달라질 수 있으니, 공지와 공식 안내를 수시로 확인하세요.' },
-    { id: '2', title: '온라인 쇼핑몰 전자상거래법 요약 (가맹점주 필독)', link: 'news.html', date: '2025-02-10', badge: '정책', source: '가맹점숲', body: '「전자상거래 등에서의 소비자보호에 관한 법률」은 온라인 쇼핑몰 운영 시 반드시 지켜야 할 사항을 담고 있습니다. 가맹점주가 꼭 숙지할 내용은 다음과 같습니다.\n\n· 표시의무: 사업자 정보, 재화·용역 정보, 청약철회 등 반드시 명시\n· 청약철회: 계약내용 서면을 받은 날(또는 재화 공급받은 날)부터 7일 이내 철회 가능하도록 안내. 디지털 콘텐츠 등 법정 예외 품목은 예외 사유 명시\n· 소비자 분쟁: 분쟁 해결 절차와 연락처 게시\n\n개정 시마다 추가·변경되는 의무가 있으니 공식 법령과 정부 고시를 확인하세요.' },
-    { id: '3', title: '2025 소상공인 카드수수료 환급 신청 방법 안내', link: 'news.html', date: '2025-02-09', badge: '지원', source: '가맹점숲', body: '2025년 정부가 운영하는 소상공인 카드수수료 환급제는 연매출 50억 원 이하 소상공인을 대상으로 합니다. 영세가맹점(연매출 3억 원 이하)은 0.8% 환급·연 최대 150만 원, 중소가맹점(연매출 30억 원 이하)은 0.5% 환급·연 최대 100만 원을 지원받을 수 있습니다.\n\n신청은 소상공인마당(www.sbiz.or.kr/sup/)에서 온라인으로 하거나 카드사를 통해 자동 환급받을 수 있습니다. 국내 사업자등록증 보유·카드 단말기 결제 매출 존재·국세·지방세 체납 없음 등 요건을 확인하세요. 신청 기간·필요 서류는 공단·카드사 공지를 확인하세요.' },
-    { id: '4', title: '쇼핑몰 해킹·사기 피해 예방 가이드 (결제 보안)', link: 'news.html', date: '2025-02-08', badge: '가이드', source: '가맹점숲', body: '온라인 쇼핑몰은 결제·개인정보를 다루기 때문에 보안이 필수입니다.\n\n· SSL(HTTPS): 결제·로그인 페이지는 반드시 SSL 적용\n· PG 연동: PG사가 제공하는 공식 연동 가이드와 인증 방식 준수\n· 관리자 계정: 기본 비밀번호 변경, 2단계 인증 적용\n· 정기 점검: 결제·주문 로그 확인, 이상 거래 모니터링\n\nPCI-DSS는 카드 정보를 직접 저장·처리할 때 요구되는 보안 기준입니다. 대부분의 중소 쇼핑몰은 PG사 페이지에서 결제를 처리하므로 카드 정보를 직접 보관하지 않으면 PCI-DSS 인증 범위가 줄어듭니다. 자세한 요건은 PG사와 보안 전문가에게 문의하세요.' },
-    { id: '5', title: '토스페이먼츠·이니시스 등 PG사 연매출별 수수료 비교 (영세·중소)', link: 'pg.html', date: '2025-02-07', badge: '뉴스', source: '가맹점숲' },
-    { id: '6', title: '전자세금계산서·현금영수증 의무 발행 가맹점 체크리스트', link: 'must-know.html#tax', date: '2025-02-06', badge: '가이드', source: '가맹점숲' },
-    { id: '7', title: '쇼핑몰 정산 주기 D+3·D+5·D+7 차이와 PG사별 정산일', link: 'pg.html', date: '2025-02-05', badge: '정보', source: '가맹점숲' },
-    { id: '8', title: '온라인 쇼핑몰 개인정보처리방침·이용약관 필수 게시 항목', link: 'must-know.html#privacy', date: '2025-02-04', badge: '정책', source: '가맹점숲' }
-  ];
+  // 뉴스는 API(GET /api/news)에서만 조회. 하드코딩/목업 없음.
 
   // 커뮤니티 글 전부 비움 — 직접 올릴 예정
   var MOCK_POSTS = [];
@@ -343,12 +334,14 @@
 
     fetchNews: function (limit, offset, callback) {
       var url = BASE('api/news') + '?limit=' + (limit || 10) + '&offset=' + (offset || 0);
-      fetch(url).then(function (res) { return res.ok ? res.json() : Promise.reject(); })
+      fetch(url).then(function (res) { return res.ok ? res.json() : Promise.reject(new Error(res.statusText || 'Network error')); })
         .then(function (data) {
-          callback(null, data.items || data, data.total);
+          var items = data.items || data || [];
+          var total = data.total != null ? data.total : items.length;
+          callback(null, items, total);
         })
-        .catch(function () {
-          callback(null, MOCK_NEWS.slice(0, limit || 10), MOCK_NEWS.length);
+        .catch(function (err) {
+          callback(err && err.message ? err.message : '뉴스를 불러오지 못했어요.', [], 0);
         });
     },
 
@@ -381,23 +374,16 @@
     addLocalPost: addLocalPost,
     getLocalPostById: getLocalPostById,
 
-    getNewsById: function (id) {
-      var list = MOCK_NEWS.filter(function (n) { return n.id === id; });
-      return list[0] || null;
-    },
-
     renderNews: function (containerId, list, linkPrefix) {
       var el = document.getElementById(containerId);
       if (!el) return;
       var prefix = linkPrefix || '';
-      el.innerHTML = (list || []).map(function (n) {
-        var rawLink = n.link || '#';
-        if (n.id && (rawLink === 'news.html' || rawLink.indexOf('news.html') === 0)) rawLink = 'news.html?id=' + n.id;
-        var link = rawLink.indexOf('http') === 0 ? rawLink : (prefix + rawLink);
-        var external = rawLink.indexOf('http') === 0;
-        var targetAttr = external ? ' target="_blank" rel="noopener"' : '';
-        var badge = n.badge ? '<span class="news-badge">' + n.badge + '</span>' : '';
-        return '<li class="news-item"><a href="' + link + '"' + targetAttr + '><span class="news-title">' + (n.title || '') + '</span>' + badge + '<div class="news-meta">' + (n.date || '') + (n.source ? ' · ' + n.source : '') + '</div></a></li>';
+      var items = list || [];
+      el.innerHTML = items.map(function (n) {
+        var link = (n.id ? (prefix + 'news.html?id=' + n.id) : '#');
+        var badge = (n.category || n.badge) ? '<span class="news-badge">' + (n.category || n.badge) + '</span>' : '';
+        var date = n.date || (n.created_at ? new Date(n.created_at).toLocaleDateString('ko-KR', { year: 'numeric', month: 'short', day: 'numeric' }) : '');
+        return '<li class="news-item"><a href="' + link + '"><span class="news-title">' + (n.title || '') + '</span>' + badge + '<div class="news-meta">' + date + ' · 가맹점숲</div></a></li>';
       }).join('');
     },
 
