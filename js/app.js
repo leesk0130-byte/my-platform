@@ -40,73 +40,25 @@
     { id: '8', title: '온라인 쇼핑몰 개인정보처리방침·이용약관 필수 게시 항목', link: 'must-know.html#privacy', date: '2025-02-04', badge: '정책', source: '가맹점숲' }
   ];
 
-  // 동적 시간 생성을 위한 기본 템플릿 (createdAt 없이)
-  var MOCK_POSTS_TEMPLATE = [
-    { id: '1', title: 'PG사 토스 vs 이니시스 vs 나이스 수수료 비교 후기 있어요', author: '가맹점주', hits: 42, board: 'fee', body: '', verified: false, hoursAgo: 2 },
-    { id: '2', title: '쇼핑몰 오픈 3개월 차, 정산 일정 D+5면 괜찮을까요?', author: '초보사장', hits: 28, board: 'qna', verified: false, hoursAgo: 5 },
-    { id: '3', title: '전자세금계산서 자동 발행 연동 PG 추천 부탁드려요', author: '회원', hits: 15, board: 'qna', verified: false, hoursAgo: 24 },
-    { id: '4', title: '결제 오류 시 PG사 대응 팁 공유합니다', author: '운영자', hits: 89, board: 'info', verified: true, hoursAgo: 48 },
-    { id: '5', title: '영세사업자 수수료 우대 받은 분 계신가요?', author: '가맹점주', hits: 56, board: 'fee', body: '', verified: false, hoursAgo: 72 }
-  ];
-
-  // 동적 MOCK_POSTS 생성 함수
-  function generateMockPosts() {
-    var MOCK_TIMESTAMPS_KEY = 'mock_posts_timestamps';
-    var savedTimestamps = localStorage.getItem(MOCK_TIMESTAMPS_KEY);
-    var timestamps = {};
-    
-    if (savedTimestamps) {
-      try {
-        timestamps = JSON.parse(savedTimestamps);
-      } catch (e) {
-        timestamps = {};
-      }
-    }
-    
-    var now = Date.now();
-    var needsSave = false;
-    
-    return MOCK_POSTS_TEMPLATE.map(function(template) {
-      // 저장된 타임스탬프가 없으면 새로 생성
-      if (!timestamps[template.id]) {
-        timestamps[template.id] = now - (template.hoursAgo * 60 * 60 * 1000);
-        needsSave = true;
-      }
-      
-      var createdAt = timestamps[template.id];
-      var date = formatRelativeDate(new Date(createdAt));
-      
-      return {
-        id: template.id,
-        title: template.title,
-        author: template.author,
-        date: date,
-        hits: template.hits,
-        board: template.board,
-        body: template.body || '',
-        verified: template.verified,
-        createdAt: createdAt
-      };
-    });
-    
-    // 새로운 타임스탬프가 생성되었으면 저장
-    if (needsSave) {
-      localStorage.setItem(MOCK_TIMESTAMPS_KEY, JSON.stringify(timestamps));
-    }
-  }
-  
-  // 동적으로 생성된 MOCK_POSTS
-  var MOCK_POSTS = generateMockPosts();
-
-  var MOCK_COMMENTS = {
-    '1': [{ id: 'c1', author: '가맹점주', date: '1시간 전', body: '저도 토스 쓰는데 연회비 11만원에 카드 수수료 3.4%라 부담돼요. 이니시스 연회비 면제인 거 보고 바꿀까 고민 중.', verified: false }],
-    '4': [{ id: 'c4', author: '운영자', date: '1일 전', body: 'PG사 고객센터 연락 시 거래일시·주문번호를 알려주시면 빠르게 조회됩니다.', verified: true }]
-  };
+  // 커뮤니티 글 전부 비움 — 직접 올릴 예정
+  var MOCK_POSTS = [];
+  var MOCK_COMMENTS = {};
   var COMMENTS_STORAGE_PREFIX = 'merchant_plus_comments_';
   var VERIFIED_AUTHORS = { '운영자': true };
   var OPERATOR_EMAIL = 'leesk0130@point3.team';
 
   var STORAGE_KEY = 'merchant_plus_posts';
+  var DATA_VERSION = 'community_reset_1';
+  if (typeof localStorage !== 'undefined' && localStorage.getItem('merchant_plus_data_version') !== DATA_VERSION) {
+    try {
+      localStorage.removeItem(STORAGE_KEY);
+      for (var i = localStorage.length - 1; i >= 0; i--) {
+        var k = localStorage.key(i);
+        if (k && k.indexOf(COMMENTS_STORAGE_PREFIX) === 0) localStorage.removeItem(k);
+      }
+      localStorage.setItem('merchant_plus_data_version', DATA_VERSION);
+    } catch (e) {}
+  }
 
   function getLocalPosts() {
     try {
@@ -358,58 +310,26 @@
     },
 
     fetchPosts: function (board, limit, offset, callback) {
-      var url = BASE('api/community/posts') + '?board=' + (board || 'all') + '&limit=' + (limit || 20) + '&offset=' + (offset || 0);
-      fetch(url).then(function (res) { return res.ok ? res.json() : Promise.reject(); })
-        .then(function (data) {
-          callback(null, data.items || data, data.total);
-        })
-        .catch(function () {
-          var local = getLocalPosts();
-          var mock = MOCK_POSTS.map(function (p) { 
-            // 댓글 개수 계산: localStorage 댓글 + MOCK 댓글 - 숨김 댓글
-            var localComments = getLocalComments(p.id);
-            var mockComments = getMockComments(p.id);
-            var hiddenComments = getHiddenCommentIds(p.id);
-            var totalComments = localComments.length + mockComments.filter(function(c) { return hiddenComments.indexOf(c.id) === -1; }).length;
-            
-            // 조회수 계산: 기본 조회수 + localStorage 조회수
-            var additionalViews = getPostViewCount(p.id);
-            var totalHits = (p.hits || 0) + additionalViews;
-            
-            return { 
-              id: p.id, 
-              title: p.title, 
-              author: p.author, 
-              date: p.date, 
-              board: p.board || 'free', 
-              hits: totalHits, 
-              verified: p.verified,
-              commentCount: totalComments,
-              createdAt: p.createdAt
-            }; 
-          });
-          var combined = local.map(function (p) { 
-            // 로컬 포스트의 댓글 개수 계산
-            var localComments = getLocalComments(p.id);
-            var mockComments = getMockComments(p.id);
-            var hiddenComments = getHiddenCommentIds(p.id);
-            var totalComments = localComments.length + mockComments.filter(function(c) { return hiddenComments.indexOf(c.id) === -1; }).length;
-            
-            return { 
-              id: p.id, 
-              title: p.title, 
-              author: p.author, 
-              date: p.date, 
-              board: p.board || 'free', 
-              hits: p.hits != null ? p.hits : 0, 
-              body: p.body, 
-              verified: p.verified,
-              commentCount: totalComments
-            }; 
-          }).concat(mock);
-          var filtered = (board && board !== 'all') ? combined.filter(function (p) { return p.board === board; }) : combined;
-          callback(null, filtered.slice(0, limit || 20), filtered.length);
-        });
+      // API·목업 사용 안 함. 로컬 저장 글만 표시(비어 있음, 글쓰기로 올리면 그만 보임)
+      var local = getLocalPosts();
+      var list = local.map(function (p) {
+        var localComments = getLocalComments(p.id);
+        var additionalViews = typeof getPostViewCount === 'function' ? getPostViewCount(p.id) : 0;
+        return {
+          id: p.id,
+          title: p.title,
+          author: p.author,
+          date: p.date,
+          board: p.board || 'free',
+          hits: (p.hits != null ? p.hits : 0) + additionalViews,
+          verified: p.verified,
+          commentCount: localComments.length,
+          body: p.body,
+          createdAt: p.createdAt
+        };
+      });
+      var filtered = (board && board !== 'all') ? list.filter(function (p) { return p.board === board; }) : list;
+      if (callback) callback(null, filtered.slice(offset || 0, (offset || 0) + (limit || 20)), filtered.length);
     },
 
     getLocalPosts: getLocalPosts,
