@@ -17,6 +17,7 @@
   var allFilteredItems = [];
   var searchQuery = '';
   var sortBy = 'latest';
+  var noticeToggleBound = false;
 
   /**
    * 단일 상태 렌더링
@@ -292,24 +293,28 @@
     var html = '';
     var itemsToShow = posts.slice(0, currentShown || PAGE_SIZE);
     
+    var isOp = window.app && window.app.isOperator && window.app.isOperator();
     itemsToShow.forEach(function(post) {
       var categoryLabel = post.board === 'free' ? '자유' :
                           post.board === 'fee' ? '수수료' :
                           post.board === 'qna' ? '질문' :
                           post.board === 'info' ? '정보' : '';
-      
+      var noticeBadge = post.notice ? '<span class="notice-badge">공지</span>' : '';
+      var noticeBtn = isOp ? '<button type="button" class="notice-toggle-btn btn btn-outline btn-sm" data-post-id="' + (post.id || '').replace(/"/g, '&quot;') + '">' + (post.notice ? '공지 해제' : '공지') + '</button>' : '';
       var commentBadge = (post.commentCount && post.commentCount > 0) ?
         '<span class="comment-count-badge">' + post.commentCount + '</span>' : '';
       
-      html += '<li class="feed-item">' +
+      html += '<li class="feed-item feed-item-row">' +
         '<a href="community.html?id=' + post.id + '" class="feed-title-wrapper">' +
           '<span class="feed-title-content">' +
+            noticeBadge +
             (categoryLabel ? '<span class="category-badge">' + categoryLabel + '</span>' : '') +
             (post.title || '제목 없음') +
           '</span>' +
           commentBadge +
         '</a>' +
-        '<span class="feed-meta">' + (post.nickname || '익명') + ' · ' + (post.createdAt || '') + ' · 조회 ' + (post.hits || 0) + '</span>' +
+        '<span class="feed-meta">' + (post.author || post.nickname || '익명') + ' · ' + (post.date || post.createdAt || '') + ' · 조회 ' + (post.hits || 0) + '</span>' +
+        (noticeBtn ? '<span class="feed-operator-actions">' + noticeBtn + '</span>' : '') +
       '</li>';
     });
     
@@ -336,6 +341,24 @@
     var moreBtn = document.getElementById('posts-more-btn');
     if (moreBtn) {
       moreBtn.addEventListener('click', handleLoadMore);
+    }
+    
+    // 공지 토글 (운영자만, 위임, 한 번만 등록)
+    if (!noticeToggleBound) {
+      noticeToggleBound = true;
+      document.body.addEventListener('click', function(e) {
+        var btn = e.target && e.target.closest && e.target.closest('.notice-toggle-btn');
+        if (!btn) return;
+        e.preventDefault();
+        e.stopPropagation();
+        var id = btn.getAttribute('data-post-id');
+        if (!id || !window.app || !window.app.togglePostNotice) return;
+        if (!window.app.isOperator || !window.app.isOperator()) { alert('운영자만 공지 설정할 수 있어요.'); return; }
+        window.app.togglePostNotice(id, function(err) {
+          if (err) { alert(err); return; }
+          loadList();
+        });
+      });
     }
     
     // 에러 재시도

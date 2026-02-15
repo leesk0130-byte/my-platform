@@ -223,6 +223,21 @@
   <script>
     (function() {
       document.addEventListener('click', function(e) {
+        var noticeBtn = e.target && e.target.closest && e.target.closest('.notice-toggle-btn');
+        if (noticeBtn) {
+          e.preventDefault();
+          e.stopPropagation();
+          var id = noticeBtn.getAttribute('data-post-id');
+          if (id && window.app && window.app.togglePostNotice) {
+            if (!window.app.isOperator || !window.app.isOperator()) { alert('운영자만 공지 설정할 수 있어요.'); return; }
+            window.app.togglePostNotice(id, function(err) {
+              if (err) { alert(err); return; }
+              var loadListFn = typeof loadList === 'function' ? loadList : (window.loadList || function() { location.reload(); });
+              loadListFn(false);
+            });
+          }
+          return;
+        }
         var btn = e.target && e.target.closest && e.target.closest('.comment-delete-btn');
         if (!btn) return;
         e.preventDefault();

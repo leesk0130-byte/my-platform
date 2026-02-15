@@ -86,11 +86,21 @@
       board: data.board || 'free',
       hits: 0,
       verified: false,
+      notice: !!(data.notice),
       createdAt: new Date().toISOString()
     };
     list.unshift(post);
     saveLocalPosts(list);
     return post;
+  }
+
+  function togglePostNotice(postId, callback) {
+    var list = getLocalPosts();
+    var idx = list.findIndex(function (p) { return p.id === postId; });
+    if (idx === -1) { if (callback) callback('글을 찾을 수 없어요.'); return; }
+    list[idx].notice = !list[idx].notice;
+    saveLocalPosts(list);
+    if (callback) callback(null);
   }
 
   function getCommentsStorageKey(postId) { return COMMENTS_STORAGE_PREFIX + (postId || ''); }
@@ -323,12 +333,14 @@
           board: p.board || 'free',
           hits: (p.hits != null ? p.hits : 0) + additionalViews,
           verified: p.verified,
+          notice: !!p.notice,
           commentCount: localComments.length,
           body: p.body,
           createdAt: p.createdAt
         };
       });
       var filtered = (board && board !== 'all') ? list.filter(function (p) { return p.board === board; }) : list;
+      filtered.sort(function (a, b) { return (b.notice ? 1 : 0) - (a.notice ? 1 : 0); });
       if (callback) callback(null, filtered.slice(offset || 0, (offset || 0) + (limit || 20)), filtered.length);
     },
 
@@ -361,23 +373,24 @@
       if (!el) return;
       var base = detailUrl || 'community.html?id=';
       var boardLabels = { free: '자유', fee: '수수료/정산', qna: '질문답변', info: '정보공유' };
+      var isOp = isOperator();
       el.innerHTML = (list || []).map(function (p) {
         var href = base + (p.id || '');
         var board = p.board || 'free';
         var badge = showBoardBadge ? '<span class="feed-board-badge">' + (boardLabels[board] || board) + '</span>' : '';
+        var noticeBadge = p.notice ? '<span class="notice-badge">공지</span>' : '';
         var verified = (p.verified === true || isAuthorVerified(p.author)) ? verifiedBadgeHtml(true, p.author) : '';
         var meta = (p.author ? p.author + ' · ' : '') + (p.date || '') + (p.hits != null ? ' · 조회 ' + p.hits : '') + verified;
-        
-        // 댓글 개수 뱃지 (0이면 표시하지 않음)
         var commentCount = p.commentCount || 0;
         var commentBadge = commentCount > 0 ? '<span class="comment-count-badge">' + commentCount + '</span>' : '';
-        
-        return '<li class="feed-item">' +
+        var noticeBtn = isOp ? '<button type="button" class="notice-toggle-btn btn btn-outline btn-sm" data-post-id="' + (p.id || '').replace(/"/g, '&quot;') + '">' + (p.notice ? '공지 해제' : '공지') + '</button>' : '';
+        return '<li class="feed-item feed-item-row">' +
           '<a href="' + href + '" class="feed-title-wrapper">' +
-            '<span class="feed-title-content">' + badge + (p.title || '') + '</span>' +
+            '<span class="feed-title-content">' + noticeBadge + badge + (p.title || '') + '</span>' +
             commentBadge +
           '</a>' +
           '<span class="feed-meta">' + meta + '</span>' +
+          (noticeBtn ? '<span class="feed-operator-actions">' + noticeBtn + '</span>' : '') +
         '</li>';
       }).join('');
     },
@@ -394,6 +407,7 @@
     addLocalComment: addLocalComment,
     deleteComment: deleteComment,
     isOperator: isOperator,
+    togglePostNotice: togglePostNotice,
     renderComments: function (containerId, list, opts) {
       var el = document.getElementById(containerId);
       if (!el) return;
