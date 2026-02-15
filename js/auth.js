@@ -1,79 +1,70 @@
 /**
- * 전역 인증 상태 관리 시스템
- * 모든 페이지에서 공통으로 사용
+ * 전역 인증 상태 관리 시스템 (단일 소스 오브 트루스)
+ * 헤더 Auth 영역을 상태에 따라 1세트만 렌더링
  */
 
 (function() {
   'use strict';
 
-  // 인증 상태 타입
-  var AUTH_STATES = {
-    UNKNOWN: 'unknown',
-    LOGGED_OUT: 'loggedOut', 
-    LOGGED_IN: 'loggedIn'
-  };
-
-  var currentAuthState = AUTH_STATES.UNKNOWN;
+  var authState = 'loggedOut'; // 'loggedOut' | 'loggedIn'
+  var currentUser = null;
 
   /**
-   * 현재 인증 상태 확인
+   * 인증 상태 확인 및 업데이트
    */
-  function getAuthState() {
-    if (!window.app) return AUTH_STATES.UNKNOWN;
+  function checkAuthState() {
+    if (!window.app) {
+      authState = 'loggedOut';
+      currentUser = null;
+      return;
+    }
     
     var isLoggedIn = window.app.isLoggedIn && window.app.isLoggedIn();
     var user = window.app.getUser && window.app.getUser();
     
     if (isLoggedIn && user) {
-      return AUTH_STATES.LOGGED_IN;
+      authState = 'loggedIn';
+      currentUser = user;
     } else {
-      return AUTH_STATES.LOGGED_OUT;
+      authState = 'loggedOut';
+      currentUser = null;
     }
   }
 
   /**
-   * 헤더 인증 UI 업데이트
+   * 헤더 Auth Actions 렌더링 (상태에 따라 1세트만)
    */
-  function updateHeaderAuth() {
-    var guestEl = document.getElementById('headerAuthGuest');
-    var userEl = document.getElementById('headerAuthUser');
-    var nameEl = document.getElementById('headerUser');
+  function renderAuthActions() {
+    var authContainer = document.getElementById('auth-actions');
+    if (!authContainer) return;
     
-    if (!guestEl || !userEl) return;
+    checkAuthState();
     
-    var authState = getAuthState();
-    currentAuthState = authState;
+    var html = '';
     
-    switch (authState) {
-      case AUTH_STATES.LOGGED_IN:
-        var user = window.app.getUser();
-        guestEl.style.display = 'none';
-        userEl.style.display = 'flex';
-        if (nameEl && user) {
-          nameEl.textContent = (user.name || user.email || '회원') + '님';
-        }
-        break;
-        
-      case AUTH_STATES.LOGGED_OUT:
-        guestEl.style.display = 'flex';
-        userEl.style.display = 'none';
-        break;
-        
-      case AUTH_STATES.UNKNOWN:
-      default:
-        // 로딩 중이거나 불명확한 상태 - 게스트 UI 표시
-        guestEl.style.display = 'flex';
-        userEl.style.display = 'none';
-        break;
+    if (authState === 'loggedIn') {
+      // 로그인 상태: [닉네임] [로그아웃]
+      var displayName = (currentUser.name || currentUser.email || '회원') + '님';
+      html = '<span class="header-user">' + displayName + '</span>' +
+             '<button type="button" class="btn btn-outline" onclick="window.authSystem.logout()">로그아웃</button>';
+    } else {
+      // 비로그인 상태: [로그인] [회원가입]
+      html = '<button type="button" class="btn btn-outline" onclick="window.authSystem.openLoginModal()">로그인</button>' +
+             '<button type="button" class="btn btn-primary" onclick="window.authSystem.openSignupModal()">회원가입</button>';
     }
+    
+    authContainer.innerHTML = html;
   }
 
   /**
-   * 모달 관리
+   * 로그인 모달 열기
    */
-  function openModal(modalId) {
-    var modal = document.getElementById(modalId);
-    if (!modal) return;
+  function openLoginModal() {
+    var modal = document.getElementById('loginModal');
+    if (!modal) {
+      console.error('Login modal not found');
+      return;
+    }
     
     modal.classList.add('is-open');
     modal.setAttribute('aria-hidden', 'false');
@@ -84,10 +75,40 @@
       'button, [href], input, select, textarea, [tabindex]:not([tabindex="-1"])'
     );
     if (focusableElements.length > 0) {
-      focusableElements[0].focus();
+      setTimeout(function() {
+        focusableElements[0].focus();
+      }, 100);
     }
   }
 
+  /**
+   * 회원가입 모달 열기
+   */
+  function openSignupModal() {
+    var modal = document.getElementById('signupModal');
+    if (!modal) {
+      console.error('Signup modal not found');
+      return;
+    }
+    
+    modal.classList.add('is-open');
+    modal.setAttribute('aria-hidden', 'false');
+    document.body.style.overflow = 'hidden';
+    
+    // 포커스 트랩
+    var focusableElements = modal.querySelectorAll(
+      'button, [href], input, select, textarea, [tabindex]:not([tabindex="-1"])'
+    );
+    if (focusableElements.length > 0) {
+      setTimeout(function() {
+        focusableElements[0].focus();
+      }, 100);
+    }
+  }
+
+  /**
+   * 모달 닫기
+   */
   function closeModal(modalId) {
     var modal = document.getElementById(modalId);
     if (!modal) return;
@@ -95,6 +116,32 @@
     modal.classList.remove('is-open');
     modal.setAttribute('aria-hidden', 'true');
     document.body.style.overflow = '';
+  }
+
+  /**
+   * 로그아웃
+   */
+  function logout() {
+    if (window.app && window.app.logout) {
+      window.app.logout();
+    }
+    authState = 'loggedOut';
+    currentUser = null;
+    renderAuthActions();
+    
+    // authStateChanged 이벤트 발생
+    window.dispatchEvent(new Event('authStateChanged'));
+  }
+
+  /**
+   * 로그인 성공 처리
+   */
+  function onLoginSuccess() {
+    checkAuthState();
+    renderAuthActions();
+    
+    // authStateChanged 이벤트 발생
+    window.dispatchEvent(new Event('authStateChanged'));
   }
 
   /**
@@ -142,10 +189,26 @@
   /**
    * 전역 함수 등록
    */
-  window.openModal = openModal;
+  window.authSystem = {
+    renderAuthActions: renderAuthActions,
+    openLoginModal: openLoginModal,
+    openSignupModal: openSignupModal,
+    closeModal: closeModal,
+    logout: logout,
+    onLoginSuccess: onLoginSuccess,
+    checkAuthState: checkAuthState
+  };
+  
+  // 하위 호환성을 위한 전역 함수
+  window.openModal = function(modalId) {
+    if (modalId === 'loginModal') {
+      openLoginModal();
+    } else if (modalId === 'signupModal') {
+      openSignupModal();
+    }
+  };
   window.closeModal = closeModal;
   window.toggleNav = toggleNav;
-  window.updateHeaderAuth = updateHeaderAuth;
 
   /**
    * 초기화
@@ -155,34 +218,34 @@
     if (document.readyState === 'loading') {
       document.addEventListener('DOMContentLoaded', function() {
         initModals();
-        updateHeaderAuth();
+        renderAuthActions();
       });
     } else {
       initModals();
-      updateHeaderAuth();
+      renderAuthActions();
     }
 
     // 인증 상태 변경 이벤트 리스너
-    window.addEventListener('authStateChanged', updateHeaderAuth);
+    window.addEventListener('authStateChanged', renderAuthActions);
     
     // 주기적으로 상태 확인 (Firebase 등 비동기 인증 대응)
+    var checkCount = 0;
     var checkInterval = setInterval(function() {
+      checkCount++;
       if (window.app && window.app.isLoggedIn) {
-        var newState = getAuthState();
-        if (newState !== currentAuthState) {
-          updateHeaderAuth();
+        var oldState = authState;
+        checkAuthState();
+        if (oldState !== authState) {
+          renderAuthActions();
         }
         // app이 로드되면 주기적 체크 중단
-        if (newState !== AUTH_STATES.UNKNOWN) {
-          clearInterval(checkInterval);
-        }
+        clearInterval(checkInterval);
+      }
+      // 10초 후 강제 중단 (무한 루프 방지)
+      if (checkCount >= 20) {
+        clearInterval(checkInterval);
       }
     }, 500);
-    
-    // 5초 후 강제 중단 (무한 루프 방지)
-    setTimeout(function() {
-      clearInterval(checkInterval);
-    }, 5000);
   }
 
   // 즉시 초기화

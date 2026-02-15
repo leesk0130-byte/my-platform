@@ -24,10 +24,7 @@
       <a href="community.html">커뮤니티</a>
     </nav>
     <div class="header-auth" id="headerAuth" aria-label="로그인 상태">
-      <span class="header-auth-user" id="headerAuthUser" style="display:none;"><span class="header-user" id="headerUser"></span>
-      <button type="button" class="btn btn-outline" id="headerLogoutBtn" onclick="if(window.app&&window.app.logout)window.app.logout();if(typeof updateHeaderAuth==='function')updateHeaderAuth();">로그아웃</button></span>
-      <span class="header-auth-guest" id="headerAuthGuest"><button type="button" class="btn btn-outline" id="headerLoginBtn" onclick="openModal('loginModal')">로그인</button>
-      <button type="button" class="btn btn-primary" id="headerSignupBtn" onclick="openModal('signupModal')">회원가입</button></span>
+      <div id="auth-actions"></div>
     </div>
   </header>
 
