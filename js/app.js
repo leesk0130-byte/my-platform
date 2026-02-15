@@ -279,8 +279,12 @@
         .catch(function () {
           var local = getLocalPosts();
           var mock = MOCK_POSTS.map(function (p) { 
-            // 댓글 개수 계산: MOCK_COMMENTS에서 가져오거나 기본값 사용
-            var commentCount = p.commentCount != null ? p.commentCount : (MOCK_COMMENTS[p.id] ? MOCK_COMMENTS[p.id].length : 0);
+            // 댓글 개수 계산: localStorage 댓글 + MOCK 댓글 - 숨김 댓글
+            var localComments = getLocalComments(p.id);
+            var mockComments = getMockComments(p.id);
+            var hiddenComments = getHiddenCommentIds(p.id);
+            var totalComments = localComments.length + mockComments.filter(function(c) { return hiddenComments.indexOf(c.id) === -1; }).length;
+            
             return { 
               id: p.id, 
               title: p.title, 
@@ -289,7 +293,7 @@
               board: p.board || 'free', 
               hits: p.hits, 
               verified: p.verified,
-              commentCount: commentCount
+              commentCount: totalComments
             }; 
           });
           var combined = local.map(function (p) { 
