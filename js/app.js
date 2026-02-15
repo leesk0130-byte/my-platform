@@ -207,18 +207,13 @@
     },
 
     fetchPosts: function (board, limit, offset, callback) {
-      var url = BASE('api/community/posts') + '?board=' + (board || 'all') + '&limit=' + (limit || 20) + '&offset=' + (offset || 0);
-      fetch(url).then(function (res) { return res.ok ? res.json() : Promise.reject(); })
-        .then(function (data) {
-          callback(null, data.items || data, data.total);
-        })
-        .catch(function () {
-          var local = getLocalPosts();
-          var mock = MOCK_POSTS.map(function (p) { return { id: p.id, title: p.title, author: p.author, date: p.date, board: p.board || 'free', hits: p.hits, verified: p.verified }; });
-          var combined = local.map(function (p) { return { id: p.id, title: p.title, author: p.author, date: p.date, board: p.board || 'free', verified: p.verified }; }).concat(mock);
-          var filtered = (board && board !== 'all') ? combined.filter(function (p) { return p.board === board; }) : combined;
-          callback(null, filtered.slice(0, limit || 20), filtered.length);
-        });
+      // API·목업 사용 안 함. 로컬 저장 글만 표시(지금은 비어 있음, 글쓰기로 올리면 그만 보임)
+      var local = getLocalPosts();
+      var list = local.map(function (p) {
+        return { id: p.id, title: p.title, author: p.author, date: p.date, board: p.board || 'free', hits: p.hits || 0, verified: p.verified, commentCount: (getLocalComments(p.id) || []).length };
+      });
+      var filtered = (board && board !== 'all') ? list.filter(function (p) { return p.board === board; }) : list;
+      if (callback) callback(null, filtered.slice(offset || 0, (offset || 0) + (limit || 20)), filtered.length);
     },
 
     getLocalPosts: getLocalPosts,
