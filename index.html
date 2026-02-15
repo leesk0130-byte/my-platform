@@ -61,100 +61,61 @@
   </a>
 
   <main id="main" class="container">
-    <section class="intro-block" aria-label="가맹점숲 소개">
-      <h2 class="intro-title">가맹점숲이란?</h2>
-      <p class="intro-desc">토스·이니시스 등 PG사마다 들어가 봐야 했던 수수료·정산 정보를 <strong>한곳에</strong> 모았어요. <strong>온라인 쇼핑몰·가맹점</strong>이 처음 시작할 때 어려움을 덜고, 가맹점주가 편하게 정보를 얻을 수 있도록 만든 플랫폼입니다. 뉴스·수수료 계산기·꼭 알아야 할 것은 회원가입 없이 이용 가능하고, 커뮤니티에서는 닉네임만으로 글을 쓸 수 있어요.</p>
-    </section>
+    <!-- A. Hero Section - 허브 중심 -->
     <div class="hero">
-      <h2>온라인 가맹점을 위한 정보 플랫폼</h2>
-      <p>PG 수수료, 쇼핑몰 뉴스, 필수 정보를 한곳에서. 온라인 가맹점 커뮤니티와 함께하세요.</p>
+      <h1>온라인 가맹점 정보 & 커뮤니티</h1>
+      <p>PG 수수료부터 쇼핑몰 운영 꿀팁까지, 가맹점주를 위한 모든 정보를 한곳에서 찾아보세요.</p>
+      <p class="hero-trust">회원가입 없이 뉴스·계산기 이용 가능 · 커뮤니티는 닉네임만으로 참여</p>
       <div class="hero-cta">
-        <a href="about.html" class="btn btn-hero">가맹점숲이란?</a>
-        <a href="news.html" class="btn btn-hero">뉴스 보기</a>
-        <a href="pg.html" class="btn btn-hero">PG 수수료</a>
-        <a href="calculator.html" class="btn btn-hero">수수료 계산기</a>
-        <a href="must-know.html" class="btn btn-hero">꼭 알아야 할 것</a>
-        <a href="community.html" class="btn btn-hero">커뮤니티</a>
+        <a href="community.html" class="btn btn-primary btn-lg">커뮤니티 가기</a>
+        <a href="calculator.html" class="btn btn-secondary btn-lg">수수료 계산기</a>
       </div>
     </div>
 
+    <!-- B. 미리보기 섹션 -->
     <div class="main-layout">
       <div class="main-content">
-        <!-- 메인: 최신 뉴스 (온라인 쇼핑몰 관련) -->
-        <section class="section" id="news">
+        <!-- 최신 뉴스 미리보기 -->
+        <section class="section" id="news-preview">
           <div class="card">
-            <h3 class="section-title">
-              최신 뉴스 <span class="section-title-sub">온라인 쇼핑몰 · 가맹점</span>
-              <a href="news.html">더보기</a>
-            </h3>
+            <h2 class="section-title">
+              최신 뉴스
+              <a href="news.html" class="btn btn-ghost btn-sm">더보기</a>
+            </h2>
             <ul class="news-list" id="news-list"></ul>
           </div>
         </section>
 
-        <!-- 메인: 커뮤니티 최신글 -->
+        <!-- 커뮤니티 최신글 미리보기 -->
         <section class="section" id="community-preview">
           <div class="card">
-            <h3 class="section-title">
+            <h2 class="section-title">
               커뮤니티 최신글
-              <a href="community.html">전체보기</a>
-            </h3>
+              <a href="community.html" class="btn btn-ghost btn-sm">전체보기</a>
+            </h2>
             <ul class="feed-list" id="community-list"></ul>
           </div>
         </section>
-
-        <!-- 본문 중간 광고 슬롯 -->
-        <div class="ad-slot ad-banner" style="margin: 1.5rem 0;">광고 영역 (728×90)</div>
-
-        <!-- 꼭 알아야 할 것 -->
-        <section class="section" id="must-know">
-          <div class="card">
-            <h3 class="section-title">온라인 쇼핑몰이 꼭 알아야 할 것</h3>
-            <ul class="must-know-list">
-              <li><a href="must-know.html">전자상거래법 준수 사항 (표시의무, 청약철회 등)</a></li>
-              <li><a href="must-know.html">전자세금계산서·현금영수증 의무 발행</a></li>
-              <li><a href="pg.html">PG 계약 시 확인할 수수료·정산 주기</a></li>
-              <li><a href="must-know.html">개인정보처리방침·이용약관 필수 게시</a></li>
-              <li><a href="must-know.html">결제 보안(PCI-DSS, SSL) 기본 개념</a></li>
-              <li><a href="must-know.html">소상공인 결제 수수료 지원 제도</a></li>
-            </ul>
-          </div>
-        </section>
-
-        <!-- 커뮤니티 칸 (게시판 탭 + 로그인 유도) -->
-        <section class="section community-section" id="community">
-          <div class="card">
-            <div class="board-tabs">
-              <a href="community.html" class="active">전체</a>
-              <a href="community.html?board=free">자유게시판</a>
-              <a href="community.html?board=fee">수수료/정산</a>
-              <a href="community.html?board=qna">질문답변</a>
-              <a href="community.html?board=info">정보공유</a>
-            </div>
-            <ul class="feed-list" id="community-list-main"></ul>
-            <div class="board-actions">
-              <a href="write.html" class="btn btn-primary">글쓰기</a>
-              <span class="board-actions-divider">|</span>
-              <button type="button" class="btn btn-outline" onclick="openModal('loginModal')">로그인</button>
-              <button type="button" class="btn btn-outline" onclick="openModal('signupModal')">회원가입</button>
-            </div>
-          </div>
-        </section>
       </div>
-
-      <!-- 사이드바: 광고 + 빠른 링크 -->
-      <aside>
-        <div class="ad-slot ad-sidebar" style="margin-bottom: 1.5rem;">광고 영역 (300×250)</div>
-        <div class="card sidebar-card">
-          <h3 class="section-title section-title-plain">바로가기</h3>
-          <ul class="must-know-list" style="padding: 0;">
-            <li><a href="news.html">최신 뉴스</a></li>
-            <li><a href="pg.html">PG 수수료</a></li>
-            <li><a href="calculator.html">수수료 계산기</a></li>
-            <li><a href="must-know.html">꼭 알아야 할 것</a></li>
-            <li><a href="community.html">커뮤니티</a></li>
+      
+      <aside class="sidebar">
+        <!-- C. 꼭 알아야 할 것 (간단히) -->
+        <div class="card">
+          <h3 class="section-title">꼭 알아야 할 것</h3>
+          <ul class="quick-links">
+            <li><a href="must-know.html#law">전자상거래법 준수</a></li>
+            <li><a href="must-know.html#tax">전자세금계산서 발행</a></li>
+            <li><a href="pg.html">PG 수수료 비교</a></li>
+            <li><a href="must-know.html#privacy">개인정보처리방침</a></li>
+            <li><a href="must-know.html#security">결제 보안 기본</a></li>
+            <li><a href="must-know.html#support">소상공인 지원제도</a></li>
           </ul>
         </div>
-        <div class="ad-slot ad-sidebar" style="margin-top: 1.5rem;">광고 영역 (300×250)</div>
+
+        <!-- D. 광고 영역 (시각적 우선순위 낮춤) -->
+        <div class="ad-slot ad-sidebar">
+          광고 영역
+        </div>
       </aside>
     </div>
   </main>
@@ -248,42 +209,24 @@
   <script src="https://www.gstatic.com/firebasejs/10.7.0/firebase-auth-compat.js"></script>
   <script src="js/config.js"></script>
   <script src="js/app.js"></script>
+  <script src="js/auth.js"></script>
   <script>
-    function updateHeaderAuth() {
-      var guestEl = document.getElementById('headerAuthGuest');
-      var userEl = document.getElementById('headerAuthUser');
-      var nameEl = document.getElementById('headerUser');
-      if (!guestEl || !userEl) return;
-      var loggedIn = window.app && window.app.isLoggedIn && window.app.isLoggedIn();
-      var user = window.app && window.app.getUser && window.app.getUser();
-      if (loggedIn && user) {
-        guestEl.style.display = 'none';
-        userEl.style.display = '';
-        if (nameEl) nameEl.textContent = (user.name || user.email || '회원') + '님';
-      } else {
-        guestEl.style.display = '';
-        userEl.style.display = 'none';
-      }
-    }
+    // 홈페이지 미리보기 데이터 로드
     (function() {
-      if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', updateHeaderAuth); else updateHeaderAuth();
-      window.addEventListener('authStateChanged', updateHeaderAuth);
+      // 뉴스 미리보기 (5개)
       if (window.app && document.getElementById('news-list')) {
         window.app.fetchNews(5, 0, function(err, items) {
-          if (items && items.length) window.app.renderNews('news-list', items);
+          if (items && items.length) {
+            window.app.renderNews('news-list', items);
+          }
         });
       }
+      
+      // 커뮤니티 미리보기 (5개)
       if (window.app && document.getElementById('community-list')) {
         window.app.fetchPosts('all', 5, 0, function(err, items) {
-          var listEl = document.getElementById('community-list');
-          var mainEl = document.getElementById('community-list-main');
           if (items && items.length) {
             window.app.renderPosts('community-list', items, 'community.html?id=');
-            if (mainEl) mainEl.innerHTML = listEl.innerHTML;
-          } else {
-            var emptyHtml = '<li class="empty"><span class="empty-inline">아직 글이 없어요.</span> <a href="write.html">첫 글 쓰기</a></li>';
-            listEl.innerHTML = emptyHtml;
-            if (mainEl) mainEl.innerHTML = emptyHtml;
           }
         });
       }
