@@ -49,32 +49,37 @@
       <p class="hero-hint"><a href="verify.html">인증된 아이디</a>로 이용하려면 4대보험 가입이력을 <a href="mailto:leesk0130@naver.com">leesk0130@naver.com</a>으로 보내 주세요.</p>
     </div>
     <section class="section community-section">
-      <div class="card">
-        <div class="board-tabs">
-          <a href="community.html" class="active">전체</a>
-          <a href="community.html?board=free">자유게시판</a>
-          <a href="community.html?board=fee">수수료/정산</a>
-          <a href="community.html?board=qna">질문답변</a>
-          <a href="community.html?board=info">정보공유</a>
-        </div>
-        <div class="board-toolbar" id="board-toolbar">
-          <div class="board-search">
-            <label for="board-search-input" class="sr-only">제목으로 검색</label>
-            <input type="search" id="board-search-input" placeholder="제목 검색" aria-label="제목 검색" autocomplete="off">
-            <button type="button" class="btn btn-outline btn-sm" id="board-search-btn" aria-label="검색 실행">찾기</button>
-          </div>
-          <div class="board-sort">
-            <label for="board-sort-select" class="sr-only">정렬</label>
-            <select id="board-sort-select" aria-label="정렬 기준">
-              <option value="latest">최신순</option>
-              <option value="hits">조회순</option>
-            </select>
-          </div>
-        </div>
-        <div class="board-actions" style="justify-content:flex-end;">
-          <a href="write.html" class="btn btn-primary">글쓰기</a>
-        </div>
-        <div id="board-notice" class="board-notice" aria-label="공지" style="display:none;"></div>
+      <!-- Famous Community 2-Column Layout -->
+      <div class="community-layout">
+        <!-- Left Column (Main) -->
+        <div class="community-main">
+          <div class="card">
+            <div class="board-tabs">
+              <a href="community.html" class="active">전체</a>
+              <a href="community.html?board=free">자유게시판</a>
+              <a href="community.html?board=fee">수수료/정산</a>
+              <a href="community.html?board=qna">질문답변</a>
+              <a href="community.html?board=info">정보공유</a>
+            </div>
+            <div class="board-toolbar" id="board-toolbar">
+              <div class="board-search">
+                <label for="board-search-input" class="sr-only">제목으로 검색</label>
+                <input type="search" id="board-search-input" placeholder="제목 검색" aria-label="제목 검색" autocomplete="off">
+                <button type="button" class="btn btn-outline btn-sm" id="board-search-btn" aria-label="검색 실행">찾기</button>
+              </div>
+              <div class="board-sort">
+                <label for="board-sort-select" class="sr-only">정렬</label>
+                <select id="board-sort-select" aria-label="정렬 기준">
+                  <option value="latest">최신순</option>
+                  <option value="hits">조회순</option>
+                  <option value="comments">댓글순</option>
+                </select>
+              </div>
+            </div>
+            <div class="board-actions" style="justify-content:flex-end;">
+              <a href="write.html" class="btn btn-primary">글쓰기</a>
+            </div>
+            <div id="board-notice" class="board-notice" aria-label="공지" style="display:none;"></div>
         <div id="view-loading" class="loading-state" aria-live="polite" data-view="loading">
           <div class="loading-spinner"></div>
           <p>글 목록을 불러오는 중이에요...</p>
@@ -102,47 +107,116 @@
           <p class="empty-state-desc" id="view-error-message">잠시 후 다시 시도해 주세요.</p>
           <button type="button" class="btn btn-primary" id="view-error-retry">다시 시도</button>
         </div>
-        <div id="view-detail" class="post-detail-wrap" data-view="detail" style="display:none;margin-top:1rem;">
-          <div class="post-detail-nav">
-            <a href="community.html" class="btn btn-outline btn-back">← 목록으로</a>
+            <div id="view-detail" class="post-detail-wrap" data-view="detail" style="display:none;margin-top:1rem;">
+              <div class="post-detail-nav">
+                <a href="community.html" class="btn btn-outline btn-back">← 목록으로</a>
+              </div>
+              <article class="post-detail-card" aria-label="글 본문">
+                <header class="post-detail-header">
+                  <p class="post-detail-title-label" aria-hidden="true">제목</p>
+                  <h1 id="post-detail-title" class="post-detail-title"></h1>
+                  <div id="post-detail-meta" class="post-detail-meta"></div>
+                </header>
+                <div class="post-body-wrap" aria-label="본문 내용">
+                  <p class="post-body-label">본문</p>
+                  <div id="post-detail-body" class="post-body"></div>
+                </div>
+              </article>
+              <section class="comment-section" id="comment-section" aria-label="댓글">
+                <h2 class="comment-section-title" id="comment-section-title">댓글 <span class="comment-count" id="comment-count">0</span></h2>
+                <ul class="comment-list" id="comment-list"></ul>
+                <div class="comment-form-wrap">
+                  <p class="comment-form-label">댓글 작성</p>
+                  <form id="comment-form" class="comment-form" onsubmit="return false;">
+                    <div class="form-group comment-nickname-row" id="comment-nickname-row">
+                      <span class="comment-nickname-label">닉네임</span>
+                      <span class="comment-nickname-value" id="comment-nickname-value">—</span>
+                    </div>
+                    <div class="form-group form-group-checkbox">
+                      <label><input type="checkbox" id="comment-anonymous" name="comment-anonymous"> 익명으로 작성</label>
+                    </div>
+                    <div class="form-group">
+                      <label for="comment-body" class="sr-only">댓글 내용</label>
+                      <textarea id="comment-body" placeholder="댓글을 입력하세요" required rows="3"></textarea>
+                    </div>
+                    <div id="comment-error" class="msg-error" style="display:none;"></div>
+                    <div class="form-actions">
+                      <button type="submit" class="btn btn-primary">댓글 등록</button>
+                    </div>
+                  </form>
+                </div>
+              </section>
+              <div class="post-detail-nav post-detail-nav-bottom">
+                <a href="community.html" class="btn btn-outline btn-back">← 목록으로</a>
+              </div>
+            </div>
           </div>
-          <article class="post-detail-card" aria-label="글 본문">
-            <header class="post-detail-header">
-              <p class="post-detail-title-label" aria-hidden="true">제목</p>
-              <h1 id="post-detail-title" class="post-detail-title"></h1>
-              <div id="post-detail-meta" class="post-detail-meta"></div>
-            </header>
-            <div class="post-body-wrap" aria-label="본문 내용">
-              <p class="post-body-label">본문</p>
-              <div id="post-detail-body" class="post-body"></div>
+        </div>
+        
+        <!-- Right Column (Sidebar) -->
+        <div class="community-sidebar">
+          <!-- Popular Posts -->
+          <div class="sidebar-widget">
+            <h3 class="sidebar-widget-title">🔥 인기글</h3>
+            <ul class="sidebar-list" id="popular-posts">
+              <li class="sidebar-item">
+                <a href="community.html?id=1" class="sidebar-link">
+                  <span class="sidebar-title">PG사 토스 vs 이니시스 vs 나이스 수수료 비교 후기</span>
+                  <span class="sidebar-meta">조회 42 · 댓글 1</span>
+                </a>
+              </li>
+              <li class="sidebar-item">
+                <a href="community.html?id=4" class="sidebar-link">
+                  <span class="sidebar-title">결제 오류 시 PG사 대응 팁 공유합니다</span>
+                  <span class="sidebar-meta">조회 89 · 댓글 1</span>
+                </a>
+              </li>
+              <li class="sidebar-item">
+                <a href="community.html?id=5" class="sidebar-link">
+                  <span class="sidebar-title">영세사업자 수수료 우대 받은 분 계신가요?</span>
+                  <span class="sidebar-meta">조회 56</span>
+                </a>
+              </li>
+            </ul>
+          </div>
+
+          <!-- Notices -->
+          <div class="sidebar-widget">
+            <h3 class="sidebar-widget-title">📢 공지사항</h3>
+            <ul class="sidebar-list">
+              <li class="sidebar-item">
+                <a href="community.html?id=4" class="sidebar-link">
+                  <span class="sidebar-title">결제 오류 시 PG사 대응 팁 공유합니다</span>
+                  <span class="sidebar-meta">운영자 · 2일 전</span>
+                </a>
+              </li>
+            </ul>
+          </div>
+
+          <!-- Writing Guide -->
+          <div class="sidebar-widget">
+            <h3 class="sidebar-widget-title">✍️ 작성 가이드</h3>
+            <div class="sidebar-content">
+              <ul class="guide-list">
+                <li>• 수수료·정산 관련 질문은 <strong>구체적인 상황</strong>을 포함해 주세요</li>
+                <li>• PG사명, 업종, 월 매출 규모를 명시하면 더 정확한 답변을 받을 수 있어요</li>
+                <li>• 개인정보(사업자등록번호, 계좌번호 등)는 절대 공개하지 마세요</li>
+              </ul>
             </div>
-          </article>
-          <section class="comment-section" id="comment-section" aria-label="댓글">
-            <h2 class="comment-section-title" id="comment-section-title">댓글 <span class="comment-count" id="comment-count">0</span></h2>
-            <ul class="comment-list" id="comment-list"></ul>
-            <div class="comment-form-wrap">
-              <p class="comment-form-label">댓글 작성</p>
-              <form id="comment-form" class="comment-form" onsubmit="return false;">
-                <div class="form-group comment-nickname-row" id="comment-nickname-row">
-                  <span class="comment-nickname-label">닉네임</span>
-                  <span class="comment-nickname-value" id="comment-nickname-value">—</span>
-                </div>
-                <div class="form-group form-group-checkbox">
-                  <label><input type="checkbox" id="comment-anonymous" name="comment-anonymous"> 익명으로 작성</label>
-                </div>
-                <div class="form-group">
-                  <label for="comment-body" class="sr-only">댓글 내용</label>
-                  <textarea id="comment-body" placeholder="댓글을 입력하세요" required rows="3"></textarea>
-                </div>
-                <div id="comment-error" class="msg-error" style="display:none;"></div>
-                <div class="form-actions">
-                  <button type="submit" class="btn btn-primary">댓글 등록</button>
-                </div>
-              </form>
+          </div>
+
+          <!-- Verification Guide -->
+          <div class="sidebar-widget">
+            <h3 class="sidebar-widget-title">✅ 인증 안내</h3>
+            <div class="sidebar-content">
+              <p class="guide-text">
+                <strong>인증된 아이디</strong>로 더 신뢰할 수 있는 정보를 나누세요.
+              </p>
+              <p class="guide-text">
+                4대보험 가입이력을 <a href="mailto:leesk0130@naver.com">leesk0130@naver.com</a>으로 보내주시면 인증해 드려요.
+              </p>
+              <a href="verify.html" class="btn btn-outline btn-sm">자세히 보기</a>
             </div>
-          </section>
-          <div class="post-detail-nav post-detail-nav-bottom">
-            <a href="community.html" class="btn btn-outline btn-back">← 목록으로</a>
           </div>
         </div>
       </div>
@@ -194,22 +268,43 @@
       var detailEl = document.getElementById('view-detail');
       var currentDetailPostId = null;
       var viewState = 'loading';
+      
+      // Initialize all views to hidden state
+      var allViews = document.querySelectorAll('[data-view]');
+      allViews.forEach(function(el) { el.style.display = 'none'; });
 
       function setViewState(state) {
         viewState = state;
+        console.log('Setting view state to:', state);
+        
+        // Hide ALL views first
         var views = document.querySelectorAll('[data-view]');
-        views.forEach(function(el) { el.style.display = (el.getAttribute('data-view') === state) ? '' : 'none'; });
+        views.forEach(function(el) { 
+          el.style.display = 'none'; 
+        });
+        
+        // Show ONLY the current state view
+        var currentView = document.querySelector('[data-view="' + state + '"]');
+        if (currentView) {
+          currentView.style.display = 'block';
+        }
+        
+        // Control list UI elements (tabs, toolbar, actions, notice)
         var card = document.querySelector('.community-section .card');
         if (!card) return;
+        
         var tabs = card.querySelector('.board-tabs');
         var toolbar = card.querySelector('#board-toolbar');
         var actions = card.querySelector('.board-actions');
         var notice = document.getElementById('board-notice');
+        
+        // Show list UI elements only for list-related states
         var showListUi = (state === 'loading' || state === 'list' || state === 'empty' || state === 'error');
-        if (tabs) tabs.style.display = showListUi ? '' : 'none';
-        if (toolbar) toolbar.style.display = showListUi ? '' : 'none';
-        if (actions) actions.style.display = showListUi ? '' : 'none';
-        if (notice) notice.style.display = (showListUi && notice.innerHTML) ? '' : 'none';
+        
+        if (tabs) tabs.style.display = showListUi ? 'block' : 'none';
+        if (toolbar) toolbar.style.display = showListUi ? 'flex' : 'none';
+        if (actions) actions.style.display = showListUi ? 'flex' : 'none';
+        if (notice) notice.style.display = (showListUi && notice.innerHTML.trim()) ? 'block' : 'none';
       }
 
       function refreshCommentListWithDeleteFlag() {
@@ -222,9 +317,17 @@
       }
       window.addEventListener('authStateChanged', refreshCommentListWithDeleteFlag);
 
+      // Handle detail view (when post ID is present)
       if (postId) {
+        console.log('Loading post detail for ID:', postId);
+        
+        // First, set loading state
+        setViewState('loading');
+        
+        // Try to get post from local storage first
         var post = window.app.getLocalPostById(postId);
         if (!post) {
+          // Fallback to mock data
           var MOCK = [
             { id: '1', title: 'PG사 토스 vs 이니시스 vs 나이스 수수료 비교 후기 있어요', author: '가맹점주', date: '2시간 전', body: '각 PG사 수수료 비교해 보신 분들 후기 공유해 주세요.\n\n저는 토스 쓰고 있는데 연회비 11만원에 카드 3.4%라 부담되네요. 이니시스는 연회비 면제라 바꿀까 고민 중이에요.', verified: false },
             { id: '2', title: '쇼핑몰 오픈 3개월 차, 정산 일정 D+5면 괜찮을까요?', author: '초보사장', date: '5시간 전', body: '정산이 D+5인 PG사 고려 중인데, 자금 회전에 무리가 없을지 궁금합니다.', verified: false },
@@ -234,16 +337,24 @@
           ];
           post = MOCK.filter(function(p) { return p.id === postId; })[0];
         }
-        if (post && detailEl) {
+        
+        if (post) {
+          // Post found - show detail view
+          console.log('Post found, showing detail view');
           setViewState('detail');
+          
+          // Populate post details
           document.getElementById('post-detail-title').textContent = post.title;
           var metaEl = document.getElementById('post-detail-meta');
           var verified = (post.verified === true || (window.app && window.app.isAuthorVerified && window.app.isAuthorVerified(post.author)));
           var badgeHtml = (window.app && window.app.verifiedBadgeHtml) ? window.app.verifiedBadgeHtml(verified, post.author) : '';
           metaEl.innerHTML = (post.author || '익명') + badgeHtml + ' · ' + (post.date || '');
           document.getElementById('post-detail-body').textContent = post.body || '(내용 없음)';
+          
           currentDetailPostId = postId;
           var currentPostId = postId;
+          
+          // Load comments
           function drawComments() {
             window.app.getComments(currentPostId, function(err, comments) {
               window.app.renderComments('comment-list', comments, { postId: currentPostId, canDelete: window.app.isOperator && window.app.isOperator() });
@@ -254,6 +365,8 @@
           drawComments();
           setTimeout(drawComments, 600);
           setTimeout(drawComments, 1500);
+          
+          // Setup comment form
           var commentForm = document.getElementById('comment-form');
           var nicknameEl = document.getElementById('comment-nickname-value');
           var anonymousCheck = document.getElementById('comment-anonymous');
@@ -266,6 +379,7 @@
               if (anonymousCheck) anonymousCheck.checked = true;
             }
           }
+          
           if (commentForm) {
             commentForm.onsubmit = function(e) {
               e.preventDefault();
@@ -289,21 +403,13 @@
               });
             };
           }
-          var card = detailEl.closest('.card');
-          if (card) {
-            var tabs = card.querySelector('.board-tabs');
-            var toolbar = document.getElementById('board-toolbar');
-            var actions = card.querySelector('.board-actions');
-            if (tabs) tabs.style.display = 'none';
-            if (toolbar) toolbar.style.display = 'none';
-            if (actions) actions.style.display = 'none';
-            var noticeEl2 = document.getElementById('board-notice');
-            if (noticeEl2) noticeEl2.style.display = 'none';
-          }
+          return;
+        } else {
+          // Post not found - show not found view
+          console.log('Post not found, showing notFound view');
+          setViewState('notFound');
           return;
         }
-        setViewState('notFound');
-        return;
       }
 
       var board = params.get('board') || 'all';
@@ -341,26 +447,65 @@
       function renderPage() {
         var toShow = allFilteredItems.slice(0, currentShown);
         if (listEl) window.app.renderPosts('community-list', toShow, 'community.html?id=', true);
-        if (toShow.length > 0) setViewState('list'); else setViewState('empty');
+        
+        // Determine correct state based on data
+        if (toShow.length > 0) {
+          console.log('Showing list with', toShow.length, 'items');
+          setViewState('list');
+        } else {
+          console.log('No items to show, showing empty state');
+          setViewState('empty');
+        }
+        
+        // Show/hide more button
         if (moreWrap) moreWrap.style.display = (currentShown < allFilteredItems.length) ? 'block' : 'none';
       }
 
       function loadList(append) {
         if (!listEl) return;
-        if (!append) setViewState('loading');
+        
+        // Only show loading if not appending (initial load or refresh)
+        if (!append) {
+          console.log('Loading posts, showing loading state');
+          setViewState('loading');
+        }
+        
         window.app.fetchPosts(board, 500, 0, function(err, items) {
+          if (err) {
+            console.log('Error loading posts:', err);
+            setViewState('error');
+            var errorMsg = document.getElementById('view-error-message');
+            if (errorMsg) errorMsg.textContent = err;
+            return;
+          }
+          
+          console.log('Posts loaded successfully:', items ? items.length : 0, 'items');
           allFilteredItems = applyFilterAndSort(items || []);
-          if (!append) currentShown = PAGE_SIZE;
-          else currentShown = Math.min(currentShown + PAGE_SIZE, allFilteredItems.length);
-          if (!append && currentShown > allFilteredItems.length) currentShown = allFilteredItems.length;
-          if (!append) currentShown = Math.min(PAGE_SIZE, allFilteredItems.length);
+          
+          if (!append) {
+            currentShown = Math.min(PAGE_SIZE, allFilteredItems.length);
+          } else {
+            currentShown = Math.min(currentShown + PAGE_SIZE, allFilteredItems.length);
+          }
+          
           renderPage();
         });
       }
 
-      if (moreBtn) moreBtn.onclick = function() { currentShown = Math.min(currentShown + PAGE_SIZE, allFilteredItems.length); renderPage(); };
+      if (moreBtn) {
+        moreBtn.onclick = function() { 
+          console.log('Loading more posts');
+          currentShown = Math.min(currentShown + PAGE_SIZE, allFilteredItems.length); 
+          renderPage(); 
+        };
+      }
       var errorRetry = document.getElementById('view-error-retry');
-      if (errorRetry) errorRetry.onclick = function() { loadList(false); };
+      if (errorRetry) {
+        errorRetry.onclick = function() { 
+          console.log('Retrying to load posts');
+          loadList(false); 
+        };
+      }
 
       if (searchBtn && searchInput) {
         searchBtn.onclick = function() {
@@ -372,7 +517,14 @@
         };
         searchInput.onkeydown = function(e) { if (e.key === 'Enter') searchBtn.click(); };
       }
-      if (sortSelect) sortSelect.onchange = function() { loadList(false); };
+      if (sortSelect) {
+        sortSelect.onchange = function() { 
+          console.log('Sort changed to:', sortSelect.value);
+          allFilteredItems = applyFilterAndSort(allFilteredItems);
+          currentShown = Math.min(PAGE_SIZE, allFilteredItems.length);
+          renderPage();
+        };
+      }
 
       loadList(false);
 

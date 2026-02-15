@@ -113,11 +113,25 @@
     window.addEventListener('authStateChanged', updateHeaderAuth);
     if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', updateHeaderAuth); else updateHeaderAuth();
     function setNewsView(state) {
+      console.log('Setting news view state to:', state);
+      
+      // Hide ALL views first
       document.querySelectorAll('[data-news-view]').forEach(function(el) {
-        el.style.display = el.getAttribute('data-news-view') === state ? '' : 'none';
+        el.style.display = 'none';
       });
+      
+      // Show ONLY the current state view
+      var currentView = document.querySelector('[data-news-view="' + state + '"]');
+      if (currentView) {
+        currentView.style.display = 'block';
+      }
     }
     (function() {
+      // Initialize all views to hidden state
+      document.querySelectorAll('[data-news-view]').forEach(function(el) { 
+        el.style.display = 'none'; 
+      });
+      
       var params = new URLSearchParams(location.search);
       var id = params.get('id');
       var listEl = document.getElementById('news-list');
@@ -128,23 +142,67 @@
           setNewsView('detail');
           document.getElementById('news-detail-title').textContent = article.title;
           document.getElementById('news-detail-meta').textContent = (article.date || '') + (article.source ? ' · ' + article.source : '');
-          var body = (article.body || '(내용 없음)').replace(/^#+\s*/gm, '').replace(/\n\n+/g, '\n\n');
-          document.getElementById('news-detail-body').innerHTML = body.split(/\n\n+/).map(function(p) { return '<p class="news-detail-p">' + p.replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/\n/g, '<br>') + '</p>'; }).join('');
+          // Clean up markdown and broken text
+          var body = (article.body || '(내용 없음)')
+            .replace(/^#+\s*/gm, '') // Remove markdown headers
+            .replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>') // Convert **bold** to <strong>
+            .replace(/\*(.*?)\*/g, '<em>$1</em>') // Convert *italic* to <em>
+            .replace(/\n\n+/g, '\n\n'); // Normalize line breaks
+          
+          document.getElementById('news-detail-body').innerHTML = body.split(/\n\n+/).map(function(p) { 
+            return '<p class="news-detail-p">' + p.replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/\n/g, '<br>').replace(/&lt;strong&gt;/g, '<strong>').replace(/&lt;\/strong&gt;/g, '</strong>').replace(/&lt;em&gt;/g, '<em>').replace(/&lt;\/em&gt;/g, '</em>') + '</p>'; 
+          }).join('');
           return;
         }
       }
       if (!listEl) return;
+      
+      console.log('Loading news list');
       setNewsView('loading');
+      
       window.app.fetchNews(20, 0, function(err, items) {
-        if (items && items.length) {
+        if (err) {
+          console.log('Error loading news:', err);
+          setNewsView('error');
+          var errorMsg = document.getElementById('news-error-message');
+          if (errorMsg) errorMsg.textContent = err;
+          return;
+        }
+        
+        console.log('News loaded successfully:', items ? items.length : 0, 'items');
+        
+        if (items && items.length > 0) {
           window.app.renderNews('news-list', items);
           setNewsView('list');
         } else {
+          console.log('No news items, showing empty state');
           setNewsView('empty');
         }
       });
       var retryBtn = document.getElementById('news-error-retry');
-      if (retryBtn) retryBtn.onclick = function() { setNewsView('loading'); window.app.fetchNews(20, 0, function(e, list) { if (list && list.length) { window.app.renderNews('news-list', list); setNewsView('list'); } else setNewsView('empty'); }); };
+      if (retryBtn) {
+        retryBtn.onclick = function() { 
+          console.log('Retrying to load news');
+          setNewsView('loading'); 
+          
+          window.app.fetchNews(20, 0, function(err, items) {
+            if (err) {
+              console.log('Retry failed:', err);
+              setNewsView('error');
+              var errorMsg = document.getElementById('news-error-message');
+              if (errorMsg) errorMsg.textContent = err;
+              return;
+            }
+            
+            if (items && items.length > 0) {
+              window.app.renderNews('news-list', items);
+              setNewsView('list');
+            } else {
+              setNewsView('empty');
+            }
+          }); 
+        };
+      }
     })();
     function openModal(id) {
       document.getElementById(id).classList.add('is-open');
