@@ -1,4 +1,6 @@
 /* ===== 가맹점숲 · 공통 스타일 ===== */
+@import url('tokens.css');
+@import url('components.css');
 @import url('https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/static/pretendard.min.css');
 
 :root {
@@ -69,6 +71,11 @@
   --shadow-lg: 0 8px 24px rgba(0,0,0,0.08);
   --container-max: 1040px;
   --section-gap: 32px;
+}
+
+@keyframes fadeIn {
+  from { opacity: 0; }
+  to { opacity: 1; }
 }
 
 * { box-sizing: border-box; margin: 0; padding: 0; }

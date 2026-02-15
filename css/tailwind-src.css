@@ -1,0 +1,22 @@
+@import url('https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/static/pretendard.min.css');
+
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+  * { @apply box-border; }
+  html { @apply overflow-x-hidden; }
+  body {
+    @apply font-sans text-body text-slate-800 bg-slate-50 antialiased;
+  }
+}
+
+@layer components {
+  .page-container {
+    @apply max-w-container mx-auto px-4 sm:px-6;
+  }
+  .content-prose {
+    @apply max-w-prose;
+  }
+}

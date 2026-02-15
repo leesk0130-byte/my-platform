@@ -3,12 +3,8 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <meta name="theme-color" content="#0f172a">
   <title>커뮤니티 인증 안내 | 가맹점숲</title>
-  <meta name="description" content="가맹점숲 인증된 회원 안내. 4대보험 가입이력으로 인증 마크를 받을 수 있습니다.">
-  <link rel="canonical" href="https://my-platform.pages.dev/verify.html">
   <link rel="stylesheet" href="css/common.css">
-  <script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-3006893636342653" crossorigin="anonymous"></script>
 </head>
 <body>
   <a href="#main" class="skip-link">본문으로 건너뛰기</a>
@@ -16,15 +12,17 @@
     <h1><a href="index.html">가맹점숲</a></h1>
     <button type="button" class="nav-toggle" aria-label="메뉴 열기" aria-expanded="false" onclick="toggleNav()"><span></span><span></span><span></span></button>
     <nav class="header-nav" id="headerNav" aria-label="메인 메뉴">
-      <a href="about.html">가맹점숲이란?</a>
       <a href="news.html">뉴스</a>
       <a href="pg.html">PG 수수료</a>
       <a href="calculator.html">수수료 계산기</a>
       <a href="must-know.html">꼭 알아야 할 것</a>
       <a href="community.html">커뮤니티</a>
     </nav>
-    <div class="header-auth" id="headerAuth" aria-label="로그인 상태">
-      <div id="auth-actions"></div>
+    <div class="header-auth" id="headerAuth">
+      <span class="header-user" id="headerUser" style="display:none;"></span>
+      <button type="button" class="btn btn-outline" id="headerLoginBtn" onclick="openModal('loginModal')">로그인</button>
+      <button type="button" class="btn btn-primary" id="headerSignupBtn" onclick="openModal('signupModal')">회원가입</button>
+      <button type="button" class="btn btn-outline" id="headerLogoutBtn" style="display:none;" onclick="if(window.app&&window.app.logout)window.app.logout();if(typeof updateHeaderAuth==='function')updateHeaderAuth();">로그아웃</button>
     </div>
   </header>
 
@@ -52,13 +50,10 @@
   <footer>
     <div class="footer-inner">
       <p><a href="terms.html">이용약관</a> | <a href="privacy.html">개인정보처리방침</a> | <a href="verify.html">인증 안내</a></p>
-      <p>© 2025–2026 가맹점숲. 온라인 가맹점 정보 & 커뮤니티. All rights reserved.</p>
+      <p>© 2025 가맹점숲. 온라인 가맹점 정보 & 커뮤니티. All rights reserved.</p>
       <div class="footer-contact">
         <h4>문의하기</h4>
-        <p><a href="tel:010-9694-4336">010-9694-4336</a></p>
-        <p>이수광</p>
-        <p><a href="mailto:leesk0130@naver.com">leesk0130@naver.com</a></p>
-        <p>서울특별시 동대문구 이문동 317-16 201호</p>
+        <p>문의: <a href="mailto:leesk0130@naver.com?subject=가맹점숲 문의">leesk0130@naver.com</a></p>
       </div>
     </div>
   </footer>
@@ -67,9 +62,30 @@
   <script src="https://www.gstatic.com/firebasejs/10.7.0/firebase-auth-compat.js"></script>
   <script src="js/config.js"></script>
   <script src="js/app.js"></script>
-  <script src="js/auth.js"></script>
   <script>
-    // 인증 페이지 전용 스크립트
+    function updateHeaderAuth() {
+      var auth = document.getElementById('headerAuth');
+      var userEl = document.getElementById('headerUser');
+      var loginBtn = document.getElementById('headerLoginBtn');
+      var signupBtn = document.getElementById('headerSignupBtn');
+      var logoutBtn = document.getElementById('headerLogoutBtn');
+      if (!auth) return;
+      var loggedIn = window.app && window.app.isLoggedIn && window.app.isLoggedIn();
+      var user = window.app && window.app.getUser && window.app.getUser();
+      if (loggedIn && user && (userEl || loginBtn)) {
+        if (userEl) { userEl.textContent = (user.name || user.email || '회원') + '님'; userEl.style.display = 'inline'; }
+        if (loginBtn) loginBtn.style.display = 'none';
+        if (signupBtn) signupBtn.style.display = 'none';
+        if (logoutBtn) logoutBtn.style.display = 'inline-block';
+      } else {
+        if (userEl) userEl.style.display = 'none';
+        if (loginBtn) loginBtn.style.display = 'inline-block';
+        if (signupBtn) signupBtn.style.display = 'inline-block';
+        if (logoutBtn) logoutBtn.style.display = 'none';
+      }
+    }
+    window.addEventListener('authStateChanged', updateHeaderAuth);
+    if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', updateHeaderAuth); else updateHeaderAuth();
     function openModal(id) { document.getElementById(id).classList.add('is-open'); document.body.style.overflow = 'hidden'; }
     function closeModal(id) { document.getElementById(id).classList.remove('is-open'); document.body.style.overflow = ''; }
     function toggleNav() {

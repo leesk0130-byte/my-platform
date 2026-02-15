@@ -136,9 +136,9 @@
   <script>
     // 홈페이지 미리보기 데이터 로드
     (function() {
-      // 뉴스 미리보기 (5개)
+      // 뉴스 미리보기 (3개)
       if (window.app && document.getElementById('news-list')) {
-        window.app.fetchNews(5, 0, function(err, items) {
+        window.app.fetchNews(3, 0, function(err, items) {
           if (items && items.length) {
             window.app.renderNews('news-list', items);
           }

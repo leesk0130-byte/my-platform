@@ -1,0 +1,57 @@
+/**
+ * 전역 디자인 토큰 (CSS 변수)
+ * 유명 커뮤니티 스타일: 정돈된 IA, 높은 가독성, 정보 밀도, 일관된 컴포넌트
+ */
+:root {
+  /* Spacing: 4, 8, 12, 16, 24, 32, 48, 64 */
+  --space-4: 4px;
+  --space-8: 8px;
+  --space-12: 12px;
+  --space-16: 16px;
+  --space-24: 24px;
+  --space-32: 32px;
+  --space-48: 48px;
+  --space-64: 64px;
+
+  /* Radius: 10, 14, 18 */
+  --radius-10: 10px;
+  --radius-14: 14px;
+  --radius-18: 18px;
+
+  /* Font sizes: 12, 13, 15, 16, 18, 20, 24, 30, 36 */
+  --text-12: 12px;
+  --text-13: 13px;
+  --text-15: 15px;
+  --text-16: 16px;
+  --text-18: 18px;
+  --text-20: 20px;
+  --text-24: 24px;
+  --text-30: 30px;
+  --text-36: 36px;
+
+  /* Line height: title 1.35, body 1.6 */
+  --lh-title: 1.35;
+  --lh-body: 1.6;
+
+  /* Container */
+  --container-max: 1040px;
+
+  /* Shadow / border 기본 1세트 */
+  --shadow-default: 0 1px 3px rgba(0,0,0,0.06), 0 4px 12px rgba(0,0,0,0.04);
+  --border-default: 1px solid #e2e8f0;
+  --border-soft: 1px solid #f1f5f9;
+
+  /* Colors (공통) */
+  --color-bg: #f8fafc;
+  --color-surface: #ffffff;
+  --color-text: #0f172a;
+  --color-text-muted: #475569;
+  --color-text-subtle: #64748b;
+  --color-primary: #059669;
+  --color-primary-hover: #047857;
+  --color-border: #e2e8f0;
+  --color-header-bg: #0f172a;
+  --color-header-text: #f1f5f9;
+  --color-danger: #dc2626;
+  --color-danger-bg: #fef2f2;
+}
