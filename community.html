@@ -33,11 +33,11 @@
       <a href="must-know.html">꼭 알아야 할 것</a>
       <a href="community.html" class="active">커뮤니티</a>
     </nav>
-    <div class="header-auth" id="headerAuth">
-      <span class="header-user" id="headerUser" style="display:none;"></span>
-      <button type="button" class="btn btn-outline" id="headerLoginBtn" onclick="openModal('loginModal')">로그인</button>
-      <button type="button" class="btn btn-primary" id="headerSignupBtn" onclick="openModal('signupModal')">회원가입</button>
-      <button type="button" class="btn btn-outline" id="headerLogoutBtn" style="display:none;" onclick="if(window.app&&window.app.logout)window.app.logout();if(typeof updateHeaderAuth==='function')updateHeaderAuth();">로그아웃</button>
+    <div class="header-auth" id="headerAuth" aria-label="로그인 상태">
+      <span class="header-auth-user" id="headerAuthUser" style="display:none;"><span class="header-user" id="headerUser"></span>
+      <button type="button" class="btn btn-outline" id="headerLogoutBtn" onclick="if(window.app&&window.app.logout)window.app.logout();if(typeof updateHeaderAuth==='function')updateHeaderAuth();">로그아웃</button></span>
+      <span class="header-auth-guest" id="headerAuthGuest"><button type="button" class="btn btn-outline" id="headerLoginBtn" onclick="openModal('loginModal')">로그인</button>
+      <button type="button" class="btn btn-primary" id="headerSignupBtn" onclick="openModal('signupModal')">회원가입</button></span>
     </div>
   </header>
 
@@ -59,9 +59,9 @@
         </div>
         <div class="board-toolbar" id="board-toolbar">
           <div class="board-search">
-            <label for="board-search-input" class="sr-only">검색</label>
-            <input type="search" id="board-search-input" placeholder="제목으로 검색" aria-label="제목으로 검색" autocomplete="off">
-            <button type="button" class="btn btn-outline btn-sm" id="board-search-btn" aria-label="검색">검색</button>
+            <label for="board-search-input" class="sr-only">제목으로 검색</label>
+            <input type="search" id="board-search-input" placeholder="제목 검색" aria-label="제목 검색" autocomplete="off">
+            <button type="button" class="btn btn-outline btn-sm" id="board-search-btn" aria-label="검색 실행">찾기</button>
           </div>
           <div class="board-sort">
             <label for="board-sort-select" class="sr-only">정렬</label>
@@ -71,35 +71,38 @@
             </select>
           </div>
         </div>
-        <div class="board-actions" style="justify-content:space-between;">
+        <div class="board-actions" style="justify-content:flex-end;">
           <a href="write.html" class="btn btn-primary">글쓰기</a>
-          <span>
-            <button type="button" class="btn btn-outline" onclick="openModal('loginModal')">로그인</button>
-            <button type="button" class="btn btn-outline" onclick="openModal('signupModal')">회원가입</button>
-          </span>
         </div>
         <div id="board-notice" class="board-notice" aria-label="공지" style="display:none;"></div>
-        <div id="posts-loading" class="loading-state" style="display:none;" aria-live="polite">
+        <div id="view-loading" class="loading-state" aria-live="polite" data-view="loading">
           <div class="loading-spinner"></div>
           <p>글 목록을 불러오는 중이에요...</p>
         </div>
-        <ul class="feed-list" id="community-list" aria-label="게시글 목록"></ul>
-        <div id="posts-more-wrap" class="board-more-wrap" style="display:none;">
-          <button type="button" class="btn btn-outline" id="posts-more-btn">더보기</button>
+        <div id="view-list" data-view="list" style="display:none;">
+          <ul class="feed-list" id="community-list" aria-label="게시글 목록"></ul>
+          <div id="posts-more-wrap" class="board-more-wrap" style="display:none;">
+            <button type="button" class="btn btn-outline" id="posts-more-btn">더보기</button>
+          </div>
         </div>
-        <div id="posts-empty" class="empty-state" style="display:none;">
+        <div id="view-empty" class="empty-state" data-view="empty" style="display:none;">
           <p class="empty-state-icon" aria-hidden="true">📝</p>
           <p class="empty-state-title">아직 작성된 글이 없어요!</p>
-          <p class="empty-state-desc">첫 글을 작성해 보세요. 수수료·정산·운영 꿀팁을 나눠 주세요.</p>
+          <p class="empty-state-desc">첫 글을 작성해 보세요.</p>
           <a href="write.html" class="btn btn-primary">첫 글 쓰기</a>
         </div>
-        <div id="post-not-found" class="empty-state" style="display:none; margin:1.5rem 2rem;">
+        <div id="view-not-found" class="empty-state" data-view="notFound" style="display:none; margin:1.5rem 2rem;">
           <p class="empty-state-icon" aria-hidden="true">🔍</p>
           <p class="empty-state-title">글이 없거나 삭제되었습니다</p>
-          <p class="empty-state-desc">요청하신 글을 찾을 수 없어요. 목록에서 다시 확인해 주세요.</p>
+          <p class="empty-state-desc">요청하신 글을 찾을 수 없어요.</p>
           <a href="community.html" class="btn btn-primary">목록으로</a>
         </div>
-        <div id="post-detail" class="post-detail-wrap" style="display:none;margin-top:1rem;">
+        <div id="view-error" class="empty-state" data-view="error" style="display:none;">
+          <p class="empty-state-title">일시적인 오류가 났어요</p>
+          <p class="empty-state-desc" id="view-error-message">잠시 후 다시 시도해 주세요.</p>
+          <button type="button" class="btn btn-primary" id="view-error-retry">다시 시도</button>
+        </div>
+        <div id="view-detail" class="post-detail-wrap" data-view="detail" style="display:none;margin-top:1rem;">
           <div class="post-detail-nav">
             <a href="community.html" class="btn btn-outline btn-back">← 목록으로</a>
           </div>
@@ -188,9 +191,26 @@
       var params = new URLSearchParams(location.search);
       var postId = params.get('id');
       var listEl = document.getElementById('community-list');
-      var loadingEl = document.getElementById('posts-loading');
-      var detailEl = document.getElementById('post-detail');
+      var detailEl = document.getElementById('view-detail');
       var currentDetailPostId = null;
+      var viewState = 'loading';
+
+      function setViewState(state) {
+        viewState = state;
+        var views = document.querySelectorAll('[data-view]');
+        views.forEach(function(el) { el.style.display = (el.getAttribute('data-view') === state) ? '' : 'none'; });
+        var card = document.querySelector('.community-section .card');
+        if (!card) return;
+        var tabs = card.querySelector('.board-tabs');
+        var toolbar = card.querySelector('#board-toolbar');
+        var actions = card.querySelector('.board-actions');
+        var notice = document.getElementById('board-notice');
+        var showListUi = (state === 'loading' || state === 'list' || state === 'empty' || state === 'error');
+        if (tabs) tabs.style.display = showListUi ? '' : 'none';
+        if (toolbar) toolbar.style.display = showListUi ? '' : 'none';
+        if (actions) actions.style.display = showListUi ? '' : 'none';
+        if (notice) notice.style.display = (showListUi && notice.innerHTML) ? '' : 'none';
+      }
 
       function refreshCommentListWithDeleteFlag() {
         if (!currentDetailPostId || !document.getElementById('comment-list')) return;
@@ -215,13 +235,13 @@
           post = MOCK.filter(function(p) { return p.id === postId; })[0];
         }
         if (post && detailEl) {
+          setViewState('detail');
           document.getElementById('post-detail-title').textContent = post.title;
           var metaEl = document.getElementById('post-detail-meta');
           var verified = (post.verified === true || (window.app && window.app.isAuthorVerified && window.app.isAuthorVerified(post.author)));
           var badgeHtml = (window.app && window.app.verifiedBadgeHtml) ? window.app.verifiedBadgeHtml(verified, post.author) : '';
           metaEl.innerHTML = (post.author || '익명') + badgeHtml + ' · ' + (post.date || '');
           document.getElementById('post-detail-body').textContent = post.body || '(내용 없음)';
-          detailEl.style.display = 'block';
           currentDetailPostId = postId;
           var currentPostId = postId;
           function drawComments() {
@@ -280,29 +300,10 @@
             var noticeEl2 = document.getElementById('board-notice');
             if (noticeEl2) noticeEl2.style.display = 'none';
           }
-          if (listEl) listEl.style.display = 'none';
-          if (loadingEl) loadingEl.style.display = 'none';
           return;
         }
-        /* 잘못된 글 id: 글이 없거나 삭제됨 안내 */
-        var notFoundEl = document.getElementById('post-not-found');
-        if (notFoundEl) {
-          notFoundEl.style.display = 'block';
-          if (listEl) listEl.style.display = 'none';
-          if (loadingEl) loadingEl.style.display = 'none';
-          var card = notFoundEl.closest('.card');
-          if (card) {
-            var tabs = card.querySelector('.board-tabs');
-            var toolbar2 = document.getElementById('board-toolbar');
-            var actions = card.querySelector('.board-actions');
-            if (tabs) tabs.style.display = 'none';
-            if (toolbar2) toolbar2.style.display = 'none';
-            if (actions) actions.style.display = 'none';
-            var noticeEl3 = document.getElementById('board-notice');
-            if (noticeEl3) noticeEl3.style.display = 'none';
-          }
-          return;
-        }
+        setViewState('notFound');
+        return;
       }
 
       var board = params.get('board') || 'all';
@@ -340,17 +341,14 @@
       function renderPage() {
         var toShow = allFilteredItems.slice(0, currentShown);
         if (listEl) window.app.renderPosts('community-list', toShow, 'community.html?id=', true);
-        var emptyEl = document.getElementById('posts-empty');
-        if (listEl) listEl.style.display = (toShow.length > 0) ? '' : 'none';
-        if (emptyEl) emptyEl.style.display = (toShow.length === 0) ? 'block' : 'none';
+        if (toShow.length > 0) setViewState('list'); else setViewState('empty');
         if (moreWrap) moreWrap.style.display = (currentShown < allFilteredItems.length) ? 'block' : 'none';
       }
 
       function loadList(append) {
         if (!listEl) return;
-        if (!append) loadingEl.style.display = 'block';
+        if (!append) setViewState('loading');
         window.app.fetchPosts(board, 500, 0, function(err, items) {
-          loadingEl.style.display = 'none';
           allFilteredItems = applyFilterAndSort(items || []);
           if (!append) currentShown = PAGE_SIZE;
           else currentShown = Math.min(currentShown + PAGE_SIZE, allFilteredItems.length);
@@ -361,6 +359,8 @@
       }
 
       if (moreBtn) moreBtn.onclick = function() { currentShown = Math.min(currentShown + PAGE_SIZE, allFilteredItems.length); renderPage(); };
+      var errorRetry = document.getElementById('view-error-retry');
+      if (errorRetry) errorRetry.onclick = function() { loadList(false); };
 
       if (searchBtn && searchInput) {
         searchBtn.onclick = function() {
@@ -388,35 +388,41 @@
       }
     })();
     function openModal(id) {
-      document.getElementById(id).classList.add('is-open');
+      var el = document.getElementById(id);
+      if (el) { el.classList.add('is-open'); el.setAttribute('aria-hidden', 'false'); }
       document.body.style.overflow = 'hidden';
     }
     function closeModal(id) {
-      document.getElementById(id).classList.remove('is-open');
+      var el = document.getElementById(id);
+      if (el) { el.classList.remove('is-open'); el.setAttribute('aria-hidden', 'true'); }
       document.body.style.overflow = '';
     }
     document.querySelectorAll('.modal-overlay').forEach(function(el) {
+      el.setAttribute('aria-hidden', 'true');
+      el.setAttribute('aria-modal', 'true');
+      el.setAttribute('role', 'dialog');
       el.addEventListener('click', function(e) { if (e.target === el) closeModal(el.id); });
     });
+    document.addEventListener('keydown', function(e) {
+      if (e.key === 'Escape') {
+        var open = document.querySelector('.modal-overlay.is-open');
+        if (open) closeModal(open.id);
+      }
+    });
     function updateHeaderAuth() {
-      var auth = document.getElementById('headerAuth');
-      var userEl = document.getElementById('headerUser');
-      var loginBtn = document.getElementById('headerLoginBtn');
-      var signupBtn = document.getElementById('headerSignupBtn');
-      var logoutBtn = document.getElementById('headerLogoutBtn');
-      if (!auth) return;
+      var guestEl = document.getElementById('headerAuthGuest');
+      var userEl = document.getElementById('headerAuthUser');
+      var nameEl = document.getElementById('headerUser');
+      if (!guestEl || !userEl) return;
       var loggedIn = window.app && window.app.isLoggedIn && window.app.isLoggedIn();
       var user = window.app && window.app.getUser && window.app.getUser();
-      if (loggedIn && user && (userEl || loginBtn)) {
-        if (userEl) { userEl.textContent = (user.name || user.email || '회원') + '님'; userEl.style.display = 'inline'; }
-        if (loginBtn) loginBtn.style.display = 'none';
-        if (signupBtn) signupBtn.style.display = 'none';
-        if (logoutBtn) logoutBtn.style.display = 'inline-block';
+      if (loggedIn && user) {
+        guestEl.style.display = 'none';
+        userEl.style.display = '';
+        if (nameEl) nameEl.textContent = (user.name || user.email || '회원') + '님';
       } else {
-        if (userEl) userEl.style.display = 'none';
-        if (loginBtn) loginBtn.style.display = 'inline-block';
-        if (signupBtn) signupBtn.style.display = 'inline-block';
-        if (logoutBtn) logoutBtn.style.display = 'none';
+        guestEl.style.display = '';
+        userEl.style.display = 'none';
       }
     }
     window.addEventListener('authStateChanged', updateHeaderAuth);
