@@ -98,7 +98,15 @@
     } catch (e) { return []; }
   }
   function getMockComments(postId) {
-    return (MOCK_COMMENTS[postId] || []).map(function (c) { return { id: c.id, author: c.author, date: c.date, body: c.body, verified: c.verified }; });
+    var now = Date.now();
+    return (MOCK_COMMENTS[postId] || []).map(function (c, i) {
+      return { id: c.id, author: c.author, date: c.date, body: c.body, verified: c.verified, createdAt: now - 3600000 * (i + 2) };
+    });
+  }
+  function commentSortKey(c) {
+    if (c.createdAt != null) return Number(c.createdAt);
+    var m = (c.id || '').toString().match(/comment_(\d+)/);
+    return m ? parseInt(m[1], 10) : 0;
   }
   function getComments(postId, callback) {
     var url = BASE('api/community/posts/' + (postId || '') + '/comments');
@@ -108,18 +116,21 @@
         var local = getLocalComments(postId);
         var mock = getMockComments(postId);
         var combined = local.concat(mock);
+        combined.sort(function (a, b) { return commentSortKey(a) - commentSortKey(b); });
         callback(null, combined);
       });
   }
   function addLocalComment(postId, data) {
     var list = getLocalComments(postId);
     var id = 'comment_' + Date.now();
+    var now = Date.now();
     var comment = {
       id: id,
       author: data.author || '익명',
       date: formatRelativeDate(new Date()),
       body: data.body || '',
-      verified: false
+      verified: false,
+      createdAt: now
     };
     list.push(comment);
     try { localStorage.setItem(getCommentsStorageKey(postId), JSON.stringify(list)); } catch (e) {}
