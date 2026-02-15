@@ -41,11 +41,11 @@
   ];
 
   var MOCK_POSTS = [
-    { id: '1', title: 'PG사 토스 vs 이니시스 vs 나이스 수수료 비교 후기 있어요', author: '가맹점주', date: '2시간 전', hits: 42, board: 'fee', body: '', verified: false },
-    { id: '2', title: '쇼핑몰 오픈 3개월 차, 정산 일정 D+5면 괜찮을까요?', author: '초보사장', date: '5시간 전', hits: 28, board: 'qna', verified: false },
-    { id: '3', title: '전자세금계산서 자동 발행 연동 PG 추천 부탁드려요', author: '회원', date: '어제', hits: 15, board: 'qna', verified: false },
-    { id: '4', title: '결제 오류 시 PG사 대응 팁 공유합니다', author: '운영자', date: '2일 전', hits: 89, board: 'info', verified: true },
-    { id: '5', title: '영세사업자 수수료 우대 받은 분 계신가요?', author: '가맹점주', date: '3일 전', hits: 56, board: 'fee', body: '', verified: false }
+    { id: '1', title: 'PG사 토스 vs 이니시스 vs 나이스 수수료 비교 후기 있어요', author: '가맹점주', date: '2시간 전', hits: 42, board: 'fee', body: '', verified: false, commentCount: 1 },
+    { id: '2', title: '쇼핑몰 오픈 3개월 차, 정산 일정 D+5면 괜찮을까요?', author: '초보사장', date: '5시간 전', hits: 28, board: 'qna', verified: false, commentCount: 0 },
+    { id: '3', title: '전자세금계산서 자동 발행 연동 PG 추천 부탁드려요', author: '회원', date: '어제', hits: 15, board: 'qna', verified: false, commentCount: 0 },
+    { id: '4', title: '결제 오류 시 PG사 대응 팁 공유합니다', author: '운영자', date: '2일 전', hits: 89, board: 'info', verified: true, commentCount: 1 },
+    { id: '5', title: '영세사업자 수수료 우대 받은 분 계신가요?', author: '가맹점주', date: '3일 전', hits: 56, board: 'fee', body: '', verified: false, commentCount: 0 }
   ];
 
   var MOCK_COMMENTS = {
@@ -278,8 +278,39 @@
         })
         .catch(function () {
           var local = getLocalPosts();
-          var mock = MOCK_POSTS.map(function (p) { return { id: p.id, title: p.title, author: p.author, date: p.date, board: p.board || 'free', hits: p.hits, verified: p.verified }; });
-          var combined = local.map(function (p) { return { id: p.id, title: p.title, author: p.author, date: p.date, board: p.board || 'free', hits: p.hits != null ? p.hits : 0, body: p.body, verified: p.verified }; }).concat(mock);
+          var mock = MOCK_POSTS.map(function (p) { 
+            // 댓글 개수 계산: MOCK_COMMENTS에서 가져오거나 기본값 사용
+            var commentCount = p.commentCount != null ? p.commentCount : (MOCK_COMMENTS[p.id] ? MOCK_COMMENTS[p.id].length : 0);
+            return { 
+              id: p.id, 
+              title: p.title, 
+              author: p.author, 
+              date: p.date, 
+              board: p.board || 'free', 
+              hits: p.hits, 
+              verified: p.verified,
+              commentCount: commentCount
+            }; 
+          });
+          var combined = local.map(function (p) { 
+            // 로컬 포스트의 댓글 개수 계산
+            var localComments = getLocalComments(p.id);
+            var mockComments = getMockComments(p.id);
+            var hiddenComments = getHiddenCommentIds(p.id);
+            var totalComments = localComments.length + mockComments.filter(function(c) { return hiddenComments.indexOf(c.id) === -1; }).length;
+            
+            return { 
+              id: p.id, 
+              title: p.title, 
+              author: p.author, 
+              date: p.date, 
+              board: p.board || 'free', 
+              hits: p.hits != null ? p.hits : 0, 
+              body: p.body, 
+              verified: p.verified,
+              commentCount: totalComments
+            }; 
+          }).concat(mock);
           var filtered = (board && board !== 'all') ? combined.filter(function (p) { return p.board === board; }) : combined;
           callback(null, filtered.slice(0, limit || 20), filtered.length);
         });
@@ -320,7 +351,18 @@
         var badge = showBoardBadge ? '<span class="feed-board-badge">' + (boardLabels[board] || board) + '</span>' : '';
         var verified = (p.verified === true || isAuthorVerified(p.author)) ? verifiedBadgeHtml(true, p.author) : '';
         var meta = (p.author ? p.author + ' · ' : '') + (p.date || '') + (p.hits != null ? ' · 조회 ' + p.hits : '') + verified;
-        return '<li class="feed-item"><a href="' + href + '" class="feed-title">' + badge + (p.title || '') + '</a><span class="feed-meta">' + meta + '</span></li>';
+        
+        // 댓글 개수 뱃지 (0이면 표시하지 않음)
+        var commentCount = p.commentCount || 0;
+        var commentBadge = commentCount > 0 ? '<span class="comment-count-badge">' + commentCount + '</span>' : '';
+        
+        return '<li class="feed-item">' +
+          '<a href="' + href + '" class="feed-title-wrapper">' +
+            '<span class="feed-title-content">' + badge + (p.title || '') + '</span>' +
+            commentBadge +
+          '</a>' +
+          '<span class="feed-meta">' + meta + '</span>' +
+        '</li>';
       }).join('');
     },
 
