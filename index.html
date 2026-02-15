@@ -117,87 +117,13 @@
     </div>
   </main>
 
-  <!-- 로그인 모달 -->
-  <div class="modal-overlay" id="loginModal" aria-hidden="true">
-    <div class="modal">
-      <div class="modal-header">
-        <h3>로그인</h3>
-        <button type="button" class="modal-close" onclick="closeModal('loginModal')" aria-label="닫기">&times;</button>
-      </div>
-      <div class="modal-body">
-        <form onsubmit="return false;">
-          <div class="form-group">
-            <label for="login-email">이메일</label>
-            <input type="email" id="login-email" placeholder="example@email.com" required>
-          </div>
-          <div class="form-group">
-            <label for="login-pw">비밀번호</label>
-            <input type="password" id="login-pw" placeholder="비밀번호" required>
-          </div>
-          <div class="form-options">
-            <label><input type="checkbox" name="remember"> 로그인 유지</label>
-            <a href="mailto:leesk0130@naver.com?subject=가맹점숲 비밀번호 찾기">비밀번호 찾기</a>
-          </div>
-          <div id="login-error" class="msg-error" style="display:none;"></div>
-          <div id="login-success" class="msg-success" style="display:none;"></div>
-          <div class="modal-footer">
-            <button type="submit" class="btn btn-primary" id="login-submit-btn">로그인</button>
-          </div>
-        </form>
-        <p class="modal-switch">아직 회원이 아니신가요? <a href="javascript:void(0)" onclick="closeModal('loginModal'); openModal('signupModal');">회원가입</a></p>
-      </div>
-    </div>
-  </div>
-
-  <!-- 회원가입 모달 -->
-  <div class="modal-overlay" id="signupModal" aria-hidden="true">
-    <div class="modal">
-      <div class="modal-header">
-        <h3>회원가입</h3>
-        <button type="button" class="modal-close" onclick="closeModal('signupModal')" aria-label="닫기">&times;</button>
-      </div>
-      <div class="modal-body">
-        <form id="signupForm" onsubmit="return false;">
-          <div class="form-group">
-            <label for="signup-name">이름 또는 닉네임</label>
-            <input type="text" id="signup-name" placeholder="커뮤니티에 표시될 이름" required autocomplete="name">
-          </div>
-          <div class="form-group">
-            <label for="signup-email">이메일</label>
-            <input type="email" id="signup-email" placeholder="example@email.com" required autocomplete="email">
-          </div>
-          <div class="form-group">
-            <label for="signup-pw">비밀번호</label>
-            <input type="password" id="signup-pw" placeholder="8자 이상 입력" required minlength="8" autocomplete="new-password">
-          </div>
-          <div class="form-group">
-            <label for="signup-pw2">비밀번호 확인</label>
-            <input type="password" id="signup-pw2" placeholder="비밀번호 다시 입력" required autocomplete="new-password">
-          </div>
-          <div class="form-group form-agree">
-            <label><input type="checkbox" required> <a href="terms.html" target="_blank" rel="noopener">이용약관</a> 및 <a href="privacy.html" target="_blank" rel="noopener">개인정보처리방침</a>에 동의합니다.</label>
-          </div>
-          <div id="signup-error" class="msg-error" style="display:none;"></div>
-          <div id="signup-success" class="msg-success" style="display:none;"></div>
-          <div class="modal-footer">
-            <button type="submit" class="btn btn-primary" id="signup-submit-btn">가입하기</button>
-          </div>
-        </form>
-        <p class="modal-switch">이미 회원이신가요? <a href="javascript:void(0)" onclick="closeModal('signupModal'); openModal('loginModal');">로그인</a></p>
-      </div>
-    </div>
-  </div>
-
   <footer>
     <div class="footer-inner">
       <p><a href="terms.html">이용약관</a> | <a href="privacy.html">개인정보처리방침</a> | <a href="verify.html">인증 안내</a></p>
       <p>© 2025–2026 가맹점숲. 온라인 가맹점 정보 & 커뮤니티. All rights reserved.</p>
       <div class="footer-contact">
         <h4>문의하기</h4>
-        <p><a href="tel:010-9694-4336">010-9694-4336</a></p>
-        <p>이수광</p>
-        <p><a href="mailto:leesk0130@naver.com">leesk0130@naver.com</a></p>
-        <p>서울특별시 동대문구 이문동 317-16 201호</p>
+        <p>문의: <a href="mailto:leesk0130@naver.com?subject=가맹점숲 문의">leesk0130@naver.com</a></p>
       </div>
     </div>
   </footer>
@@ -228,93 +154,6 @@
         });
       }
     })();
-    function openModal(id) {
-      document.getElementById(id).classList.add('is-open');
-      document.body.style.overflow = 'hidden';
-    }
-    function closeModal(id) {
-      document.getElementById(id).classList.remove('is-open');
-      document.body.style.overflow = '';
-    }
-    document.querySelectorAll('.modal-overlay').forEach(function(el) {
-      el.addEventListener('click', function(e) { if (e.target === el) closeModal(el.id); });
-    });
-    var loginForm = document.querySelector('#loginModal form');
-    var loginErrorEl = document.getElementById('login-error');
-    var loginBtn = document.getElementById('login-submit-btn');
-    if (loginForm) {
-      loginForm.addEventListener('submit', function(e) {
-        e.preventDefault();
-        var email = document.getElementById('login-email').value.trim();
-        var pw = document.getElementById('login-pw').value;
-        if (loginErrorEl) { loginErrorEl.style.display = 'none'; loginErrorEl.textContent = ''; }
-        if (!email || !pw) {
-          if (loginErrorEl) { loginErrorEl.textContent = '이메일과 비밀번호를 입력해 주세요.'; loginErrorEl.style.display = 'block'; }
-          return;
-        }
-        if (loginBtn) { loginBtn.disabled = true; loginBtn.textContent = '로그인 중...'; }
-        window.app.login(email, pw, function(err, data) {
-          if (loginBtn) { loginBtn.disabled = false; loginBtn.textContent = '로그인'; }
-          if (err) {
-            if (loginErrorEl) { loginErrorEl.textContent = err; loginErrorEl.style.display = 'block'; }
-            return;
-          }
-          if (loginErrorEl) loginErrorEl.style.display = 'none';
-          var loginSuccessEl = document.getElementById('login-success');
-          if (loginSuccessEl) {
-            var userName = (data && data.user && data.user.name) ? data.user.name : (window.app.getUser && window.app.getUser() && window.app.getUser().name) ? window.app.getUser().name : '';
-            loginSuccessEl.textContent = userName ? userName + '님, 로그인되었습니다. 환영해요!' : '로그인되었습니다. 환영해요!';
-            loginSuccessEl.style.display = 'block';
-          }
-          setTimeout(function() {
-            closeModal('loginModal');
-            if (loginSuccessEl) loginSuccessEl.style.display = 'none';
-            // 헤더 인증 상태 업데이트
-            if (window.authSystem) {
-              window.authSystem.onLoginSuccess();
-            }
-          }, 1500);
-        });
-      });
-    }
-    var signupForm = document.getElementById('signupForm');
-    var signupErrorEl = document.getElementById('signup-error');
-    var signupSuccessEl = document.getElementById('signup-success');
-    var signupBtn = document.getElementById('signup-submit-btn');
-    if (signupForm) {
-      signupForm.addEventListener('submit', function(e) {
-        e.preventDefault();
-        var name = document.getElementById('signup-name').value.trim();
-        var email = document.getElementById('signup-email').value.trim();
-        var pw = document.getElementById('signup-pw').value;
-        var pw2 = document.getElementById('signup-pw2').value;
-        if (signupErrorEl) signupErrorEl.style.display = 'none';
-        if (signupSuccessEl) signupSuccessEl.style.display = 'none';
-        if (!name) { if (signupErrorEl) { signupErrorEl.textContent = '이름 또는 닉네임을 입력해 주세요.'; signupErrorEl.style.display = 'block'; } return; }
-        if (!email) { if (signupErrorEl) { signupErrorEl.textContent = '이메일을 입력해 주세요.'; signupErrorEl.style.display = 'block'; } return; }
-        if (pw.length < 8) { if (signupErrorEl) { signupErrorEl.textContent = '비밀번호는 8자 이상이어야 해요.'; signupErrorEl.style.display = 'block'; } return; }
-        if (pw !== pw2) { if (signupErrorEl) { signupErrorEl.textContent = '비밀번호가 일치하지 않아요.'; signupErrorEl.style.display = 'block'; } return; }
-        if (signupBtn) { signupBtn.disabled = true; signupBtn.textContent = '가입 중...'; }
-        window.app.signup(name, email, pw, function(err) {
-          if (signupBtn) { signupBtn.disabled = false; signupBtn.textContent = '가입하기'; }
-          if (err) {
-            if (signupErrorEl) { signupErrorEl.textContent = err; signupErrorEl.style.display = 'block'; }
-            return;
-          }
-          if (signupSuccessEl) {
-            signupSuccessEl.textContent = '회원가입이 완료되었어요. 잠시 후 로그인 화면으로 이동합니다.';
-            signupSuccessEl.style.display = 'block';
-          }
-          setTimeout(function() {
-            closeModal('signupModal');
-            if (signupErrorEl) signupErrorEl.style.display = 'none';
-            if (signupSuccessEl) signupSuccessEl.style.display = 'none';
-            openModal('loginModal');
-            if (document.getElementById('login-email')) document.getElementById('login-email').value = email;
-          }, 1800);
-        });
-      });
-    }
     function toggleNav() {
       var nav = document.getElementById('headerNav');
       var btn = document.querySelector('.nav-toggle');
