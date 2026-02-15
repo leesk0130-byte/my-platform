@@ -46,11 +46,11 @@
       // 로그인 상태: [닉네임] [로그아웃]
       var displayName = (currentUser.name || currentUser.email || '회원') + '님';
       html = '<span class="header-user">' + displayName + '</span>' +
-             '<button type="button" class="btn btn-outline" onclick="window.authSystem.logout()">로그아웃</button>';
+             '<button type="button" class="btn btn-outline" data-auth="logout">로그아웃</button>';
     } else {
-      // 비로그인 상태: [로그인] [회원가입]
-      html = '<button type="button" class="btn btn-outline" onclick="window.authSystem.openLoginModal()">로그인</button>' +
-             '<button type="button" class="btn btn-primary" onclick="window.authSystem.openSignupModal()">회원가입</button>';
+      // 비로그인 상태: [로그인] [회원가입] — data-auth로 클릭 위임 처리 (onclick 의존 제거)
+      html = '<button type="button" class="btn btn-outline" data-auth="login">로그인</button>' +
+             '<button type="button" class="btn btn-primary" data-auth="signup">회원가입</button>';
     }
     
     authContainer.innerHTML = html;
@@ -294,9 +294,32 @@
   }
 
   /**
+   * 헤더 로그인/회원가입/로그아웃 버튼 클릭 — document 위임 (버튼이 동적이라 onclick 대신)
+   */
+  function setupAuthClickDelegation() {
+    document.addEventListener('click', function(e) {
+      var btn = e.target && e.target.closest && e.target.closest('[data-auth]');
+      if (!btn) return;
+      var action = btn.getAttribute('data-auth');
+      if (action === 'login') {
+        e.preventDefault();
+        openLoginModal();
+      } else if (action === 'signup') {
+        e.preventDefault();
+        openSignupModal();
+      } else if (action === 'logout') {
+        e.preventDefault();
+        logout();
+      }
+    });
+  }
+
+  /**
    * 초기화
    */
   function init() {
+    setupAuthClickDelegation();
+
     // DOM 로드 완료 후 실행
     if (document.readyState === 'loading') {
       document.addEventListener('DOMContentLoaded', function() {
