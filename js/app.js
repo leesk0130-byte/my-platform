@@ -230,6 +230,8 @@
   }
 
   function showToast(message, type) {
+    var text = (message || '').toString().trim();
+    if (text === '잠시 후 다시 시도해 주세요.' || text === '') return;
     type = type || 'default';
     var container = document.getElementById('toast-container');
     if (!container) {
@@ -241,7 +243,7 @@
     var toast = document.createElement('div');
     toast.className = 'toast' + (type === 'error' ? ' toast-error' : type === 'success' ? ' toast-success' : '');
     toast.setAttribute('role', 'alert');
-    toast.textContent = message || '잠시 후 다시 시도해 주세요.';
+    toast.textContent = text;
     container.appendChild(toast);
     setTimeout(function () {
       if (toast.parentNode) toast.parentNode.removeChild(toast);
