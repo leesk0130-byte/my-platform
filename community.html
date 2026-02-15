@@ -336,6 +336,15 @@
         if (post) {
           // Post found - show detail view
           console.log('Post found, showing detail view');
+          
+          // 조회수 증가 (쿨다운 적용)
+          if (window.app && window.app.incrementPostViews) {
+            var viewIncreased = window.app.incrementPostViews(postId);
+            if (viewIncreased) {
+              console.log('Post view count increased for post:', postId);
+            }
+          }
+          
           setViewState('detail');
           
           // Populate post details

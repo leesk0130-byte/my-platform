@@ -40,13 +40,63 @@
     { id: '8', title: '온라인 쇼핑몰 개인정보처리방침·이용약관 필수 게시 항목', link: 'must-know.html#privacy', date: '2025-02-04', badge: '정책', source: '가맹점숲' }
   ];
 
-  var MOCK_POSTS = [
-    { id: '1', title: 'PG사 토스 vs 이니시스 vs 나이스 수수료 비교 후기 있어요', author: '가맹점주', date: '2시간 전', hits: 42, board: 'fee', body: '', verified: false, commentCount: 1 },
-    { id: '2', title: '쇼핑몰 오픈 3개월 차, 정산 일정 D+5면 괜찮을까요?', author: '초보사장', date: '5시간 전', hits: 28, board: 'qna', verified: false, commentCount: 0 },
-    { id: '3', title: '전자세금계산서 자동 발행 연동 PG 추천 부탁드려요', author: '회원', date: '어제', hits: 15, board: 'qna', verified: false, commentCount: 0 },
-    { id: '4', title: '결제 오류 시 PG사 대응 팁 공유합니다', author: '운영자', date: '2일 전', hits: 89, board: 'info', verified: true, commentCount: 1 },
-    { id: '5', title: '영세사업자 수수료 우대 받은 분 계신가요?', author: '가맹점주', date: '3일 전', hits: 56, board: 'fee', body: '', verified: false, commentCount: 0 }
+  // 동적 시간 생성을 위한 기본 템플릿 (createdAt 없이)
+  var MOCK_POSTS_TEMPLATE = [
+    { id: '1', title: 'PG사 토스 vs 이니시스 vs 나이스 수수료 비교 후기 있어요', author: '가맹점주', hits: 42, board: 'fee', body: '', verified: false, hoursAgo: 2 },
+    { id: '2', title: '쇼핑몰 오픈 3개월 차, 정산 일정 D+5면 괜찮을까요?', author: '초보사장', hits: 28, board: 'qna', verified: false, hoursAgo: 5 },
+    { id: '3', title: '전자세금계산서 자동 발행 연동 PG 추천 부탁드려요', author: '회원', hits: 15, board: 'qna', verified: false, hoursAgo: 24 },
+    { id: '4', title: '결제 오류 시 PG사 대응 팁 공유합니다', author: '운영자', hits: 89, board: 'info', verified: true, hoursAgo: 48 },
+    { id: '5', title: '영세사업자 수수료 우대 받은 분 계신가요?', author: '가맹점주', hits: 56, board: 'fee', body: '', verified: false, hoursAgo: 72 }
   ];
+
+  // 동적 MOCK_POSTS 생성 함수
+  function generateMockPosts() {
+    var MOCK_TIMESTAMPS_KEY = 'mock_posts_timestamps';
+    var savedTimestamps = localStorage.getItem(MOCK_TIMESTAMPS_KEY);
+    var timestamps = {};
+    
+    if (savedTimestamps) {
+      try {
+        timestamps = JSON.parse(savedTimestamps);
+      } catch (e) {
+        timestamps = {};
+      }
+    }
+    
+    var now = Date.now();
+    var needsSave = false;
+    
+    return MOCK_POSTS_TEMPLATE.map(function(template) {
+      // 저장된 타임스탬프가 없으면 새로 생성
+      if (!timestamps[template.id]) {
+        timestamps[template.id] = now - (template.hoursAgo * 60 * 60 * 1000);
+        needsSave = true;
+      }
+      
+      var createdAt = timestamps[template.id];
+      var date = formatRelativeDate(new Date(createdAt));
+      
+      return {
+        id: template.id,
+        title: template.title,
+        author: template.author,
+        date: date,
+        hits: template.hits,
+        board: template.board,
+        body: template.body || '',
+        verified: template.verified,
+        createdAt: createdAt
+      };
+    });
+    
+    // 새로운 타임스탬프가 생성되었으면 저장
+    if (needsSave) {
+      localStorage.setItem(MOCK_TIMESTAMPS_KEY, JSON.stringify(timestamps));
+    }
+  }
+  
+  // 동적으로 생성된 MOCK_POSTS
+  var MOCK_POSTS = generateMockPosts();
 
   var MOCK_COMMENTS = {
     '1': [{ id: 'c1', author: '가맹점주', date: '1시간 전', body: '저도 토스 쓰는데 연회비 11만원에 카드 수수료 3.4%라 부담돼요. 이니시스 연회비 면제인 거 보고 바꿀까 고민 중.', verified: false }],
@@ -229,6 +279,56 @@
     setUser(null);
   }
 
+  // 조회수 관리 함수들
+  var POST_VIEWS_KEY = 'post_views_map';
+  var LAST_VIEWED_KEY = 'last_viewed_map';
+  var VIEW_COOLDOWN = 30 * 60 * 1000; // 30분
+
+  function getPostViews() {
+    try {
+      return JSON.parse(localStorage.getItem(POST_VIEWS_KEY) || '{}');
+    } catch (e) {
+      return {};
+    }
+  }
+
+  function getLastViewed() {
+    try {
+      return JSON.parse(localStorage.getItem(LAST_VIEWED_KEY) || '{}');
+    } catch (e) {
+      return {};
+    }
+  }
+
+  function incrementPostViews(postId) {
+    if (!postId) return false;
+    
+    var now = Date.now();
+    var lastViewed = getLastViewed();
+    var lastViewTime = lastViewed[postId] || 0;
+    
+    // 쿨다운 체크 (30분 이내면 조회수 증가 안 함)
+    if (now - lastViewTime < VIEW_COOLDOWN) {
+      return false;
+    }
+    
+    // 조회수 증가
+    var views = getPostViews();
+    views[postId] = (views[postId] || 0) + 1;
+    localStorage.setItem(POST_VIEWS_KEY, JSON.stringify(views));
+    
+    // 마지막 조회 시간 업데이트
+    lastViewed[postId] = now;
+    localStorage.setItem(LAST_VIEWED_KEY, JSON.stringify(lastViewed));
+    
+    return true;
+  }
+
+  function getPostViewCount(postId) {
+    var views = getPostViews();
+    return views[postId] || 0;
+  }
+
   function showToast(message, type) {
     var text = (message || '').toString().trim();
     if (text === '잠시 후 다시 시도해 주세요.' || text === '') return;
@@ -285,15 +385,20 @@
             var hiddenComments = getHiddenCommentIds(p.id);
             var totalComments = localComments.length + mockComments.filter(function(c) { return hiddenComments.indexOf(c.id) === -1; }).length;
             
+            // 조회수 계산: 기본 조회수 + localStorage 조회수
+            var additionalViews = getPostViewCount(p.id);
+            var totalHits = (p.hits || 0) + additionalViews;
+            
             return { 
               id: p.id, 
               title: p.title, 
               author: p.author, 
               date: p.date, 
               board: p.board || 'free', 
-              hits: p.hits, 
+              hits: totalHits, 
               verified: p.verified,
-              commentCount: totalComments
+              commentCount: totalComments,
+              createdAt: p.createdAt
             }; 
           });
           var combined = local.map(function (p) { 
@@ -500,6 +605,10 @@
         });
     },
 
-    showToast: showToast
+    showToast: showToast,
+    
+    // 조회수 관련 함수들
+    incrementPostViews: incrementPostViews,
+    getPostViewCount: getPostViewCount
   };
 })();
