@@ -12,6 +12,11 @@
   <meta property="og:description" content="온라인 쇼핑몰·가맹점 관련 뉴스. PG 수수료, 전자상거래, 쇼핑몰 정책·시장 소식.">
   <meta property="og:url" content="https://my-platform.pages.dev/news.html">
   <meta property="og:locale" content="ko_KR">
+  <meta property="og:image" content="https://my-platform.pages.dev/og-image.png">
+  <meta name="twitter:card" content="summary_large_image">
+  <meta name="twitter:title" content="온라인 쇼핑몰 뉴스 | 가맹점숲">
+  <meta name="twitter:description" content="온라인 쇼핑몰·가맹점 관련 뉴스. PG 수수료, 전자상거래, 쇼핑몰 정책·시장 소식.">
+  <meta name="twitter:image" content="https://my-platform.pages.dev/og-image.png">
   <link rel="stylesheet" href="css/common.css">
   <script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-3006893636342653" crossorigin="anonymous"></script>
 </head>
@@ -45,7 +50,7 @@
     <section class="section">
       <div class="card">
         <h3 class="section-title">최신 뉴스</h3>
-        <div id="news-loading" class="loading" style="display:none;">뉴스를 불러오는 중이에요...</div>
+        <div id="news-loading" class="loading-state" style="display:none;" aria-live="polite"><div class="loading-spinner"></div><p>뉴스를 불러오는 중이에요...</p></div>
         <div id="news-detail" class="news-detail" style="display:none;">
           <h2 id="news-detail-title" class="news-detail-title"></h2>
           <div id="news-detail-meta" class="news-detail-meta"></div>
@@ -128,7 +133,7 @@
         if (items && items.length) {
           window.app.renderNews('news-list', items);
         } else {
-          listEl.innerHTML = '<li class="empty">아직 뉴스가 없어요. 서버에서 네이버 뉴스 API를 연동하면 여기에 실시간 뉴스가 표시돼요.</li>';
+          listEl.innerHTML = '<li class="empty-state" style="list-style:none;margin:0;"><p class="empty-state-icon" aria-hidden="true">📰</p><p class="empty-state-title">아직 뉴스가 없어요!</p><p class="empty-state-desc">서버에서 뉴스 API를 연동하면 여기에 실시간 뉴스가 표시돼요. 잠시 후 다시 확인해 주세요.</p></li>';
         }
       });
     })();

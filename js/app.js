@@ -113,8 +113,10 @@
     fetch(url).then(function (res) { return res.ok ? res.json() : Promise.reject(); })
       .then(function (data) { callback(null, data.items || data || []); })
       .catch(function () {
+        showToast('잠시 후 다시 시도해 주세요.');
         var local = getLocalComments(postId);
-        var mock = getMockComments(postId);
+        var hidden = getHiddenCommentIds(postId);
+        var mock = getMockComments(postId).filter(function (c) { return hidden.indexOf(c.id) === -1; });
         var combined = local.concat(mock);
         combined.sort(function (a, b) { return commentSortKey(a) - commentSortKey(b); });
         callback(null, combined);
@@ -135,6 +137,32 @@
     list.push(comment);
     try { localStorage.setItem(getCommentsStorageKey(postId), JSON.stringify(list)); } catch (e) {}
     return comment;
+  }
+  var HIDDEN_COMMENTS_PREFIX = 'merchant_plus_hidden_comments_';
+  function getHiddenCommentIds(postId) {
+    try {
+      return JSON.parse(localStorage.getItem(HIDDEN_COMMENTS_PREFIX + (postId || '')) || '[]');
+    } catch (e) { return []; }
+  }
+  function addHiddenCommentId(postId, commentId) {
+    var ids = getHiddenCommentIds(postId);
+    if (ids.indexOf(commentId) === -1) { ids.push(commentId); localStorage.setItem(HIDDEN_COMMENTS_PREFIX + (postId || ''), JSON.stringify(ids)); }
+  }
+  function deleteComment(postId, commentId, callback) {
+    if ((commentId || '').toString().indexOf('comment_') === 0) {
+      var list = getLocalComments(postId).filter(function (c) { return c.id !== commentId; });
+      try { localStorage.setItem(getCommentsStorageKey(postId), JSON.stringify(list)); } catch (e) {}
+    } else {
+      addHiddenCommentId(postId, commentId);
+    }
+    if (callback) callback();
+  }
+  function isOperator() {
+    var u = getUser();
+    if (!u) return false;
+    if (u.name === '운영자') return true;
+    var em = (u.email || '').toString().toLowerCase().trim();
+    return em === OPERATOR_EMAIL.toLowerCase();
   }
   function addComment(postId, data, callback) {
     var url = BASE('api/community/posts/' + (postId || '') + '/comments');
@@ -202,6 +230,25 @@
     setUser(null);
   }
 
+  function showToast(message, type) {
+    type = type || 'default';
+    var container = document.getElementById('toast-container');
+    if (!container) {
+      container = document.createElement('div');
+      container.id = 'toast-container';
+      container.className = 'toast-container';
+      document.body.appendChild(container);
+    }
+    var toast = document.createElement('div');
+    toast.className = 'toast' + (type === 'error' ? ' toast-error' : type === 'success' ? ' toast-success' : '');
+    toast.setAttribute('role', 'alert');
+    toast.textContent = message || '잠시 후 다시 시도해 주세요.';
+    container.appendChild(toast);
+    setTimeout(function () {
+      if (toast.parentNode) toast.parentNode.removeChild(toast);
+    }, 3500);
+  }
+
   window.app = {
     apiUrl: BASE,
     getToken: getToken,
@@ -218,6 +265,7 @@
           callback(null, data.items || data, data.total);
         })
         .catch(function () {
+          showToast('잠시 후 다시 시도해 주세요.');
           callback(null, MOCK_NEWS.slice(0, limit || 10), MOCK_NEWS.length);
         });
     },
@@ -229,6 +277,7 @@
           callback(null, data.items || data, data.total);
         })
         .catch(function () {
+          showToast('잠시 후 다시 시도해 주세요.');
           var local = getLocalPosts();
           var mock = MOCK_POSTS.map(function (p) { return { id: p.id, title: p.title, author: p.author, date: p.date, board: p.board || 'free', hits: p.hits, verified: p.verified }; });
           var combined = local.map(function (p) { return { id: p.id, title: p.title, author: p.author, date: p.date, board: p.board || 'free', hits: p.hits != null ? p.hits : 0, body: p.body, verified: p.verified }; }).concat(mock);
@@ -286,16 +335,23 @@
     getComments: getComments,
     addComment: addComment,
     addLocalComment: addLocalComment,
-    renderComments: function (containerId, list) {
+    deleteComment: deleteComment,
+    isOperator: isOperator,
+    renderComments: function (containerId, list, opts) {
       var el = document.getElementById(containerId);
       if (!el) return;
+      opts = opts || {};
+      var postId = opts.postId;
+      var canDelete = opts.canDelete === true && postId;
       if (!list || list.length === 0) {
         el.innerHTML = '<li class="comment-empty">아직 댓글이 없어요. 첫 댓글을 남겨 보세요.</li>';
         return;
       }
       el.innerHTML = list.map(function (c) {
         var verified = (c.verified === true || isAuthorVerified(c.author)) ? verifiedBadgeHtml(true, c.author) : '';
-        return '<li class="comment-item"><div class="comment-meta">' + (c.author || '익명') + verified + ' · ' + (c.date || '') + '</div><div class="comment-body">' + (c.body || '').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/\n/g, '<br>') + '</div></li>';
+        var metaText = '<span class="comment-meta-info">' + (c.author || '익명') + verified + ' · ' + (c.date || '') + '</span>';
+        var delBtn = canDelete ? '<button type="button" class="comment-delete-btn" data-post-id="' + (postId || '').replace(/"/g, '&quot;') + '" data-comment-id="' + (c.id || '').replace(/"/g, '&quot;') + '" aria-label="댓글 삭제">삭제</button>' : '';
+        return '<li class="comment-item"><div class="comment-meta">' + metaText + delBtn + '</div><div class="comment-body">' + (c.body || '').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/\n/g, '<br>') + '</div></li>';
       }).join('');
     },
     isAuthorVerified: isAuthorVerified,
@@ -322,6 +378,7 @@
           } else if (callback) callback(result.error || result.message || '등록 실패');
         })
         .catch(function () {
+          showToast('잠시 후 다시 시도해 주세요.');
           var post = addLocalPost(data);
           if (callback) callback(null, post);
         });
@@ -358,6 +415,7 @@
           } else if (callback) callback(data.error || '로그인 실패');
         })
         .catch(function (err) {
+          showToast('잠시 후 다시 시도해 주세요.');
           if (callback) callback('서버에 연결할 수 없어요. 서버를 켜 두면 로그인됩니다.');
         });
     },
@@ -395,8 +453,11 @@
           } else if (callback) callback(data.error || '가입 실패');
         })
         .catch(function () {
+          showToast('잠시 후 다시 시도해 주세요.');
           if (callback) callback('서버에 연결할 수 없어요. 서버를 켜 두면 회원가입됩니다.');
         });
-    }
+    },
+
+    showToast: showToast
   };
 })();

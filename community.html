@@ -12,6 +12,11 @@
   <meta property="og:description" content="온라인 가맹점·쇼핑몰 커뮤니티. 수수료·정산·운영 정보 나누고 질문하는 게시판.">
   <meta property="og:url" content="https://my-platform.pages.dev/community.html">
   <meta property="og:locale" content="ko_KR">
+  <meta property="og:image" content="https://my-platform.pages.dev/og-image.png">
+  <meta name="twitter:card" content="summary_large_image">
+  <meta name="twitter:title" content="커뮤니티 | 가맹점숲">
+  <meta name="twitter:description" content="온라인 가맹점·쇼핑몰 커뮤니티. 수수료·정산·운영 정보 나누고 질문하는 게시판.">
+  <meta name="twitter:image" content="https://my-platform.pages.dev/og-image.png">
   <link rel="stylesheet" href="css/common.css">
   <script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-3006893636342653" crossorigin="anonymous"></script>
 </head>
@@ -83,11 +88,13 @@
           <button type="button" class="btn btn-outline" id="posts-more-btn">더보기</button>
         </div>
         <div id="posts-empty" class="empty-state" style="display:none;">
-          <p class="empty-state-title">아직 글이 없어요</p>
+          <p class="empty-state-icon" aria-hidden="true">📝</p>
+          <p class="empty-state-title">아직 작성된 글이 없어요!</p>
           <p class="empty-state-desc">첫 글을 작성해 보세요. 수수료·정산·운영 꿀팁을 나눠 주세요.</p>
           <a href="write.html" class="btn btn-primary">첫 글 쓰기</a>
         </div>
         <div id="post-not-found" class="empty-state" style="display:none; margin:1.5rem 2rem;">
+          <p class="empty-state-icon" aria-hidden="true">🔍</p>
           <p class="empty-state-title">글이 없거나 삭제되었습니다</p>
           <p class="empty-state-desc">요청하신 글을 찾을 수 없어요. 목록에서 다시 확인해 주세요.</p>
           <a href="community.html" class="btn btn-primary">목록으로</a>
@@ -162,11 +169,38 @@
   <script src="js/app.js"></script>
   <script>
     (function() {
+      document.addEventListener('click', function(e) {
+        var btn = e.target && e.target.closest && e.target.closest('.comment-delete-btn');
+        if (!btn) return;
+        e.preventDefault();
+        var postId = btn.getAttribute('data-post-id');
+        var commentId = btn.getAttribute('data-comment-id');
+        if (!postId || !commentId || !window.app || !window.app.deleteComment) return;
+        window.app.deleteComment(postId, commentId, function() {
+          window.app.getComments(postId, function(_, comments) {
+            window.app.renderComments('comment-list', comments, { postId: postId, canDelete: window.app.isOperator && window.app.isOperator() });
+            var countEl = document.getElementById('comment-count');
+            if (countEl) countEl.textContent = (comments ? comments.length : 0);
+          });
+        });
+      });
+
       var params = new URLSearchParams(location.search);
       var postId = params.get('id');
       var listEl = document.getElementById('community-list');
       var loadingEl = document.getElementById('posts-loading');
       var detailEl = document.getElementById('post-detail');
+      var currentDetailPostId = null;
+
+      function refreshCommentListWithDeleteFlag() {
+        if (!currentDetailPostId || !document.getElementById('comment-list')) return;
+        window.app.getComments(currentDetailPostId, function(_, comments) {
+          window.app.renderComments('comment-list', comments, { postId: currentDetailPostId, canDelete: window.app.isOperator && window.app.isOperator() });
+          var countEl = document.getElementById('comment-count');
+          if (countEl) countEl.textContent = (comments ? comments.length : 0);
+        });
+      }
+      window.addEventListener('authStateChanged', refreshCommentListWithDeleteFlag);
 
       if (postId) {
         var post = window.app.getLocalPostById(postId);
@@ -188,12 +222,18 @@
           metaEl.innerHTML = (post.author || '익명') + badgeHtml + ' · ' + (post.date || '');
           document.getElementById('post-detail-body').textContent = post.body || '(내용 없음)';
           detailEl.style.display = 'block';
+          currentDetailPostId = postId;
           var currentPostId = postId;
-          window.app.getComments(currentPostId, function(err, comments) {
-            window.app.renderComments('comment-list', comments);
-            var countEl = document.getElementById('comment-count');
-            if (countEl) countEl.textContent = (comments ? comments.length : 0);
-          });
+          function drawComments() {
+            window.app.getComments(currentPostId, function(err, comments) {
+              window.app.renderComments('comment-list', comments, { postId: currentPostId, canDelete: window.app.isOperator && window.app.isOperator() });
+              var countEl = document.getElementById('comment-count');
+              if (countEl) countEl.textContent = (comments ? comments.length : 0);
+            });
+          }
+          drawComments();
+          setTimeout(drawComments, 600);
+          setTimeout(drawComments, 1500);
           var commentForm = document.getElementById('comment-form');
           var nicknameEl = document.getElementById('comment-nickname-value');
           var anonymousCheck = document.getElementById('comment-anonymous');
@@ -222,7 +262,7 @@
                 if (err) { errEl.textContent = err; errEl.style.display = 'block'; return; }
                 document.getElementById('comment-body').value = '';
                 window.app.getComments(currentPostId, function(_, comments) {
-                  window.app.renderComments('comment-list', comments);
+                  window.app.renderComments('comment-list', comments, { postId: currentPostId, canDelete: window.app.isOperator && window.app.isOperator() });
                   var countEl = document.getElementById('comment-count');
                   if (countEl) countEl.textContent = (comments ? comments.length : 0);
                 });
