@@ -421,7 +421,7 @@ a.ad-slot:hover { background: #cbd5e1; }
 .section-title {
   font-size: var(--text-lg);
   font-weight: 700;
-  margin-bottom: 0;
+  margin-bottom: 20px;
   padding: var(--space-5) var(--space-6);
   border-bottom: 1px solid var(--color-border-soft);
   color: var(--color-text);
@@ -449,6 +449,8 @@ a.ad-slot:hover { background: #cbd5e1; }
   overflow: hidden;
   transition: box-shadow 0.25s ease, border-color 0.2s ease;
 }
+.main-content .card,
+.sidebar .card { padding: 24px; }
 .card:hover { box-shadow: var(--shadow-md); border-color: var(--color-border); }
 .card-content { padding: var(--space-6) var(--space-8); padding-top: var(--space-6); line-height: 1.5; }
 @media (max-width: 768px) { .card-content { padding: var(--space-4); } }
@@ -459,6 +461,7 @@ a.ad-slot:hover { background: #cbd5e1; }
 .news-list { list-style: none; }
 .news-item {
   padding: var(--space-5) var(--space-6) var(--space-4);
+  margin-bottom: 16px;
   min-height: 3rem;
   border-bottom: 1px solid var(--color-border-soft);
   display: block;
@@ -466,7 +469,7 @@ a.ad-slot:hover { background: #cbd5e1; }
   transition: background 0.2s ease;
 }
 @media (max-width: 768px) { .news-item { padding: var(--space-4); } }
-.news-item:last-child { border-bottom: none; }
+.news-item:last-child { border-bottom: none; margin-bottom: 0; }
 .news-item:hover { background: #f1f5f9; text-decoration: none; }
 .news-item .news-title { font-weight: 600; margin-bottom: var(--space-1); font-size: var(--text-base); line-height: 1.5; color: var(--color-text); }
 .news-item .news-meta { font-size: var(--text-xs); color: var(--color-text-subtle); }
@@ -477,7 +480,8 @@ a.ad-slot:hover { background: #cbd5e1; }
   font-size: var(--text-xs);
   padding: var(--space-1) var(--space-2);
   border-radius: var(--radius-sm);
-  margin-left: var(--space-2);
+  margin-left: 8px;
+  margin-right: 8px;
   font-weight: 600;
 }
 .news-detail { padding: var(--space-5) var(--space-6); }
@@ -506,11 +510,11 @@ a.ad-slot:hover { background: #cbd5e1; }
 .feed-item a:hover { color: var(--color-primary); }
 .feed-item .feed-title { font-weight: 600; flex: 1; min-width: 0; font-size: var(--text-base); color: var(--color-text); line-height: 1.5; }
 .feed-item .feed-meta { font-size: var(--text-xs); color: var(--color-text-subtle); white-space: nowrap; flex-shrink: 0; margin-left: var(--space-2); }
-/* 공지 배지 + 제목 행: 15px 간격, 수직 정렬, 배지 시각 분리 */
+/* 공지 배지 + 제목 행: 8px 간격, 수직 정렬, 배지 시각 분리 */
 .feed-title-row {
   display: flex;
   align-items: center;
-  gap: 12px;
+  gap: 8px;
 }
 .feed-title-row .feed-title-text { flex: 1; min-width: 0; }
 .notice-badge {
