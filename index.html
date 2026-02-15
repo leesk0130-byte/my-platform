@@ -193,68 +193,6 @@
       btn.setAttribute('aria-expanded', open);
       btn.setAttribute('aria-label', open ? '메뉴 닫기' : '메뉴 열기');
     }
-
-    // 로그인/회원가입 폼 제출 (메인 페이지)
-    var loginForm = document.getElementById('loginForm');
-    var loginErrorEl = document.getElementById('login-error');
-    var loginSuccessEl = document.getElementById('login-success');
-    var loginBtn = document.getElementById('login-submit-btn');
-    if (loginForm && window.app) {
-      loginForm.addEventListener('submit', function(e) {
-        e.preventDefault();
-        var email = document.getElementById('login-email').value.trim();
-        var pw = document.getElementById('login-pw').value;
-        if (loginErrorEl) { loginErrorEl.style.display = 'none'; loginErrorEl.textContent = ''; }
-        if (loginSuccessEl) loginSuccessEl.style.display = 'none';
-        if (!email || !pw) { if (loginErrorEl) { loginErrorEl.textContent = '이메일과 비밀번호를 입력해 주세요.'; loginErrorEl.style.display = 'block'; } return; }
-        if (loginBtn) { loginBtn.disabled = true; loginBtn.textContent = '로그인 중...'; }
-        window.app.login(email, pw, function(err, data) {
-          if (loginBtn) { loginBtn.disabled = false; loginBtn.textContent = '로그인'; }
-          if (err) { if (loginErrorEl) { loginErrorEl.textContent = err; loginErrorEl.style.display = 'block'; } return; }
-          if (loginErrorEl) loginErrorEl.style.display = 'none';
-          if (loginSuccessEl) {
-            var userName = (data && data.user && data.user.name) ? data.user.name : (window.app.getUser && window.app.getUser() && window.app.getUser().name) ? window.app.getUser().name : '';
-            loginSuccessEl.textContent = userName ? userName + '님, 로그인되었습니다.' : '로그인되었습니다.';
-            loginSuccessEl.style.display = 'block';
-          }
-          setTimeout(function() {
-            closeModal('loginModal');
-            if (loginSuccessEl) loginSuccessEl.style.display = 'none';
-            if (window.authSystem && window.authSystem.renderAuthActions) window.authSystem.renderAuthActions();
-          }, 1200);
-        });
-      });
-    }
-    var signupForm = document.getElementById('signupForm');
-    var signupErrorEl = document.getElementById('signup-error');
-    var signupSuccessEl = document.getElementById('signup-success');
-    var signupBtn = document.getElementById('signup-submit-btn');
-    if (signupForm && window.app) {
-      signupForm.addEventListener('submit', function(e) {
-        e.preventDefault();
-        var name = document.getElementById('signup-name').value.trim();
-        var email = document.getElementById('signup-email').value.trim();
-        var pw = document.getElementById('signup-pw').value;
-        var pw2 = document.getElementById('signup-pw2').value;
-        if (signupErrorEl) signupErrorEl.style.display = 'none';
-        if (signupSuccessEl) signupSuccessEl.style.display = 'none';
-        if (pw !== pw2) { if (signupErrorEl) { signupErrorEl.textContent = '비밀번호가 일치하지 않아요.'; signupErrorEl.style.display = 'block'; } return; }
-        if (pw.length < 8) { if (signupErrorEl) { signupErrorEl.textContent = '비밀번호는 8자 이상이에요.'; signupErrorEl.style.display = 'block'; } return; }
-        if (signupBtn) { signupBtn.disabled = true; signupBtn.textContent = '가입 중...'; }
-        window.app.signup(name, email, pw, function(err) {
-          if (signupBtn) { signupBtn.disabled = false; signupBtn.textContent = '가입하기'; }
-          if (err) { if (signupErrorEl) { signupErrorEl.textContent = err; signupErrorEl.style.display = 'block'; } return; }
-          if (signupSuccessEl) { signupSuccessEl.textContent = '회원가입이 완료되었어요. 로그인해 주세요.'; signupSuccessEl.style.display = 'block'; }
-          setTimeout(function() {
-            closeModal('signupModal');
-            if (signupErrorEl) signupErrorEl.style.display = 'none';
-            if (signupSuccessEl) signupSuccessEl.style.display = 'none';
-            openModal('loginModal');
-            if (document.getElementById('login-email')) document.getElementById('login-email').value = email;
-          }, 1800);
-        });
-      });
-    }
   </script>
 </body>
 </html>

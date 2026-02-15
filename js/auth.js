@@ -211,6 +211,89 @@
   window.toggleNav = toggleNav;
 
   /**
+   * 로그인/회원가입 폼 바인딩 (모든 페이지에서 #loginForm, #signupForm 있으면 동작)
+   */
+  function bindLoginSignupForms() {
+    if (!window.app || !window.app.login || !window.app.signup) return;
+
+    var loginForm = document.getElementById('loginForm');
+    var loginErrorEl = document.getElementById('login-error');
+    var loginSuccessEl = document.getElementById('login-success');
+    var loginBtn = document.getElementById('login-submit-btn');
+    if (loginForm && !loginForm._authBound) {
+      loginForm._authBound = true;
+      loginForm.addEventListener('submit', function(e) {
+        e.preventDefault();
+        var email = document.getElementById('login-email');
+        var pwEl = document.getElementById('login-pw');
+        var emailVal = email ? email.value.trim() : '';
+        var pw = pwEl ? pwEl.value : '';
+        if (loginErrorEl) { loginErrorEl.style.display = 'none'; loginErrorEl.textContent = ''; }
+        if (loginSuccessEl) loginSuccessEl.style.display = 'none';
+        if (!emailVal || !pw) {
+          if (loginErrorEl) { loginErrorEl.textContent = '이메일과 비밀번호를 입력해 주세요.'; loginErrorEl.style.display = 'block'; }
+          return;
+        }
+        if (loginBtn) { loginBtn.disabled = true; loginBtn.textContent = '로그인 중...'; }
+        window.app.login(emailVal, pw, function(err, data) {
+          if (loginBtn) { loginBtn.disabled = false; loginBtn.textContent = '로그인'; }
+          if (err) {
+            if (loginErrorEl) { loginErrorEl.textContent = err; loginErrorEl.style.display = 'block'; }
+            return;
+          }
+          if (loginErrorEl) loginErrorEl.style.display = 'none';
+          if (loginSuccessEl) {
+            var userName = (data && data.user && data.user.name) ? data.user.name : (window.app.getUser && window.app.getUser() && window.app.getUser().name) ? window.app.getUser().name : '';
+            loginSuccessEl.textContent = userName ? userName + '님, 로그인되었습니다.' : '로그인되었습니다.';
+            loginSuccessEl.style.display = 'block';
+          }
+          setTimeout(function() {
+            closeModal('loginModal');
+            if (loginSuccessEl) loginSuccessEl.style.display = 'none';
+            renderAuthActions();
+          }, 1200);
+        });
+      });
+    }
+
+    var signupForm = document.getElementById('signupForm');
+    var signupErrorEl = document.getElementById('signup-error');
+    var signupSuccessEl = document.getElementById('signup-success');
+    var signupBtn = document.getElementById('signup-submit-btn');
+    if (signupForm && !signupForm._authBound) {
+      signupForm._authBound = true;
+      signupForm.addEventListener('submit', function(e) {
+        e.preventDefault();
+        var nameEl = document.getElementById('signup-name');
+        var emailEl = document.getElementById('signup-email');
+        var pwEl = document.getElementById('signup-pw');
+        var pw2El = document.getElementById('signup-pw2');
+        var name = nameEl ? nameEl.value.trim() : '';
+        var emailVal = emailEl ? emailEl.value.trim() : '';
+        var pw = pwEl ? pwEl.value : '';
+        var pw2 = pw2El ? pw2El.value : '';
+        if (signupErrorEl) signupErrorEl.style.display = 'none';
+        if (signupSuccessEl) signupSuccessEl.style.display = 'none';
+        if (pw !== pw2) { if (signupErrorEl) { signupErrorEl.textContent = '비밀번호가 일치하지 않아요.'; signupErrorEl.style.display = 'block'; } return; }
+        if (pw.length < 8) { if (signupErrorEl) { signupErrorEl.textContent = '비밀번호는 8자 이상이에요.'; signupErrorEl.style.display = 'block'; } return; }
+        if (signupBtn) { signupBtn.disabled = true; signupBtn.textContent = '가입 중...'; }
+        window.app.signup(name, emailVal, pw, function(err) {
+          if (signupBtn) { signupBtn.disabled = false; signupBtn.textContent = '가입하기'; }
+          if (err) { if (signupErrorEl) { signupErrorEl.textContent = err; signupErrorEl.style.display = 'block'; } return; }
+          if (signupSuccessEl) { signupSuccessEl.textContent = '회원가입이 완료되었어요. 로그인해 주세요.'; signupSuccessEl.style.display = 'block'; }
+          setTimeout(function() {
+            closeModal('signupModal');
+            if (signupErrorEl) signupErrorEl.style.display = 'none';
+            if (signupSuccessEl) signupSuccessEl.style.display = 'none';
+            openLoginModal();
+            if (document.getElementById('login-email')) document.getElementById('login-email').value = emailVal;
+          }, 1800);
+        });
+      });
+    }
+  }
+
+  /**
    * 초기화
    */
   function init() {
@@ -219,16 +302,18 @@
       document.addEventListener('DOMContentLoaded', function() {
         initModals();
         renderAuthActions();
+        bindLoginSignupForms();
       });
     } else {
       initModals();
       renderAuthActions();
+      bindLoginSignupForms();
     }
 
     // 인증 상태 변경 이벤트 리스너
     window.addEventListener('authStateChanged', renderAuthActions);
     
-    // 주기적으로 상태 확인 (Firebase 등 비동기 인증 대응)
+    // 주기적으로 상태 확인 (Firebase 등 비동기 인증 대응) + 폼 바인딩 재시도 (app 지연 로드 대비)
     var checkCount = 0;
     var checkInterval = setInterval(function() {
       checkCount++;
@@ -238,13 +323,10 @@
         if (oldState !== authState) {
           renderAuthActions();
         }
-        // app이 로드되면 주기적 체크 중단
-        clearInterval(checkInterval);
       }
-      // 10초 후 강제 중단 (무한 루프 방지)
-      if (checkCount >= 20) {
-        clearInterval(checkInterval);
-      }
+      bindLoginSignupForms();
+      if (window.app && window.app.isLoggedIn !== undefined) clearInterval(checkInterval);
+      if (checkCount >= 20) clearInterval(checkInterval);
     }, 500);
   }
 
