@@ -505,6 +505,23 @@ a.ad-slot:hover { background: #cbd5e1; }
 .feed-item a:hover { color: var(--color-primary); }
 .feed-item .feed-title { font-weight: 600; flex: 1; min-width: 0; font-size: var(--text-base); color: var(--color-text); line-height: 1.45; }
 .feed-item .feed-meta { font-size: var(--text-xs); color: var(--color-text-subtle); white-space: nowrap; flex-shrink: 0; margin-left: var(--space-2); }
+/* 공지 배지 + 제목 행: 15px 간격, 수직 정렬, 배지 시각 분리 */
+.feed-title-row {
+  display: flex;
+  align-items: center;
+  gap: 15px;
+}
+.feed-title-row .feed-title-text { flex: 1; min-width: 0; }
+.notice-badge {
+  flex-shrink: 0;
+  padding: 4px 10px;
+  font-size: 12px;
+  font-weight: 600;
+  line-height: 1.3;
+  border-radius: 6px;
+  background: #fef3c7;
+  color: #92400e;
+}
 .board-tabs { display: flex; gap: 0; border-bottom: 1px solid var(--color-border); padding: 0 var(--space-5); flex-wrap: wrap; background: var(--color-surface); }
 .board-tabs a {
   padding: var(--space-4) var(--space-5);

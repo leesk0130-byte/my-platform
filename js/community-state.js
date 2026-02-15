@@ -306,10 +306,10 @@
       
       html += '<li class="feed-item feed-item-row">' +
         '<a href="community.html?id=' + post.id + '" class="feed-title-wrapper">' +
-          '<span class="feed-title-content">' +
+          '<span class="feed-title-content feed-title-row">' +
             noticeBadge +
             (categoryLabel ? '<span class="category-badge">' + categoryLabel + '</span>' : '') +
-            (post.title || '제목 없음') +
+            '<span class="feed-title-text">' + (post.title || '제목 없음') + '</span>' +
           '</span>' +
           commentBadge +
         '</a>' +

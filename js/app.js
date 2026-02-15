@@ -419,7 +419,7 @@
         var noticeBtn = isOp ? '<button type="button" class="notice-toggle-btn btn btn-outline btn-sm" data-post-id="' + (p.id || '').replace(/"/g, '&quot;') + '">' + (p.notice ? '공지 해제' : '공지') + '</button>' : '';
         return '<li class="feed-item feed-item-row">' +
           '<a href="' + href + '" class="feed-title-wrapper">' +
-            '<span class="feed-title-content">' + noticeBadge + badge + (p.title || '') + '</span>' +
+            '<span class="feed-title-content feed-title-row">' + noticeBadge + badge + '<span class="feed-title-text">' + (p.title || '') + '</span></span>' +
             commentBadge +
           '</a>' +
           '<span class="feed-meta">' + meta + '</span>' +
