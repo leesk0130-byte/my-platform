@@ -113,7 +113,6 @@
     fetch(url).then(function (res) { return res.ok ? res.json() : Promise.reject(); })
       .then(function (data) { callback(null, data.items || data || []); })
       .catch(function () {
-        showToast('잠시 후 다시 시도해 주세요.');
         var local = getLocalComments(postId);
         var hidden = getHiddenCommentIds(postId);
         var mock = getMockComments(postId).filter(function (c) { return hidden.indexOf(c.id) === -1; });
@@ -265,7 +264,6 @@
           callback(null, data.items || data, data.total);
         })
         .catch(function () {
-          showToast('잠시 후 다시 시도해 주세요.');
           callback(null, MOCK_NEWS.slice(0, limit || 10), MOCK_NEWS.length);
         });
     },
@@ -277,7 +275,6 @@
           callback(null, data.items || data, data.total);
         })
         .catch(function () {
-          showToast('잠시 후 다시 시도해 주세요.');
           var local = getLocalPosts();
           var mock = MOCK_POSTS.map(function (p) { return { id: p.id, title: p.title, author: p.author, date: p.date, board: p.board || 'free', hits: p.hits, verified: p.verified }; });
           var combined = local.map(function (p) { return { id: p.id, title: p.title, author: p.author, date: p.date, board: p.board || 'free', hits: p.hits != null ? p.hits : 0, body: p.body, verified: p.verified }; }).concat(mock);
@@ -378,7 +375,6 @@
           } else if (callback) callback(result.error || result.message || '등록 실패');
         })
         .catch(function () {
-          showToast('잠시 후 다시 시도해 주세요.');
           var post = addLocalPost(data);
           if (callback) callback(null, post);
         });
@@ -415,7 +411,6 @@
           } else if (callback) callback(data.error || '로그인 실패');
         })
         .catch(function (err) {
-          showToast('잠시 후 다시 시도해 주세요.');
           if (callback) callback('서버에 연결할 수 없어요. 서버를 켜 두면 로그인됩니다.');
         });
     },
@@ -453,7 +448,6 @@
           } else if (callback) callback(data.error || '가입 실패');
         })
         .catch(function () {
-          showToast('잠시 후 다시 시도해 주세요.');
           if (callback) callback('서버에 연결할 수 없어요. 서버를 켜 두면 회원가입됩니다.');
         });
     },
