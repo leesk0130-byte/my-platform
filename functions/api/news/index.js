@@ -1,18 +1,12 @@
 ﻿/**
  * GET /api/news?limit=20&offset=0  -- public
- * POST /api/news                   -- admin only
- * GET /api/news/:id                -- public
- * DELETE /api/news/:id             -- admin only
+ * POST /api/news                   -- operator only (Firebase token)
  */
-import { verifyAdmin } from '../../_lib/admin-auth.js';
 
-function json(body, status = 200) {
+function json(body, status) {
   return new Response(JSON.stringify(body), {
-    status,
-    headers: {
-      'Content-Type': 'application/json',
-      'Access-Control-Allow-Origin': '*',
-    },
+    status: status || 200,
+    headers: { 'Content-Type': 'application/json', 'Access-Control-Allow-Origin': '*' },
   });
 }
 
@@ -22,85 +16,73 @@ function randomId() {
 
 function formatDate(ts) {
   if (!ts) return '';
-  const d = new Date(Number(ts));
-  return d.toLocaleDateString('ko-KR', { year: 'numeric', month: 'short', day: 'numeric' });
+  return new Date(Number(ts)).toLocaleDateString('ko-KR', { year: 'numeric', month: 'short', day: 'numeric' });
+}
+
+async function verifyOperator(request, env) {
+  var auth = request.headers.get('Authorization') || '';
+  var token = auth.startsWith('Bearer ') ? auth.slice(7) : '';
+  if (!token) return false;
+  try {
+    var res = await fetch('https://oauth2.googleapis.com/tokeninfo?id_token=' + token);
+    if (!res.ok) return false;
+    var data = await res.json();
+    var operatorEmail = (env.OPERATOR_EMAIL || 'leesk0130@point3.team').toLowerCase();
+    if ((data.email || '').toLowerCase() !== operatorEmail) return false;
+    if (Number(data.exp) < Date.now() / 1000) return false;
+    return true;
+  } catch (e) {
+    return false;
+  }
 }
 
 export async function onRequestOptions() {
   return new Response(null, {
     headers: {
       'Access-Control-Allow-Origin': '*',
-      'Access-Control-Allow-Methods': 'GET, POST, DELETE, OPTIONS',
+      'Access-Control-Allow-Methods': 'GET, POST, OPTIONS',
       'Access-Control-Allow-Headers': 'Content-Type, Authorization',
     },
   });
 }
 
 export async function onRequestGet(context) {
-  const { env, request, params } = context;
-  const url = new URL(request.url);
-
-  const id = params && params.id;
-  if (id) {
-    try {
-      const row = await env.DB.prepare(
-        'SELECT id, title, category, content, created_at, updated_at FROM news WHERE id = ?'
-      ).bind(id).first();
-      if (!row) return json({ error: 'Not found' }, 404);
-      return json({
-        id: row.id, title: row.title, category: row.category,
-        content: row.content, date: formatDate(row.created_at),
-        created_at: row.created_at, updated_at: row.updated_at,
-      });
-    } catch (e) {
-      return json({ error: e.message }, 500);
-    }
-  }
-
-  const limit = Math.min(Number(url.searchParams.get('limit')) || 20, 100);
-  const offset = Number(url.searchParams.get('offset')) || 0;
+  var env = context.env;
+  var request = context.request;
+  var url = new URL(request.url);
+  var limit = Math.min(Number(url.searchParams.get('limit')) || 20, 100);
+  var offset = Number(url.searchParams.get('offset')) || 0;
   try {
-    const { results } = await env.DB.prepare(
+    var stmt = await env.DB.prepare(
       'SELECT id, title, category, content, created_at, updated_at FROM news ORDER BY created_at DESC LIMIT ? OFFSET ?'
     ).bind(limit, offset).all();
-    const countRow = await env.DB.prepare('SELECT COUNT(*) as total FROM news').first();
-    const items = (results || []).map((r) => ({
-      id: r.id, title: r.title, category: r.category,
-      content: r.content, date: formatDate(r.created_at),
-      created_at: r.created_at, updated_at: r.updated_at,
-    }));
-    return json({ items, total: (countRow && countRow.total) || 0 });
+    var countRow = await env.DB.prepare('SELECT COUNT(*) as total FROM news').first();
+    var items = (stmt.results || []).map(function(r) {
+      return { id: r.id, title: r.title, category: r.category, content: r.content, date: formatDate(r.created_at), created_at: r.created_at, updated_at: r.updated_at };
+    });
+    return json({ items: items, total: (countRow && countRow.total) || 0 });
   } catch (e) {
     return json({ error: e.message }, 500);
   }
 }
 
 export async function onRequestPost(context) {
-  const { env, request } = context;
-  if (!verifyAdmin(request, env)) return json({ error: 'Unauthorized' }, 401);
+  var env = context.env;
+  var request = context.request;
+  var ok = await verifyOperator(request, env);
+  if (!ok) return json({ error: 'Unauthorized' }, 401);
   try {
-    const body = await request.json();
-    const { title, category, content } = body;
-    if (!title || !content) return json({ error: 'title and content are required' }, 400);
-    const id = randomId();
-    const now = Date.now();
+    var body = await request.json();
+    var title = body.title;
+    var category = body.category || 'general';
+    var content = body.content;
+    if (!title || !content) return json({ error: 'title and content required' }, 400);
+    var id = randomId();
+    var now = Date.now();
     await env.DB.prepare(
       'INSERT INTO news (id, title, category, content, created_at, updated_at) VALUES (?, ?, ?, ?, ?, ?)'
-    ).bind(id, title, category || 'general', content, now, now).run();
-    return json({ id, title, category: category || 'general', content, date: formatDate(now), created_at: now }, 201);
-  } catch (e) {
-    return json({ error: e.message }, 500);
-  }
-}
-
-export async function onRequestDelete(context) {
-  const { env, request, params } = context;
-  if (!verifyAdmin(request, env)) return json({ error: 'Unauthorized' }, 401);
-  const id = params && params.id;
-  if (!id) return json({ error: 'id required' }, 400);
-  try {
-    await env.DB.prepare('DELETE FROM news WHERE id = ?').bind(id).run();
-    return json({ success: true });
+    ).bind(id, title, category, content, now, now).run();
+    return json({ id: id, title: title, category: category, content: content, date: formatDate(now), created_at: now }, 201);
   } catch (e) {
     return json({ error: e.message }, 500);
   }

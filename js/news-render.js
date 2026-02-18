@@ -100,4 +100,10 @@
   } else {
     loadList(root);
   }
+
+  window.newsRender = {
+    reload: function () {
+      if (!getQueryId()) loadList(root);
+    },
+  };
 })();
