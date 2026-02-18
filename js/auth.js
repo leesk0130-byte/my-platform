@@ -178,10 +178,17 @@
    * 네비게이션 토글 (모바일)
    */
   function toggleNav() {
+    /* drawer.js 가 로드된 경우 드로어 사용 */
+    if (typeof window.openDrawer === 'function') {
+      var btn = document.querySelector('[data-toggle-nav]');
+      var isExpanded = btn && btn.getAttribute('aria-expanded') === 'true';
+      if (isExpanded) { window.closeDrawer(); } else { window.openDrawer(); }
+      return;
+    }
+    /* 폴백: 기존 드롭다운 방식 */
     var nav = document.getElementById('headerNav');
     var btn = document.querySelector('.nav-toggle');
     if (!nav || !btn) return;
-    
     var isOpen = nav.classList.toggle('is-open');
     btn.setAttribute('aria-expanded', isOpen);
     btn.setAttribute('aria-label', isOpen ? '메뉴 닫기' : '메뉴 열기');
