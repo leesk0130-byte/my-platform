@@ -42,9 +42,32 @@
     .breadcrumb { font-size: 0.875rem; color: #64748b; margin-bottom: 0.75rem; }
     .breadcrumb a { color: #64748b; }
     .bc-sep { margin: 0 0.25rem; color: #94a3b8; }
-    .hero { background: linear-gradient(135deg, #0d9488 0%, #0f766e 50%, #115e59 100%); color: #fff; padding: 2.5rem 2rem; border-radius: 20px; text-align: center; margin-bottom: 2rem; }
-    .hero h2 { font-size: 1.75rem; margin-bottom: 0.5rem; }
-    .hero p { opacity: 0.95; font-size: 1.05rem; margin: 0; }
+    /* ── 히어로: 좌측 정렬, 자연스러운 줄바꿈 ── */
+    .hero {
+      background: linear-gradient(135deg, #0d9488 0%, #0f766e 50%, #115e59 100%);
+      color: #fff;
+      padding: 1rem 1.25rem;
+      border-radius: 20px;
+      text-align: left;
+      margin-bottom: 2rem;
+    }
+    @media (min-width: 600px) {
+      .hero { padding: 2rem 2.25rem; }
+    }
+    @media (min-width: 1024px) {
+      .hero { padding: 2.5rem 3rem; }
+    }
+    .hero h2 { font-size: 1.6rem; margin: 0 0 0.65rem; line-height: 1.3; }
+    @media (min-width: 600px) { .hero h2 { font-size: 1.75rem; } }
+    .hero p {
+      opacity: 0.95;
+      font-size: 1rem;
+      line-height: 1.65;
+      margin: 0 0 0.75rem;
+      max-width: 66ch;
+    }
+    .hero p:last-child { margin-bottom: 0; }
+    @media (min-width: 600px) { .hero p { font-size: 1.05rem; } }
     .card { background: #fff; border-radius: 16px; box-shadow: 0 4px 20px rgba(0,0,0,0.06); overflow: hidden; }
     .card-content { padding: 1.5rem 2rem; }
     .section { margin-bottom: 2rem; }
@@ -72,6 +95,22 @@
     .calc-result-list dd { margin: 0; font-weight: 600; color: #0f172a; }
     .calc-result-list dt.calc-result-total, .calc-result-list dd.calc-result-total { font-size: 1.1rem; margin-top: 0.5rem; padding-top: 0.5rem; border-top: 1px solid #99f6e4; color: #0f766e; }
     .calc-result-list dd .calc-result-kr { display: block; font-size: 0.875rem; font-weight: 500; color: #64748b; margin-top: 0.25rem; }
+    /* ── 프리셋 ── */
+    .calc-presets { display: flex; flex-wrap: wrap; gap: 0.5rem; margin-bottom: 1.25rem; }
+    .calc-preset-btn { padding: 0.4rem 0.85rem; border: 1px solid #cbd5e1; background: #f8fafc; color: #475569; font-size: 0.8125rem; font-weight: 600; border-radius: 999px; cursor: pointer; transition: background 0.15s, color 0.15s; white-space: nowrap; }
+    .calc-preset-btn:hover { background: #e2e8f0; color: #0f172a; }
+    /* ── 인라인 에러 ── */
+    .field-error { display: none; font-size: 0.8125rem; color: #dc2626; margin-top: 0.3rem; }
+    .field-error.is-visible { display: block; }
+    /* ── 입력창 에러 상태 ── */
+    .input-with-kr.is-error { border-color: #fca5a5; }
+    .form-group input.is-error { border-color: #fca5a5; }
+    /* ── 결과 조건 요약 ── */
+    .calc-result-summary { font-size: 0.8125rem; color: #0f766e; background: #ccfbf1; border-radius: 8px; padding: 0.6rem 0.9rem; margin-bottom: 1rem; line-height: 1.6; }
+    /* ── 수수료율 강조 ── */
+    .calc-result-rate { font-size: 0.875rem; color: #64748b; margin-top: 0.75rem; padding-top: 0.75rem; border-top: 1px dashed #99f6e4; }
+    /* ── 계산 버튼 비활성 ── */
+    #calc-do:disabled { opacity: 0.45; cursor: not-allowed; }
     footer { background: #0f172a; color: #94a3b8; padding: 2rem 1.5rem; margin-top: 2.5rem; font-size: 0.875rem; }
     .footer-inner { max-width: 1200px; margin: 0 auto; text-align: center; }
     .footer-inner a { color: #cbd5e1; }
@@ -131,62 +170,80 @@
     <div class="hero">
       <h2>결제수수료 계산기</h2>
       <p>총 거래액과 <strong>카드/현금 비율</strong> 또는 <strong>카드·현금 금액</strong>을 넣으면 PG 수수료를 바로 계산해 드려요.</p>
-      <p class="hero-hint">월 매출에서 카드·현금 비율과 수수료율만 입력하면 예상 수수료가 나옵니다. PG사 비교할 때 참고하세요.</p>
+      <p>월 매출에서 카드·현금 비율과 수수료율만 입력하면 예상 수수료가 나옵니다. PG사 비교할 때 참고하세요.</p>
     </div>
 
     <section class="section">
       <div class="card card-content">
         <p class="calc-desc" style="margin-bottom:0.75rem;"><a href="calculator-saved.html">저장한 계산 목록</a></p>
-        <div class="calc-mode-tabs" style="margin-bottom:0.5rem;">
-          <button type="button" class="calc-mode-btn active" data-mode="ratio">비율로 입력</button>
-          <button type="button" class="calc-mode-btn" data-mode="amount">금액으로 입력</button>
+
+        <!-- 입력 모드 탭 -->
+        <div class="calc-mode-tabs" role="tablist" aria-label="입력 방식" style="margin-bottom:0.5rem;">
+          <button type="button" class="calc-mode-btn active" data-mode="ratio"
+            role="tab" aria-selected="true" aria-controls="calc-ratio" id="tab-ratio">비율로 입력</button>
+          <button type="button" class="calc-mode-btn" data-mode="amount"
+            role="tab" aria-selected="false" aria-controls="calc-amount" id="tab-amount">금액으로 입력</button>
         </div>
-        <div class="calc-mode-tabs">
+        <!-- 계산 유형 탭 -->
+        <div class="calc-mode-tabs" style="margin-bottom:1.25rem;">
           <button type="button" class="calc-type-btn active" data-type="single">단일 계산</button>
           <button type="button" class="calc-type-btn" data-type="compare">A vs B 비교</button>
         </div>
 
-        <div id="calc-ratio" class="calc-panel">
-          <p class="calc-desc">총 거래액과 카드·현금 비율(%)을 입력하세요. (비율 합 100%)</p>
+        <!-- 프리셋 버튼 -->
+        <div class="calc-presets" aria-label="빠른 입력 프리셋">
+          <button type="button" class="calc-preset-btn" data-preset="general">일반 쇼핑몰 (카드 70 / 현금 30)</button>
+          <button type="button" class="calc-preset-btn" data-preset="cash-heavy">현금 비중 높은 업종 (카드 40 / 현금 60)</button>
+          <button type="button" class="calc-preset-btn" data-preset="card-only">카드 위주 (카드 90 / 현금 10)</button>
+        </div>
+
+        <!-- 비율 입력 패널 -->
+        <div id="calc-ratio" class="calc-panel" role="tabpanel" aria-labelledby="tab-ratio">
+          <p class="calc-desc">총 거래액과 카드·현금 비율(%)을 입력하세요. 합이 100%여야 합니다.</p>
           <div class="form-group">
             <label for="total-amount">총 거래액 (원)</label>
-            <div class="input-with-kr">
-              <input type="text" id="total-amount" inputmode="numeric" placeholder="예: 10,000,000" autocomplete="off">
+            <div class="input-with-kr" id="total-amount-wrap">
+              <input type="text" id="total-amount" inputmode="numeric" placeholder="예: 10,000,000" autocomplete="off" aria-describedby="total-amount-err">
               <span class="calc-input-kr" id="total-amount-kr" aria-hidden="true"></span>
             </div>
+            <p class="field-error" id="total-amount-err" role="alert"></p>
           </div>
           <div class="form-row">
             <div class="form-group">
               <label for="card-ratio">카드 비율 (%)</label>
-              <input type="number" id="card-ratio" placeholder="예: 70" min="0" max="100" step="0.1" value="70">
+              <input type="number" id="card-ratio" placeholder="예: 70" min="0" max="100" step="0.1" value="70" aria-describedby="ratio-sum-err">
             </div>
             <div class="form-group">
               <label for="cash-ratio">현금·실시간이체 비율 (%)</label>
-              <input type="number" id="cash-ratio" placeholder="예: 30" min="0" max="100" step="0.1" value="30">
+              <input type="number" id="cash-ratio" placeholder="예: 30" min="0" max="100" step="0.1" value="30" aria-describedby="ratio-sum-err">
             </div>
           </div>
+          <p class="field-error" id="ratio-sum-err" role="alert"></p>
         </div>
 
-        <div id="calc-amount" class="calc-panel" style="display:none;">
+        <!-- 금액 직접 입력 패널 -->
+        <div id="calc-amount" class="calc-panel" role="tabpanel" aria-labelledby="tab-amount" style="display:none;">
           <p class="calc-desc">카드 거래액과 현금(실시간이체 등) 거래액을 직접 입력하세요.</p>
           <div class="form-row">
             <div class="form-group">
               <label for="card-amount">카드 거래액 (원)</label>
-              <div class="input-with-kr">
-                <input type="text" id="card-amount" inputmode="numeric" placeholder="예: 7,000,000" autocomplete="off">
+              <div class="input-with-kr" id="card-amount-wrap">
+                <input type="text" id="card-amount" inputmode="numeric" placeholder="예: 7,000,000" autocomplete="off" aria-describedby="amount-sum-err">
                 <span class="calc-input-kr" id="card-amount-kr" aria-hidden="true"></span>
               </div>
             </div>
             <div class="form-group">
               <label for="cash-amount">현금·실시간이체 거래액 (원)</label>
-              <div class="input-with-kr">
-                <input type="text" id="cash-amount" inputmode="numeric" placeholder="예: 3,000,000" autocomplete="off">
+              <div class="input-with-kr" id="cash-amount-wrap">
+                <input type="text" id="cash-amount" inputmode="numeric" placeholder="예: 3,000,000" autocomplete="off" aria-describedby="amount-sum-err">
                 <span class="calc-input-kr" id="cash-amount-kr" aria-hidden="true"></span>
               </div>
             </div>
           </div>
+          <p class="field-error" id="amount-sum-err" role="alert"></p>
         </div>
 
+        <!-- 단일 수수료율 -->
         <div id="calc-fee-single" class="calc-fee-rates">
           <p class="calc-desc">본인 PG 계약 조건에 맞는 수수료율(%)을 입력하세요. <a href="pg.html">PG 수수료 참고</a></p>
           <div class="form-row">
@@ -200,6 +257,7 @@
             </div>
           </div>
         </div>
+        <!-- A vs B 수수료율 -->
         <div id="calc-fee-compare" class="calc-fee-rates" style="display:none;">
           <p class="calc-desc">PG A와 B의 수수료율을 각각 입력하세요. <a href="pg.html">PG 수수료 참고</a></p>
           <div class="form-row">
@@ -224,14 +282,18 @@
           </div>
         </div>
 
+        <!-- 액션 버튼 -->
         <div class="calc-actions">
           <button type="button" class="btn btn-primary" id="calc-do">수수료 계산하기</button>
           <button type="button" class="btn btn-outline" id="calc-save">저장</button>
           <button type="button" class="btn btn-outline" id="calc-share">공유 URL 복사</button>
         </div>
 
-        <div id="calc-result" class="calc-result" style="display:none;">
+        <!-- 결과 카드 -->
+        <div id="calc-result" class="calc-result" style="display:none;" aria-live="polite">
           <h4 class="calc-result-title">계산 결과</h4>
+          <p class="calc-result-summary" id="calc-result-summary"></p>
+
           <dl class="calc-result-list" id="calc-result-single">
             <dt>총 거래액</dt>
             <dd id="result-total-amount">0원</dd>
@@ -248,6 +310,8 @@
             <dt>실 수령 예상</dt>
             <dd id="result-net">0원</dd>
           </dl>
+          <p class="calc-result-rate" id="result-rate-pct" style="display:none;"></p>
+
           <dl class="calc-result-list" id="calc-result-compare" style="display:none;">
             <dt>총 거래액</dt>
             <dd id="result-comp-total">0원</dd>
@@ -255,7 +319,7 @@
             <dd id="result-fee-a">0원</dd>
             <dt>PG B 총 수수료</dt>
             <dd id="result-fee-b">0원</dd>
-            <dt class="calc-result-total">절감액 (B 기준)</dt>
+            <dt class="calc-result-total">절감액 (A→B 전환 시)</dt>
             <dd class="calc-result-total" id="result-save-amount">0원</dd>
           </dl>
         </div>
@@ -281,268 +345,349 @@
   <script src="js/app.js"></script>
   <script src="js/auth.js"></script>
   <script>
-    (function() {
-      if (window.trackEvent) window.trackEvent('pageview', { page: 'calculator' });
-      var CALC_SAVED_KEY = 'gmp_calc_saved';
-      var typeBtns = document.querySelectorAll('.calc-type-btn');
-      var isCompare = function() { return document.querySelector('.calc-type-btn.active').getAttribute('data-type') === 'compare'; };
-      typeBtns.forEach(function(btn) {
-        btn.addEventListener('click', function() {
-          typeBtns.forEach(function(b) { b.classList.remove('active'); });
-          btn.classList.add('active');
-          var compare = isCompare();
-          document.getElementById('calc-fee-single').style.display = compare ? 'none' : 'block';
-          document.getElementById('calc-fee-compare').style.display = compare ? 'block' : 'none';
-          document.getElementById('calc-result-single').style.display = compare ? 'none' : 'block';
-          document.getElementById('calc-result-compare').style.display = compare ? 'block' : 'none';
-        });
-      });
-      var btns = document.querySelectorAll('.calc-mode-btn');
-      btns.forEach(function(btn) {
-        btn.addEventListener('click', function() {
-          var mode = btn.getAttribute('data-mode');
-          btns.forEach(function(b) { b.classList.remove('active'); });
-          btn.classList.add('active');
-          document.getElementById('calc-ratio').style.display = mode === 'ratio' ? 'block' : 'none';
-          document.getElementById('calc-amount').style.display = mode === 'amount' ? 'block' : 'none';
-        });
-      });
+  (function () {
+    'use strict';
+    if (window.trackEvent) window.trackEvent('pageview', { page: 'calculator' });
 
-      function toNum(val) {
-        var n = parseFloat(String(val).replace(/,/g, ''), 10);
-        return isNaN(n) ? 0 : n;
-      }
-      function formatWithComma(val) {
-        var digits = String(val).replace(/\D/g, '');
-        if (digits === '') return '';
-        var n = parseInt(digits, 10);
-        return isNaN(n) ? '' : n.toLocaleString('ko-KR');
-      }
-      function toKoreanAmount(n) {
-        n = Math.floor(n);
-        if (n >= 1e8) {
-          var eok = Math.floor(n / 1e8);
-          var man = Math.floor((n % 1e8) / 1e4);
-          var rest = n % 1e4;
-          var s = eok + '억';
-          if (man > 0) s += ' ' + man.toLocaleString('ko-KR') + '만';
-          if (rest > 0) s += ' ' + rest.toLocaleString('ko-KR');
-          return s + '원';
-        }
-        if (n >= 1e4) {
-          var man = Math.floor(n / 1e4);
-          var rest = n % 1e4;
-          var s = man.toLocaleString('ko-KR') + '만';
-          if (rest > 0) s += ' ' + rest.toLocaleString('ko-KR');
-          return s + '원';
-        }
-        return n.toLocaleString('ko-KR') + '원';
-      }
+    var CALC_SAVED_KEY = 'gmp_calc_saved';
+    var calcBtn = document.getElementById('calc-do');
 
-      function updateAmountKr(inputId) {
-        var el = document.getElementById(inputId);
-        var krEl = document.getElementById(inputId + '-kr');
-        if (!el || !krEl) return;
-        var n = toNum(el.value);
-        krEl.textContent = n > 0 ? toKoreanAmount(n) : '';
-      }
-      var amountInputIds = ['total-amount', 'card-amount', 'cash-amount'];
-      amountInputIds.forEach(function(id) {
-        var el = document.getElementById(id);
-        if (!el) return;
-        el.addEventListener('input', function() {
-          this.value = formatWithComma(this.value);
-          this.setSelectionRange(this.value.length, this.value.length);
-          updateAmountKr(id);
-        });
-        updateAmountKr(id);
-      });
-
-      function getAmounts() {
-        var isRatio = document.querySelector('.calc-mode-btn.active').getAttribute('data-mode') === 'ratio';
-        var totalAmount = 0, cardAmount = 0, cashAmount = 0;
-        if (isRatio) {
-          totalAmount = toNum(document.getElementById('total-amount').value);
-          var cardRatio = toNum(document.getElementById('card-ratio').value);
-          var cashRatio = toNum(document.getElementById('cash-ratio').value);
-          cardAmount = Math.round(totalAmount * cardRatio / 100);
-          cashAmount = totalAmount - cardAmount;
-        } else {
-          cardAmount = toNum(document.getElementById('card-amount').value);
-          cashAmount = toNum(document.getElementById('cash-amount').value);
-          totalAmount = cardAmount + cashAmount;
-        }
-        return { totalAmount: totalAmount, cardAmount: cardAmount, cashAmount: cashAmount };
-      }
-      function fmt(n) { return n.toLocaleString('ko-KR') + '원'; }
-      function setResult(id, n) {
-        var el = document.getElementById(id);
-        if (!el) return;
-        el.innerHTML = fmt(n) + '<span class="calc-result-kr">' + toKoreanAmount(n) + '</span>';
-      }
-
-      document.getElementById('calc-do').addEventListener('click', function() {
-        var isRatio = document.querySelector('.calc-mode-btn.active').getAttribute('data-mode') === 'ratio';
-        var totalAmount = 0, cardAmount = 0, cashAmount = 0;
-        if (isRatio) {
-          totalAmount = toNum(document.getElementById('total-amount').value);
-          var cardRatio = toNum(document.getElementById('card-ratio').value);
-          var cashRatio = toNum(document.getElementById('cash-ratio').value);
-          if (totalAmount <= 0) { alert('총 거래액을 입력해 주세요.'); return; }
-          if (Math.abs(cardRatio + cashRatio - 100) > 0.01) { alert('카드 비율과 현금 비율의 합이 100%가 되어야 해요.'); return; }
-          cardAmount = Math.round(totalAmount * cardRatio / 100);
-          cashAmount = totalAmount - cardAmount;
-        } else {
-          cardAmount = toNum(document.getElementById('card-amount').value);
-          cashAmount = toNum(document.getElementById('cash-amount').value);
-          totalAmount = cardAmount + cashAmount;
-          if (totalAmount <= 0) { alert('카드 또는 현금 거래액을 입력해 주세요.'); return; }
-        }
-        var compare = isCompare();
-        document.getElementById('calc-result').style.display = 'block';
-        document.getElementById('calc-result-single').style.display = compare ? 'none' : 'block';
-        document.getElementById('calc-result-compare').style.display = compare ? 'block' : 'none';
-        if (compare) {
-          var cardRateA = toNum(document.getElementById('card-rate-a').value) / 100;
-          var cashRateA = toNum(document.getElementById('cash-rate-a').value) / 100;
-          var cardRateB = toNum(document.getElementById('card-rate-b').value) / 100;
-          var cashRateB = toNum(document.getElementById('cash-rate-b').value) / 100;
-          var feeA = Math.round(cardAmount * cardRateA + cashAmount * cashRateA);
-          var feeB = Math.round(cardAmount * cardRateB + cashAmount * cashRateB);
-          var saveAmount = feeA - feeB;
-          setResult('result-comp-total', totalAmount);
-          setResult('result-fee-a', feeA);
-          setResult('result-fee-b', feeB);
-          setResult('result-save-amount', saveAmount);
-        } else {
-          var cardRate = toNum(document.getElementById('card-rate').value) / 100;
-          var cashRate = toNum(document.getElementById('cash-rate').value) / 100;
-          var cardFee = Math.round(cardAmount * cardRate);
-          var cashFee = Math.round(cashAmount * cashRate);
-          var totalFee = cardFee + cashFee;
-          var net = totalAmount - totalFee;
-          setResult('result-total-amount', totalAmount);
-          setResult('result-card-amount', cardAmount);
-          setResult('result-cash-amount', cashAmount);
-          setResult('result-card-fee', cardFee);
-          setResult('result-cash-fee', cashFee);
-          setResult('result-total-fee', totalFee);
-          setResult('result-net', net);
-        }
-        if (window.trackEvent) window.trackEvent('calc_run', {});
-      });
-
-      function getSavedList() {
-        try {
-          var raw = localStorage.getItem(CALC_SAVED_KEY);
-          return raw ? JSON.parse(raw) : [];
-        } catch (e) { return []; }
-      }
-      function setSavedList(list) {
-        try { localStorage.setItem(CALC_SAVED_KEY, JSON.stringify(list)); } catch (e) {}
-      }
-      function getFormState() {
-        var isRatio = document.querySelector('.calc-mode-btn.active').getAttribute('data-mode') === 'ratio';
-        var compare = isCompare();
-        var state = {
-          mode: isRatio ? 'ratio' : 'amount',
-          type: compare ? 'compare' : 'single',
-          totalAmount: toNum(document.getElementById('total-amount').value),
-          cardRatio: toNum(document.getElementById('card-ratio').value),
-          cashRatio: toNum(document.getElementById('cash-ratio').value),
-          cardAmount: toNum(document.getElementById('card-amount').value),
-          cashAmount: toNum(document.getElementById('cash-amount').value),
-          cardRate: toNum(document.getElementById('card-rate').value),
-          cashRate: toNum(document.getElementById('cash-rate').value),
-          cardRateA: toNum(document.getElementById('card-rate-a').value),
-          cashRateA: toNum(document.getElementById('cash-rate-a').value),
-          cardRateB: toNum(document.getElementById('card-rate-b').value),
-          cashRateB: toNum(document.getElementById('cash-rate-b').value)
-        };
-        return state;
-      }
-      function setFormState(state) {
-        if (!state) return;
-        document.querySelector('.calc-mode-btn[data-mode="' + (state.mode || 'ratio') + '"]').click();
-        document.querySelector('.calc-type-btn[data-type="' + (state.type || 'single') + '"]').click();
-        document.getElementById('total-amount').value = formatWithComma(String(state.totalAmount || 0));
-        document.getElementById('card-ratio').value = state.cardRatio != null ? state.cardRatio : 70;
-        document.getElementById('cash-ratio').value = state.cashRatio != null ? state.cashRatio : 30;
-        document.getElementById('card-amount').value = formatWithComma(String(state.cardAmount || 0));
-        document.getElementById('cash-amount').value = formatWithComma(String(state.cashAmount || 0));
-        document.getElementById('card-rate').value = state.cardRate != null ? state.cardRate : 3.2;
-        document.getElementById('cash-rate').value = state.cashRate != null ? state.cashRate : 2;
-        document.getElementById('card-rate-a').value = state.cardRateA != null ? state.cardRateA : 3.2;
-        document.getElementById('cash-rate-a').value = state.cashRateA != null ? state.cashRateA : 2;
-        document.getElementById('card-rate-b').value = state.cardRateB != null ? state.cardRateB : 2.8;
-        document.getElementById('cash-rate-b').value = state.cashRateB != null ? state.cashRateB : 1.5;
-        amountInputIds.forEach(function(id) { updateAmountKr(id); });
-      }
-      document.getElementById('calc-save').addEventListener('click', function() {
-        var name = prompt('저장할 이름을 입력하세요.', 'PG 비교 ' + new Date().toLocaleDateString('ko-KR'));
-        if (name == null || (name = (name || '').trim()) === '') return;
-        var list = getSavedList();
-        var item = { id: 'calc_' + Date.now(), name: name, createdAt: Date.now(), params: getFormState() };
-        list.unshift(item);
-        setSavedList(list);
-        alert('저장되었습니다.');
-      });
-      document.getElementById('calc-share').addEventListener('click', function() {
-        var s = getFormState();
-        var q = [];
-        q.push('mode=' + encodeURIComponent(s.mode || 'ratio'));
-        q.push('type=' + encodeURIComponent(s.type || 'single'));
-        q.push('total=' + (s.totalAmount || 0));
-        q.push('cardRatio=' + (s.cardRatio || 70));
-        q.push('cashRatio=' + (s.cashRatio || 30));
-        q.push('cardRate=' + (s.cardRate || 3.2));
-        q.push('cashRate=' + (s.cashRate || 2));
-        q.push('cardRateA=' + (s.cardRateA != null ? s.cardRateA : 3.2));
-        q.push('cashRateA=' + (s.cashRateA != null ? s.cashRateA : 2));
-        q.push('cardRateB=' + (s.cardRateB != null ? s.cardRateB : 2.8));
-        q.push('cashRateB=' + (s.cashRateB != null ? s.cashRateB : 1.5));
-        var url = location.origin + location.pathname + '?' + q.join('&');
-        try {
-          navigator.clipboard.writeText(url);
-          this.textContent = '복사됨';
-          var btn = this;
-          setTimeout(function() { btn.textContent = '공유 URL 복사'; }, 2000);
-        } catch (e) { prompt('아래 URL을 복사하세요', url); }
-      });
-      var params = new URLSearchParams(location.search);
-      var loadId = params.get('load');
-      if (loadId) {
-        var list = getSavedList();
-        var found = list.filter(function(x) { return x.id === loadId; })[0];
-        if (found && found.params) setFormState(found.params);
-      } else {
-        var total = params.get('total');
-        if (total != null) {
-          var state = {
-            mode: params.get('mode') || 'ratio',
-            type: params.get('type') || 'single',
-            totalAmount: toNum(total),
-            cardRatio: toNum(params.get('cardRatio')) || 70,
-            cashRatio: toNum(params.get('cashRatio')) || 30,
-            cardRate: toNum(params.get('cardRate')) || 3.2,
-            cashRate: toNum(params.get('cashRate')) || 2,
-            cardRateA: toNum(params.get('cardRateA')) || 3.2,
-            cashRateA: toNum(params.get('cashRateA')) || 2,
-            cardRateB: toNum(params.get('cardRateB')) || 2.8,
-            cashRateB: toNum(params.get('cashRateB')) || 1.5
-          };
-          setFormState(state);
-        }
-      }
-    })();
-    function toggleNav() {
-      var nav = document.getElementById('headerNav');
-      var btn = document.querySelector('.nav-toggle');
-      if (!nav || !btn) return;
-      var open = nav.classList.toggle('is-open');
-      btn.setAttribute('aria-expanded', open);
-      btn.setAttribute('aria-label', open ? '메뉴 닫기' : '메뉴 열기');
+    /* ── 유틸 ── */
+    function toNum(val) {
+      var n = parseFloat(String(val || '').replace(/,/g, ''));
+      return isNaN(n) || n < 0 ? 0 : n;
     }
+    function formatWithComma(val) {
+      var digits = String(val || '').replace(/\D/g, '');
+      if (!digits) return '';
+      var n = parseInt(digits, 10);
+      return isNaN(n) ? '' : n.toLocaleString('ko-KR');
+    }
+    function toKoreanAmount(n) {
+      n = Math.floor(n);
+      if (n >= 1e8) {
+        var eok = Math.floor(n / 1e8), man = Math.floor((n % 1e8) / 1e4), rest = n % 1e4;
+        return eok + '억' + (man > 0 ? ' ' + man.toLocaleString('ko-KR') + '만' : '') + (rest > 0 ? ' ' + rest.toLocaleString('ko-KR') : '') + '원';
+      }
+      if (n >= 1e4) {
+        var man = Math.floor(n / 1e4), rest = n % 1e4;
+        return man.toLocaleString('ko-KR') + '만' + (rest > 0 ? ' ' + rest.toLocaleString('ko-KR') : '') + '원';
+      }
+      return n.toLocaleString('ko-KR') + '원';
+    }
+    function fmt(n) { return n.toLocaleString('ko-KR') + '원'; }
+    function setResult(id, n) {
+      var el = document.getElementById(id);
+      if (!el) return;
+      el.innerHTML = fmt(n) + '<span class="calc-result-kr">' + toKoreanAmount(n) + '</span>';
+    }
+    function showErr(id, msg) {
+      var el = document.getElementById(id);
+      if (!el) return;
+      el.textContent = msg;
+      el.classList.toggle('is-visible', !!msg);
+    }
+
+    /* ── 현재 입력 모드 ── */
+    function isRatioMode() {
+      var a = document.querySelector('.calc-mode-btn.active');
+      return !a || a.getAttribute('data-mode') === 'ratio';
+    }
+    function isCompare() {
+      var a = document.querySelector('.calc-type-btn.active');
+      return a && a.getAttribute('data-type') === 'compare';
+    }
+
+    /* ── 실시간 검증 ── */
+    function validate() {
+      var ok = true;
+      if (isRatioMode()) {
+        var total = toNum(document.getElementById('total-amount').value);
+        var cr = toNum(document.getElementById('card-ratio').value);
+        var nr = toNum(document.getElementById('cash-ratio').value);
+        var wrap = document.getElementById('total-amount-wrap');
+        if (total <= 0) {
+          showErr('total-amount-err', '총 거래액을 입력해 주세요.');
+          wrap && wrap.classList.add('is-error');
+          ok = false;
+        } else {
+          showErr('total-amount-err', '');
+          wrap && wrap.classList.remove('is-error');
+        }
+        var sumErr = Math.abs(cr + nr - 100) > 0.01 ? '카드 비율 + 현금 비율의 합이 100%여야 합니다. (현재 ' + (cr + nr).toFixed(1) + '%)' : '';
+        showErr('ratio-sum-err', sumErr);
+        var cardRatioEl = document.getElementById('card-ratio');
+        var cashRatioEl = document.getElementById('cash-ratio');
+        if (cardRatioEl) cardRatioEl.classList.toggle('is-error', !!sumErr);
+        if (cashRatioEl) cashRatioEl.classList.toggle('is-error', !!sumErr);
+        if (sumErr) ok = false;
+      } else {
+        var ca = toNum(document.getElementById('card-amount').value);
+        var na = toNum(document.getElementById('cash-amount').value);
+        if (ca <= 0 && na <= 0) {
+          showErr('amount-sum-err', '카드 또는 현금 거래액을 입력해 주세요.');
+          ok = false;
+        } else {
+          showErr('amount-sum-err', '');
+        }
+      }
+      calcBtn.disabled = !ok;
+      return ok;
+    }
+
+    /* ── 콤마 마스킹 + 한글 금액 ── */
+    function updateAmountKr(inputId) {
+      var el = document.getElementById(inputId);
+      var krEl = document.getElementById(inputId + '-kr');
+      if (!el || !krEl) return;
+      var n = toNum(el.value);
+      krEl.textContent = n > 0 ? toKoreanAmount(n) : '';
+    }
+    var amountInputIds = ['total-amount', 'card-amount', 'cash-amount'];
+    amountInputIds.forEach(function (id) {
+      var el = document.getElementById(id);
+      if (!el) return;
+      el.addEventListener('input', function () {
+        var pos = this.selectionStart;
+        var beforeLen = this.value.length;
+        this.value = formatWithComma(this.value);
+        var afterLen = this.value.length;
+        var newPos = Math.max(0, pos + afterLen - beforeLen);
+        try { this.setSelectionRange(newPos, newPos); } catch (e) {}
+        updateAmountKr(id);
+        validate();
+      });
+      updateAmountKr(id);
+    });
+
+    /* ── 비율 입력 실시간 검증 ── */
+    ['card-ratio', 'cash-ratio'].forEach(function (id) {
+      var el = document.getElementById(id);
+      if (el) el.addEventListener('input', validate);
+    });
+
+    /* ── 탭: 입력 방식 전환 ── */
+    var modeBtns = document.querySelectorAll('.calc-mode-btn');
+    modeBtns.forEach(function (btn) {
+      btn.addEventListener('click', function () {
+        modeBtns.forEach(function (b) {
+          b.classList.remove('active');
+          b.setAttribute('aria-selected', 'false');
+        });
+        btn.classList.add('active');
+        btn.setAttribute('aria-selected', 'true');
+        var isRatio = btn.getAttribute('data-mode') === 'ratio';
+        document.getElementById('calc-ratio').style.display = isRatio ? 'block' : 'none';
+        document.getElementById('calc-amount').style.display = isRatio ? 'none' : 'block';
+        validate();
+      });
+    });
+
+    /* ── 탭: 단일 / A vs B 전환 ── */
+    var typeBtns = document.querySelectorAll('.calc-type-btn');
+    typeBtns.forEach(function (btn) {
+      btn.addEventListener('click', function () {
+        typeBtns.forEach(function (b) { b.classList.remove('active'); });
+        btn.classList.add('active');
+        var compare = isCompare();
+        document.getElementById('calc-fee-single').style.display = compare ? 'none' : 'block';
+        document.getElementById('calc-fee-compare').style.display = compare ? 'block' : 'none';
+      });
+    });
+
+    /* ── 프리셋 ── */
+    var PRESETS = {
+      'general':    { cardRatio: 70,  cashRatio: 30 },
+      'cash-heavy': { cardRatio: 40,  cashRatio: 60 },
+      'card-only':  { cardRatio: 90,  cashRatio: 10 }
+    };
+    document.querySelectorAll('.calc-preset-btn').forEach(function (btn) {
+      btn.addEventListener('click', function () {
+        var p = PRESETS[btn.getAttribute('data-preset')];
+        if (!p) return;
+        /* 비율 모드로 전환 */
+        var ratioBtn = document.querySelector('.calc-mode-btn[data-mode="ratio"]');
+        if (ratioBtn && !ratioBtn.classList.contains('active')) ratioBtn.click();
+        document.getElementById('card-ratio').value = p.cardRatio;
+        document.getElementById('cash-ratio').value = p.cashRatio;
+        validate();
+      });
+    });
+
+    /* ── 계산 실행 ── */
+    calcBtn.addEventListener('click', function () {
+      if (!validate()) return;
+      var isRatio = isRatioMode();
+      var totalAmount = 0, cardAmount = 0, cashAmount = 0;
+      var cardRatioPct = 0, cashRatioPct = 0;
+      if (isRatio) {
+        totalAmount  = toNum(document.getElementById('total-amount').value);
+        cardRatioPct = toNum(document.getElementById('card-ratio').value);
+        cashRatioPct = toNum(document.getElementById('cash-ratio').value);
+        cardAmount   = Math.round(totalAmount * cardRatioPct / 100);
+        cashAmount   = totalAmount - cardAmount;
+      } else {
+        cardAmount   = toNum(document.getElementById('card-amount').value);
+        cashAmount   = toNum(document.getElementById('cash-amount').value);
+        totalAmount  = cardAmount + cashAmount;
+        cardRatioPct = totalAmount > 0 ? Math.round(cardAmount / totalAmount * 1000) / 10 : 0;
+        cashRatioPct = totalAmount > 0 ? Math.round(cashAmount / totalAmount * 1000) / 10 : 0;
+      }
+
+      var compare = isCompare();
+      document.getElementById('calc-result').style.display = 'block';
+      document.getElementById('calc-result-single').style.display = compare ? 'none' : 'block';
+      document.getElementById('calc-result-compare').style.display = compare ? 'block' : 'none';
+      document.getElementById('result-rate-pct').style.display = compare ? 'none' : 'block';
+
+      /* 조건 요약 */
+      var summaryEl = document.getElementById('calc-result-summary');
+      if (compare) {
+        var crA = toNum(document.getElementById('card-rate-a').value);
+        var nrA = toNum(document.getElementById('cash-rate-a').value);
+        var crB = toNum(document.getElementById('card-rate-b').value);
+        var nrB = toNum(document.getElementById('cash-rate-b').value);
+        summaryEl.textContent = '총 ' + toKoreanAmount(totalAmount) + ' | 카드 ' + cardRatioPct + '% / 현금 ' + cashRatioPct + '% | PG A(카드 ' + crA + '% / 현금 ' + nrA + '%) vs PG B(카드 ' + crB + '% / 현금 ' + nrB + '%)';
+        var feeA = Math.round(cardAmount * crA / 100 + cashAmount * nrA / 100);
+        var feeB = Math.round(cardAmount * crB / 100 + cashAmount * nrB / 100);
+        setResult('result-comp-total', totalAmount);
+        setResult('result-fee-a', feeA);
+        setResult('result-fee-b', feeB);
+        setResult('result-save-amount', feeA - feeB);
+      } else {
+        var cardRate = toNum(document.getElementById('card-rate').value);
+        var cashRate = toNum(document.getElementById('cash-rate').value);
+        summaryEl.textContent = '총 ' + toKoreanAmount(totalAmount) + ' | 카드 ' + cardRatioPct + '% (수수료 ' + cardRate + '%) / 현금 ' + cashRatioPct + '% (수수료 ' + cashRate + '%)';
+        var cardFee  = Math.round(cardAmount * cardRate / 100);
+        var cashFee  = Math.round(cashAmount * cashRate / 100);
+        var totalFee = cardFee + cashFee;
+        var net      = totalAmount - totalFee;
+        setResult('result-total-amount', totalAmount);
+        setResult('result-card-amount',  cardAmount);
+        setResult('result-cash-amount',  cashAmount);
+        setResult('result-card-fee',     cardFee);
+        setResult('result-cash-fee',     cashFee);
+        setResult('result-total-fee',    totalFee);
+        setResult('result-net',          net);
+        var ratePct = totalAmount > 0 ? (totalFee / totalAmount * 100).toFixed(2) : '0';
+        var ratePctEl = document.getElementById('result-rate-pct');
+        if (ratePctEl) ratePctEl.textContent = '전체 수수료율 ' + ratePct + '% (총 거래액 대비)';
+      }
+
+      document.getElementById('calc-result').scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+      if (window.trackEvent) window.trackEvent('calc_run', { compare: compare });
+    });
+
+    /* ── 저장 / 공유 ── */
+    function getSavedList() {
+      try { return JSON.parse(localStorage.getItem(CALC_SAVED_KEY) || '[]'); } catch (e) { return []; }
+    }
+    function setSavedList(list) {
+      try { localStorage.setItem(CALC_SAVED_KEY, JSON.stringify(list)); } catch (e) {}
+    }
+    function getFormState() {
+      return {
+        mode:      isRatioMode() ? 'ratio' : 'amount',
+        type:      isCompare() ? 'compare' : 'single',
+        totalAmount: toNum(document.getElementById('total-amount').value),
+        cardRatio:   toNum(document.getElementById('card-ratio').value),
+        cashRatio:   toNum(document.getElementById('cash-ratio').value),
+        cardAmount:  toNum(document.getElementById('card-amount').value),
+        cashAmount:  toNum(document.getElementById('cash-amount').value),
+        cardRate:    toNum(document.getElementById('card-rate').value),
+        cashRate:    toNum(document.getElementById('cash-rate').value),
+        cardRateA:   toNum(document.getElementById('card-rate-a').value),
+        cashRateA:   toNum(document.getElementById('cash-rate-a').value),
+        cardRateB:   toNum(document.getElementById('card-rate-b').value),
+        cashRateB:   toNum(document.getElementById('cash-rate-b').value)
+      };
+    }
+    function setFormState(s) {
+      if (!s) return;
+      var mBtn = document.querySelector('.calc-mode-btn[data-mode="' + (s.mode || 'ratio') + '"]');
+      if (mBtn) mBtn.click();
+      var tBtn = document.querySelector('.calc-type-btn[data-type="' + (s.type || 'single') + '"]');
+      if (tBtn) tBtn.click();
+      document.getElementById('total-amount').value = formatWithComma(String(s.totalAmount || 0));
+      document.getElementById('card-ratio').value   = s.cardRatio  != null ? s.cardRatio  : 70;
+      document.getElementById('cash-ratio').value   = s.cashRatio  != null ? s.cashRatio  : 30;
+      document.getElementById('card-amount').value  = formatWithComma(String(s.cardAmount  || 0));
+      document.getElementById('cash-amount').value  = formatWithComma(String(s.cashAmount  || 0));
+      document.getElementById('card-rate').value    = s.cardRate   != null ? s.cardRate   : 3.2;
+      document.getElementById('cash-rate').value    = s.cashRate   != null ? s.cashRate   : 2;
+      document.getElementById('card-rate-a').value  = s.cardRateA  != null ? s.cardRateA  : 3.2;
+      document.getElementById('cash-rate-a').value  = s.cashRateA  != null ? s.cashRateA  : 2;
+      document.getElementById('card-rate-b').value  = s.cardRateB  != null ? s.cardRateB  : 2.8;
+      document.getElementById('cash-rate-b').value  = s.cashRateB  != null ? s.cashRateB  : 1.5;
+      amountInputIds.forEach(updateAmountKr);
+      validate();
+    }
+
+    document.getElementById('calc-save').addEventListener('click', function () {
+      var name = prompt('저장할 이름을 입력하세요.', 'PG 비교 ' + new Date().toLocaleDateString('ko-KR'));
+      if (name == null || !(name = name.trim())) return;
+      var list = getSavedList();
+      list.unshift({ id: 'calc_' + Date.now(), name: name, createdAt: Date.now(), params: getFormState() });
+      setSavedList(list);
+      var btn = this; btn.textContent = '저장됨';
+      setTimeout(function () { btn.textContent = '저장'; }, 2000);
+    });
+
+    document.getElementById('calc-share').addEventListener('click', function () {
+      var s = getFormState();
+      var q = [
+        'mode=' + s.mode, 'type=' + s.type,
+        'total=' + s.totalAmount,
+        'cardRatio=' + s.cardRatio, 'cashRatio=' + s.cashRatio,
+        'cardRate=' + s.cardRate,   'cashRate=' + s.cashRate,
+        'cardRateA=' + s.cardRateA, 'cashRateA=' + s.cashRateA,
+        'cardRateB=' + s.cardRateB, 'cashRateB=' + s.cashRateB
+      ];
+      var url = location.origin + location.pathname + '?' + q.join('&');
+      var btn = this;
+      try {
+        navigator.clipboard.writeText(url).then(function () {
+          btn.textContent = '복사됨';
+          setTimeout(function () { btn.textContent = '공유 URL 복사'; }, 2000);
+        });
+      } catch (e) { prompt('아래 URL을 복사하세요.', url); }
+      if (window.trackEvent) window.trackEvent('share', { type: 'calc_url' });
+    });
+
+    /* ── URL 파라미터 복원 ── */
+    var params = new URLSearchParams(location.search);
+    var loadId = params.get('load');
+    if (loadId) {
+      var found = getSavedList().filter(function (x) { return x.id === loadId; })[0];
+      if (found && found.params) setFormState(found.params);
+    } else if (params.get('total') != null) {
+      setFormState({
+        mode: params.get('mode') || 'ratio',
+        type: params.get('type') || 'single',
+        totalAmount: toNum(params.get('total')),
+        cardRatio: toNum(params.get('cardRatio')) || 70,
+        cashRatio: toNum(params.get('cashRatio')) || 30,
+        cardRate:  toNum(params.get('cardRate'))  || 3.2,
+        cashRate:  toNum(params.get('cashRate'))  || 2,
+        cardRateA: toNum(params.get('cardRateA')) || 3.2,
+        cashRateA: toNum(params.get('cashRateA')) || 2,
+        cardRateB: toNum(params.get('cardRateB')) || 2.8,
+        cashRateB: toNum(params.get('cashRateB')) || 1.5
+      });
+    }
+
+    /* ── 초기 검증 ── */
+    validate();
+
+    /* ── 모바일 네비 토글 ── */
+    var navBtn = document.querySelector('.nav-toggle');
+    var nav    = document.getElementById('headerNav');
+    if (navBtn && nav) navBtn.addEventListener('click', function () {
+      var open = nav.classList.toggle('is-open');
+      navBtn.setAttribute('aria-expanded', open);
+      navBtn.setAttribute('aria-label', open ? '메뉴 닫기' : '메뉴 열기');
+    });
+  })();
   </script>
 </body>
 </html>
