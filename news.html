@@ -84,6 +84,23 @@
       }
     })();
   </script>
+  <!-- 모바일 드로어 -->
+  <div id="drawerOverlay" hidden aria-hidden="true"></div>
+  <aside id="mobileDrawer" hidden aria-hidden="true" role="dialog" aria-modal="true" aria-label="메뉴">
+    <div class="drawer-header">
+      <span class="drawer-logo">가맹점숲</span>
+      <button type="button" class="drawer-close" aria-label="메뉴 닫기">
+        <svg width="20" height="20" viewBox="0 0 20 20" fill="none" aria-hidden="true"><path d="M4 4L16 16M16 4L4 16" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg>
+      </button>
+    </div>
+    <nav class="drawer-nav" aria-label="모바일 메뉴">
+      <a href="community.html"  class="drawer-link">커뮤니티</a>
+      <a href="pg.html"         class="drawer-link">PG 수수료 표</a>
+      <a href="calculator.html" class="drawer-link">수수료 계산기</a>
+      <a href="news.html"       class="drawer-link active">뉴스</a>
+      <a href="verify.html"     class="drawer-link">인증/문의</a>
+    </nav>
+  </aside>
   <script src="js/drawer.js"></script>
 </body>
 </html>

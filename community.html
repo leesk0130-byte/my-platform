@@ -741,17 +741,26 @@
         });
       });
     }
-    function toggleNav() {
-      var nav = document.getElementById('headerNav');
-      var btn = document.querySelector('.nav-toggle');
-      if (!nav || !btn) return;
-      var open = nav.classList.toggle('is-open');
-      btn.setAttribute('aria-expanded', open);
-      btn.setAttribute('aria-label', open ? '메뉴 닫기' : '메뉴 열기');
-    }
   </script>
   <!-- 모바일 플로팅 글쓰기 버튼 -->
   <a href="write.html" class="fab-write" aria-label="글쓰기">＋</a>
+  <!-- 모바일 드로어 -->
+  <div id="drawerOverlay" hidden aria-hidden="true"></div>
+  <aside id="mobileDrawer" hidden aria-hidden="true" role="dialog" aria-modal="true" aria-label="메뉴">
+    <div class="drawer-header">
+      <span class="drawer-logo">가맹점숲</span>
+      <button type="button" class="drawer-close" aria-label="메뉴 닫기">
+        <svg width="20" height="20" viewBox="0 0 20 20" fill="none" aria-hidden="true"><path d="M4 4L16 16M16 4L4 16" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg>
+      </button>
+    </div>
+    <nav class="drawer-nav" aria-label="모바일 메뉴">
+      <a href="community.html"  class="drawer-link active">커뮤니티</a>
+      <a href="pg.html"         class="drawer-link">PG 수수료 표</a>
+      <a href="calculator.html" class="drawer-link">수수료 계산기</a>
+      <a href="news.html"       class="drawer-link">뉴스</a>
+      <a href="verify.html"     class="drawer-link">인증/문의</a>
+    </nav>
+  </aside>
   <script src="js/drawer.js"></script>
 </body>
 </html>
