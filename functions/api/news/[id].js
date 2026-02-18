@@ -1,5 +1,3 @@
-﻿import { } from '../../../_lib/admin-auth.js';
-
 function json(body, status) {
   return new Response(JSON.stringify(body), {
     status: status || 200,
