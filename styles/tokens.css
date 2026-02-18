@@ -8,6 +8,14 @@
   --px: 20px;
   --radius: 16px;
   --card-pad: 24px;
+  /* 모바일 퍼스트 토큰 */
+  --px-mobile: 16px;
+  --px-desktop: 24px;
+  --card-pad-mobile: 16px;
+  --card-pad-desktop: 24px;
+  --fs-body-mobile: 0.9375rem;  /* 15px */
+  --fs-body-desktop: 1rem;      /* 16px */
+  --tap: 44px;
 
   /* 갭 스케일 (문단·섹션·카드 내부 여백) */
   --gap-1: 8px;

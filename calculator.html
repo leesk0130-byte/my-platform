@@ -144,6 +144,23 @@
       white-space: nowrap;
       margin-left: 0.5rem;
     }
+    /* ── 모바일 계산기 최적화 ── */
+    @media (max-width: 768px) {
+      .form-row { grid-template-columns: 1fr !important; }
+      .calc-mode-tabs { gap: 0; }
+      .calc-mode-btn { flex: 1; min-height: 44px; font-size: 0.875rem; padding: 10px 8px; }
+      .calc-type-btn { min-height: 44px; padding: 10px 14px; font-size: 0.875rem; }
+      .calc-preset-btn { min-height: 40px; font-size: 0.8125rem; }
+      .calc-actions {
+        display: flex !important;
+        flex-direction: column;
+        gap: 8px;
+      }
+      .calc-actions .btn { width: 100% !important; min-height: 44px; }
+      #calc-do { min-height: 48px !important; font-size: 1rem !important; width: 100% !important; }
+      .input-with-kr { min-height: 44px; }
+      .card-content { padding: 16px !important; }
+    }
   </style>
   <script src="js/analytics-stub.js"></script>
   <script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-3006893636342653" crossorigin="anonymous"></script>
