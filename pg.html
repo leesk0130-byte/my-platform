@@ -28,7 +28,7 @@
   <a href="#main" class="skip-link">본문으로 건너뛰기</a>
   <header>
     <h1><a href="index.html">가맹점숲</a></h1>
-    <button type="button" class="nav-toggle" aria-label="메뉴 열기" aria-expanded="false" onclick="toggleNav()"><span></span><span></span><span></span></button>
+    <button type="button" class="nav-toggle" aria-label="메뉴 열기" aria-expanded="false" data-toggle-nav><span></span><span></span><span></span></button>
     <nav class="header-nav" id="headerNav" aria-label="메인 메뉴">
       <a href="about.html">가맹점숲이란?</a>
       <a href="news.html">뉴스</a>
@@ -44,16 +44,22 @@
 
   <main id="main" class="container page-pg">
     <nav class="breadcrumb" aria-label="breadcrumb"><a href="index.html">홈</a> <span class="bc-sep">/</span> <strong>PG 수수료</strong></nav>
-    <p class="page-intro"><strong>PG란?</strong> 결제 대행(Payment Gateway) 서비스예요. 쇼핑몰에서 카드·계좌이체·간편결제 등을 받을 수 있게 해 주는 업체입니다. 이 페이지는 <strong>PG 수수료</strong>만 모아 둔 참고용 안내이며, 국내 주요 PG 7곳 비교와 실시간 계좌이체 설명을 확인하세요.</p>
+    <p class="page-intro"><strong>PG란?</strong> 결제 대행(Payment Gateway) 서비스예요. 쇼핑몰에서 카드·계좌이체·간편결제 등을 받을 수 있게 해 주는 업체입니다. 이 페이지는 <a href="https://blog.portone.io/opi_pg-comparison/" target="_blank" rel="noopener">포트원 블로그의 PG 비교 글</a>을 참고해 국내 PG 현황·수수료·결제수단·가입비를 정리한 <strong>참고용</strong> 안내입니다.</p>
     <div class="pg-disclaimer" role="alert">
-      <strong>⚠️ 수수료는 확정이 아닙니다.</strong> 아래 금액은 2025년 공개·일반 등급 기준 <strong>참고용</strong>이며, PG사·가맹점 조건·연매출·시점에 따라 달라집니다. 영세·중소 가맹점은 국세청 연매출 기준 우대 수수료가 적용될 수 있습니다. <strong>계약 전 반드시 각 PG사 공식 홈페이지 또는 상담으로 최신 수수료를 확인</strong>하세요.
+      <strong>⚠️ 수수료는 확정이 아닙니다.</strong> 아래 금액은 공개·일반 등급 기준 <strong>참고용</strong>이며, PG사·가맹점 조건·연매출·시점에 따라 달라집니다. 신규 사업자는 매출 데이터가 없어 ‘일반’ 등급이 적용되며, 매년 1월·7월 국세청 연매출 기준으로 영세·중소 가맹점에 해당하면 우대 수수료 적용 및 차액 환급을 받을 수 있습니다. <strong>계약 전 반드시 각 PG사 공식 홈페이지 또는 상담으로 최신 수수료를 확인</strong>하세요.
     </div>
+
+    <section class="section">
+      <div class="card">
+        <h3 class="section-title">국내 PG 현황·순위</h3>
+        <p>금융감독원 기준, 전자지급결제 대행업(PG) 등록 업체는 150여 개사입니다. 이 중 <strong>상위 4개사(KG이니시스, NHN KCP, 토스페이먼츠, 나이스페이먼츠)</strong>가 시장의 약 65~70%를 점유하는 구조예요. 상위 PG는 안정적인 시스템과 다양한 결제 옵션, 중하위 PG는 유연한 입점 요건과 신속한 대응이 장점입니다. 비즈니스에 맞는 PG를 골라 계약을 진행하면 됩니다.</p>
+      </div>
+    </section>
+
     <section class="section pg-section-full">
       <div class="card">
-        <h3 class="section-title">국내 주요 PG사 수수료 참고 (7곳)</h3>
-        <div class="pg-glossary">
-          <strong>실시간 계좌이체란?</strong> 구매자가 결제 시 자신의 은행 계좌에서 인터넷·모바일 뱅킹으로 곧바로 가맹점 쪽으로 돈을 보내는 방식이에요. 카드 대신 통장 잔액으로 결제하는 거라, 보통 카드보다 수수료가 낮은 편(1.8~2.0%대, PG사별 최저 건당 수수료 180~200원 적용)이에요.
-        </div>
+        <h3 class="section-title">PG사 수수료 비교 (신용카드 중심)</h3>
+        <p class="pg-lead">온라인 쇼핑몰·플랫폼에서 가장 많이 쓰이는 결제 수단은 신용카드입니다. PG사별 신용카드 수수료가 운영비에 큰 영향을 미치므로, 아래 표를 참고한 뒤 <strong>필요한 결제수단·연매출 구간</strong>을 고려해 선택하세요.</p>
         <div class="pg-table-wrap">
           <table>
             <thead>
@@ -71,7 +77,7 @@
                 <td><a href="https://www.inicis.com/" target="_blank" rel="noopener">KG이니시스</a></td>
                 <td>일반 약 3.2% (영세 1.9% 등 우대)</td>
                 <td>약 1.8%</td>
-                <td>연동 가능</td>
+                <td>허브형 연동 지원</td>
                 <td>가입비 약 20만원(VAT별도), 연회비 평생 면제</td>
                 <td>업계 1위, 안정성·바로오픈</td>
               </tr>
@@ -79,7 +85,7 @@
                 <td><a href="https://www.kcp.co.kr/" target="_blank" rel="noopener">NHN KCP</a></td>
                 <td>일반 약 3.2% (영세 1.72% 등 우대)</td>
                 <td>약 1.8% (최저 200원/건)</td>
-                <td>연동 가능</td>
+                <td>허브형 연동 지원</td>
                 <td>등록비 약 22만원, 연회비 면제</td>
                 <td>해외카드·글로벌 결제 강점</td>
               </tr>
@@ -87,8 +93,8 @@
                 <td><a href="https://www.tosspayments.com/" target="_blank" rel="noopener">토스페이먼츠</a></td>
                 <td>약 3.4% (일반), 영세·중소 우대 별도</td>
                 <td>약 2.0% (최저 200원/건)</td>
-                <td>연동 가능</td>
-                <td>가입비 22만원, 연회비 11만원(연 1회, 계약별 상이)</td>
+                <td>허브형 연동 지원</td>
+                <td>가입비 약 22만원, 연회비 11만원(연 1회, 계약별 상이)</td>
                 <td>연동 쉬움·스타트업 추천</td>
               </tr>
               <tr>
@@ -97,7 +103,7 @@
                 <td>약 2.4% 내외</td>
                 <td>연동 가능</td>
                 <td>무료 또는 저비용 (PG사 확인)</td>
-                <td>저수수료 플랜·오프라인 연동</td>
+                <td>해외카드 3.8% 등 경쟁력·다양 결제수단</td>
               </tr>
               <tr>
                 <td><a href="https://www.danal.co.kr/" target="_blank" rel="noopener">다날</a></td>
@@ -105,7 +111,7 @@
                 <td>약 1.8% (최저 180원/건)</td>
                 <td>연동 가능</td>
                 <td>등록비 약 11만원 (PG사 확인)</td>
-                <td>휴대폰 소액·PASS 본인인증</td>
+                <td>PASS 본인인증·영세·중소 저수수료</td>
               </tr>
               <tr>
                 <td><a href="https://www.mobilians.co.kr/" target="_blank" rel="noopener">KG모빌리언스</a></td>
@@ -119,14 +125,55 @@
                 <td><a href="https://www.eximbay.com/" target="_blank" rel="noopener">엑심베이</a></td>
                 <td>국내 2.7~3.5% / 해외 협의</td>
                 <td>1.8~2.5% 등 (문의)</td>
-                <td>약 3.5%, 다국가 로컬 결제</td>
+                <td>다국가 로컬 결제 등</td>
                 <td>심사비 약 33만원(VAT 포함)</td>
                 <td>해외결제·역직구·글로벌</td>
               </tr>
             </tbody>
           </table>
         </div>
-        <p class="pg-note">※ 위 수수료는 2025년 기준 <strong>참고용</strong>이며, 영세·중소사업자는 국세청 연매출 기준 우대 수수료 적용 시 더 낮아질 수 있습니다. VAT(부가세) 10%는 별도 부과됩니다. <strong>확정 금액·최신 조건은 각 PG사 공식 사이트 또는 고객센터에서 반드시 확인</strong>하세요.</p>
+        <p class="pg-note">※ 실시간 계좌이체: 구매자가 인터넷·모바일 뱅킹으로 계좌에서 곧바로 가맹점으로 이체하는 방식. 카드보다 수수료가 낮은 편(1.8~2.0%대, 건당 최저 180~200원)입니다.</p>
+        <p class="pg-note">※ 위 수수료는 <strong>참고용</strong>이며, 영세·중소사업자는 국세청 연매출 기준 우대 수수료 적용 시 더 낮아질 수 있습니다. VAT 10% 별도. <strong>확정 금액·최신 조건은 각 PG사 공식 사이트 또는 고객센터에서 반드시 확인</strong>하세요.</p>
+      </div>
+    </section>
+
+    <section class="section">
+      <div class="card">
+        <h3 class="section-title">지원 결제수단 확인</h3>
+        <p>PG 선택 시 수수료율뿐 아니라 <strong>필요한 결제수단을 지원하는지</strong>가 중요합니다. 실시간 계좌이체, 휴대폰 소액결제, 상품권, 해외 카드, 본인 인증 등 비즈니스에 필요한 항목을 먼저 정한 뒤, 지원 여부와 수수료를 비교해 결정하세요.</p>
+      </div>
+    </section>
+
+    <section class="section">
+      <div class="card">
+        <h3 class="section-title">간편결제(카카오페이, Npay, 페이코 등) 연동</h3>
+        <p>간편결제는 <strong>직연동(간편결제사와 직접 계약)</strong>과 <strong>허브형(PG사를 통한 연동)</strong> 두 가지가 있습니다. 이미 PG를 쓰고 있다면 허브형이 연동·수수료·정산 관리 측면에서 편할 수 있어요. 허브형 연동을 지원하는 PG사는 <strong>KG이니시스, NHN KCP, 토스페이먼츠, 스마트로, KPN, 웰컴페이먼츠</strong> 등입니다. (기능 제한이 있을 수 있으니 PG사에 문의하세요.)</p>
+      </div>
+    </section>
+
+    <section class="section">
+      <div class="card">
+        <h3 class="section-title">가입비 안내</h3>
+        <p>PG 최초 연동 시 <strong>평균 약 22만 원</strong> 정도의 가입비가 발생하는 경우가 많습니다. 일부 PG사는 조건에 따라 가입비 면제를 운영하므로, 희망 PG사에 최신 정책을 문의하는 것이 좋습니다.</p>
+      </div>
+    </section>
+
+    <section class="section">
+      <div class="card">
+        <h3 class="section-title">비즈니스 유형별 PG 참고</h3>
+        <ul class="pg-list">
+          <li><strong>정기구독·간편결제 중심(예: 20대 타깃)</strong> → Npay 등 간편결제 시장 점유율이 높은 사업자와의 직연동 또는 해당 간편결제를 지원하는 PG 검토.</li>
+          <li><strong>해외 결제 필요(외국인 고객·해외카드)</strong> → 나이스페이먼츠(해외카드 수수료 3.8% 등 경쟁력), 휴대폰 소액·상품권 등 다양한 결제수단 지원.</li>
+          <li><strong>본인인증 + 결제 동시 연동(커뮤니티 등)</strong> → 다날(PASS 앱 본인인증, 영세·중소사업자 카드 수수료 우대).</li>
+        </ul>
+        <p class="pg-note">위는 이해를 돕기 위한 예시이며, 최종 선택은 수수료·지원 결제수단·정산 주기·고객센터 등을 종합해 결정하세요.</p>
+      </div>
+    </section>
+
+    <section class="section">
+      <div class="card">
+        <h3 class="section-title">참고 자료</h3>
+        <p>PG사 순위·수수료·결제수단·비즈니스별 추천까지 자세한 비교는 포트원 블로그를 참고하세요. <a href="https://blog.portone.io/opi_pg-comparison/" target="_blank" rel="noopener">국내 주요 PG사 완벽 비교 (포트원 블로그)</a></p>
       </div>
     </section>
   </main>
@@ -136,7 +183,7 @@
     <div class="modal">
       <div class="modal-header">
         <h3>로그인</h3>
-        <button type="button" class="modal-close" onclick="closeModal('loginModal')" aria-label="닫기">&times;</button>
+        <button type="button" class="modal-close" data-close-modal="loginModal" aria-label="닫기">&times;</button>
       </div>
       <div class="modal-body">
         <form id="loginForm" onsubmit="return false;">
@@ -149,14 +196,14 @@
             <input type="password" id="login-pw" placeholder="비밀번호" required>
           </div>
           <div class="form-options">
-            <label><input type="checkbox" name="remember"> 로그인 유지</label>
+            <input type="checkbox" id="login-remember" name="remember"> <label for="login-remember">로그인 유지</label>
             <a href="#">비밀번호 찾기</a>
           </div>
           <div class="modal-footer">
             <button type="submit" class="btn btn-primary">로그인</button>
           </div>
         </form>
-        <p class="modal-switch">아직 회원이 아니신가요? <a href="#" onclick="closeModal('loginModal'); openModal('signupModal');">회원가입</a></p>
+        <p class="modal-switch">아직 회원이 아니신가요? <a href="#" data-open-modal="signupModal">회원가입</a></p>
       </div>
     </div>
   </div>
@@ -164,7 +211,7 @@
     <div class="modal">
       <div class="modal-header">
         <h3>회원가입</h3>
-        <button type="button" class="modal-close" onclick="closeModal('signupModal')" aria-label="닫기">&times;</button>
+        <button type="button" class="modal-close" data-close-modal="signupModal" aria-label="닫기">&times;</button>
       </div>
       <div class="modal-body">
         <form id="signupForm" onsubmit="return false;">
@@ -185,13 +232,13 @@
             <input type="password" id="signup-pw2" placeholder="비밀번호 다시 입력" required>
           </div>
           <div class="form-group">
-            <label><input type="checkbox" required> 이용약관 및 개인정보처리방침에 동의합니다.</label>
+            <input type="checkbox" id="signup-agree" required> <label for="signup-agree">이용약관 및 개인정보처리방침에 동의합니다.</label>
           </div>
           <div class="modal-footer">
             <button type="submit" class="btn btn-primary">가입하기</button>
           </div>
         </form>
-        <p class="modal-switch">이미 회원이신가요? <a href="#" onclick="closeModal('signupModal'); openModal('loginModal');">로그인</a></p>
+        <p class="modal-switch">이미 회원이신가요? <a href="#" data-open-modal="loginModal">로그인</a></p>
       </div>
     </div>
   </div>
@@ -215,45 +262,5 @@
   <script src="js/config.js"></script>
   <script src="js/app.js"></script>
   <script src="js/auth.js"></script>
-  <script>
-    // PG 페이지 전용 스크립트
-    function openModal(id) {
-      document.getElementById(id).classList.add('is-open');
-      document.body.style.overflow = 'hidden';
-    }
-    function closeModal(id) {
-      document.getElementById(id).classList.remove('is-open');
-      document.body.style.overflow = '';
-    }
-    document.querySelectorAll('.modal-overlay').forEach(function(el) {
-      el.addEventListener('click', function(e) { if (e.target === el) closeModal(el.id); });
-    });
-    var lf = document.getElementById('loginForm');
-    if (lf) lf.addEventListener('submit', function(e) {
-      e.preventDefault();
-      window.app.login(document.getElementById('login-email').value, document.getElementById('login-pw').value, function(err) {
-        if (err) { alert(err); return; }
-        closeModal('loginModal');
-      });
-    });
-    var sf = document.getElementById('signupForm');
-    if (sf) sf.addEventListener('submit', function(e) {
-      e.preventDefault();
-      var pw = document.getElementById('signup-pw').value;
-      if (document.getElementById('signup-pw2').value !== pw) { alert('비밀번호가 일치하지 않아요.'); return; }
-      window.app.signup(document.getElementById('signup-name').value, document.getElementById('signup-email').value, pw, function(err) {
-        if (err) { alert(err); return; }
-        closeModal('signupModal');
-      });
-    });
-    function toggleNav() {
-      var nav = document.getElementById('headerNav');
-      var btn = document.querySelector('.nav-toggle');
-      if (!nav || !btn) return;
-      var open = nav.classList.toggle('is-open');
-      btn.setAttribute('aria-expanded', open);
-      btn.setAttribute('aria-label', open ? '메뉴 닫기' : '메뉴 열기');
-    }
-  </script>
 </body>
 </html>
