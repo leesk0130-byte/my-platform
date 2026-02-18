@@ -14,7 +14,7 @@
   <a href="#main" class="skip-link">본문으로 건너뛰기</a>
   <header>
     <h1><a href="index.html">가맹점숲</a></h1>
-    <button type="button" class="nav-toggle" aria-label="메뉴 열기" aria-expanded="false" onclick="toggleNav()"><span></span><span></span><span></span></button>
+    <button type="button" class="nav-toggle" aria-label="메뉴 열기" aria-expanded="false" data-toggle-nav><span></span><span></span><span></span></button>
     <nav class="header-nav" id="headerNav" aria-label="메인 메뉴">
       <a href="about.html">가맹점숲이란?</a>
       <a href="news.html">뉴스</a>
@@ -54,7 +54,7 @@
             </select>
           </div>
           <div class="form-group" id="write-notice-wrap">
-            <label><input type="checkbox" id="write-notice" value="1"> 공지로 등록</label>
+            <input type="checkbox" id="write-notice" value="1"> <label for="write-notice">공지로 등록</label>
             <span id="write-notice-hint" class="form-hint">로그인한 운영자만 체크할 수 있어요. 목록 상단에 고정돼요.</span>
           </div>
           <div class="form-group">

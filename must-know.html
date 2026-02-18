@@ -28,7 +28,7 @@
   <a href="#main" class="skip-link">본문으로 건너뛰기</a>
   <header>
     <h1><a href="index.html">가맹점숲</a></h1>
-    <button type="button" class="nav-toggle" aria-label="메뉴 열기" aria-expanded="false" onclick="toggleNav()"><span></span><span></span><span></span></button>
+    <button type="button" class="nav-toggle" aria-label="메뉴 열기" aria-expanded="false" data-toggle-nav><span></span><span></span><span></span></button>
     <nav class="header-nav" id="headerNav" aria-label="메인 메뉴">
       <a href="about.html">가맹점숲이란?</a>
       <a href="news.html">뉴스</a>
@@ -49,7 +49,7 @@
       <p>이 페이지는 온라인 가맹점을 위한 <strong>필수 법·제도·운영 요점</strong>만 모은 전용 안내입니다.</p>
     </div>
     <section class="section">
-      <div class="card">
+      <div class="card stack">
         <h3 class="section-title">필수 안내</h3>
         <p class="section-desc">각 항목을 클릭하면 자세한 내용을 확인할 수 있습니다.</p>
         
@@ -143,8 +143,8 @@
     </section>
   </main>
 
-  <div class="modal-overlay" id="loginModal"><div class="modal"><div class="modal-header"><h3>로그인</h3><button type="button" class="modal-close" onclick="closeModal('loginModal')">&times;</button></div><div class="modal-body"><form onsubmit="return false;"><div class="form-group"><label>이메일</label><input type="email" required></div><div class="form-group"><label>비밀번호</label><input type="password" required></div><div class="modal-footer"><button type="submit" class="btn btn-primary">로그인</button></div></form><p class="modal-switch">아직 회원이 아니신가요? <a href="#" onclick="closeModal('loginModal');openModal('signupModal');">회원가입</a></p></div></div></div>
-  <div class="modal-overlay" id="signupModal"><div class="modal"><div class="modal-header"><h3>회원가입</h3><button type="button" class="modal-close" onclick="closeModal('signupModal')">&times;</button></div><div class="modal-body"><form onsubmit="return false;"><div class="form-group"><label>이름</label><input type="text" required></div><div class="form-group"><label>이메일</label><input type="email" required></div><div class="form-group"><label>비밀번호</label><input type="password" required minlength="8"></div><div class="form-group"><label><input type="checkbox" required> 이용약관 동의</label></div><div class="modal-footer"><button type="submit" class="btn btn-primary">가입하기</button></div></form><p class="modal-switch">이미 회원이신가요? <a href="#" onclick="closeModal('signupModal');openModal('loginModal');">로그인</a></p></div></div></div>
+  <div class="modal-overlay" id="loginModal"><div class="modal"><div class="modal-header"><h3>로그인</h3><button type="button" class="modal-close" data-close-modal="loginModal" aria-label="닫기">&times;</button></div><div class="modal-body"><form id="loginForm" onsubmit="return false;"><div class="form-group"><label for="login-email">이메일</label><input type="email" id="login-email" required></div><div class="form-group"><label for="login-pw">비밀번호</label><input type="password" id="login-pw" required></div><div class="modal-footer"><button type="submit" class="btn btn-primary">로그인</button></div></form><p class="modal-switch">아직 회원이 아니신가요? <a href="#" data-open-modal="signupModal">회원가입</a></p></div></div></div>
+  <div class="modal-overlay" id="signupModal"><div class="modal"><div class="modal-header"><h3>회원가입</h3><button type="button" class="modal-close" data-close-modal="signupModal" aria-label="닫기">&times;</button></div><div class="modal-body"><form id="signupForm" onsubmit="return false;"><div class="form-group"><label for="signup-name">이름</label><input type="text" id="signup-name" required></div><div class="form-group"><label for="signup-email">이메일</label><input type="email" id="signup-email" required></div><div class="form-group"><label for="signup-pw">비밀번호</label><input type="password" id="signup-pw" required minlength="8"></div><div class="form-group"><label for="signup-pw2">비밀번호 확인</label><input type="password" id="signup-pw2" required></div><div class="form-group"><input type="checkbox" id="signup-agree" required> <label for="signup-agree">이용약관 동의</label></div><div class="modal-footer"><button type="submit" class="btn btn-primary">가입하기</button></div></form><p class="modal-switch">이미 회원이신가요? <a href="#" data-open-modal="loginModal">로그인</a></p></div></div></div>
 
   <footer>
     <div class="footer-inner">

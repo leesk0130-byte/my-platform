@@ -1,0 +1,151 @@
+/**
+ * 공통 레이아웃·카드·타이포 컴포넌트
+ * tokens.css 로드 후 사용. 박스 안 글씨 "벽에 붙는" 문제 해소 + 가독성 통일
+ */
+
+/* ---- 레이아웃 ---- */
+.container {
+  max-width: var(--container-max);
+  margin: 0 auto;
+  padding: 0 var(--px);
+  box-sizing: border-box;
+}
+
+.section {
+  padding: var(--gap-6) 0 var(--gap-5);
+}
+
+.section:last-child {
+  padding-bottom: 0;
+}
+
+/* 문단/블록 간격 통일 */
+.stack > * + * {
+  margin-top: var(--gap-3);
+}
+
+/* ---- 카드 (박스 안 여백 보장) ---- */
+.card {
+  border-radius: var(--radius);
+  padding: var(--card-pad);
+  background: #fff;
+  border: 1px solid rgba(0, 0, 0, 0.06);
+  box-sizing: border-box;
+}
+
+.card--soft {
+  background: rgba(0, 0, 0, 0.02);
+  border: 1px solid rgba(0, 0, 0, 0.06);
+}
+
+/* ---- 타이포 기본 ---- */
+body {
+  font-size: var(--fs-3);
+  line-height: var(--lh-body);
+}
+
+h1 {
+  font-size: var(--fs-7);
+  line-height: var(--lh-title);
+  margin: 0 0 var(--gap-3);
+}
+
+h2 {
+  font-size: var(--fs-6);
+  line-height: var(--lh-title);
+  margin: var(--gap-5) 0 var(--gap-3);
+}
+
+h3 {
+  font-size: var(--fs-5);
+  line-height: var(--lh-title);
+  margin: var(--gap-4) 0 var(--gap-2);
+}
+
+h1:first-child,
+h2:first-child,
+h3:first-child {
+  margin-top: 0;
+}
+
+p {
+  margin: 0;
+}
+
+.meta {
+  font-size: var(--fs-1);
+  line-height: 1.5;
+  opacity: 0.75;
+}
+
+/* ---- 문서형(긴 글) 가독성 ---- */
+.prose {
+  max-width: 72ch;
+  line-height: var(--lh-body);
+}
+
+.prose p + p {
+  margin-top: var(--gap-2);
+}
+
+.prose ul,
+.prose ol {
+  padding-left: 1.25rem;
+  margin: var(--gap-2) 0;
+}
+
+.prose li + li {
+  margin-top: 6px;
+}
+
+/* ---- 테이블 가독성 (전역) ---- */
+.table-scroll {
+  overflow-x: auto;
+  -webkit-overflow-scrolling: touch;
+  margin-bottom: var(--gap-4);
+}
+
+.table-scroll table,
+.pg-table-wrap table {
+  width: 100%;
+  min-width: 640px;
+  border-collapse: separate;
+  border-spacing: 0;
+}
+
+.table-scroll th,
+.table-scroll td,
+.pg-table-wrap th,
+.pg-table-wrap td {
+  padding: 14px 12px;
+  vertical-align: top;
+  line-height: 1.6;
+  font-size: var(--fs-2);
+  text-align: left;
+  word-break: keep-all;
+  overflow-wrap: anywhere;
+}
+
+.table-scroll th,
+.pg-table-wrap th {
+  font-weight: 700;
+  background: #f8fafc;
+  border-bottom: 2px solid rgba(0, 0, 0, 0.08);
+}
+
+.table-scroll td,
+.pg-table-wrap td {
+  border-bottom: 1px solid rgba(0, 0, 0, 0.06);
+}
+
+.table-scroll tbody tr:hover td,
+.pg-table-wrap tbody tr:hover td {
+  background: rgba(0, 0, 0, 0.02);
+}
+
+/* PG 전용: 표 래퍼 가로 스크롤 */
+.pg-table-wrap {
+  overflow-x: auto;
+  -webkit-overflow-scrolling: touch;
+  margin-bottom: var(--gap-4);
+}

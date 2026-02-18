@@ -128,8 +128,9 @@
     authState = 'loggedOut';
     currentUser = null;
     renderAuthActions();
-    
-    // authStateChanged 이벤트 발생
+    if (typeof window.updateHeaderAuth === 'function') {
+      window.updateHeaderAuth();
+    }
     window.dispatchEvent(new Event('authStateChanged'));
   }
 
@@ -294,24 +295,55 @@
   }
 
   /**
-   * 헤더 로그인/회원가입/로그아웃 버튼 클릭 — document 위임 (버튼이 동적이라 onclick 대신)
+   * 헤더 로그인/회원가입/로그아웃 + 모달 닫기·전환 — document 위임 (인라인 onclick 제거로 deprecated 경고 해소)
    */
   function setupAuthClickDelegation() {
     document.addEventListener('click', function(e) {
-      var btn = e.target && e.target.closest && e.target.closest('[data-auth]');
-      if (!btn) return;
-      var action = btn.getAttribute('data-auth');
-      if (action === 'login') {
+      var target = e.target && e.target.closest && e.target.closest('[data-auth], [data-close-modal], [data-open-modal], [data-toggle-nav]');
+      if (!target) return;
+
+      if (target.hasAttribute('data-toggle-nav')) {
         e.preventDefault();
-        openLoginModal();
-      } else if (action === 'signup') {
-        e.preventDefault();
-        openSignupModal();
-      } else if (action === 'logout') {
-        e.preventDefault();
-        logout();
+        e.stopPropagation();
+        toggleNav();
+        return;
       }
-    });
+
+      if (target.hasAttribute('data-auth')) {
+        var action = target.getAttribute('data-auth');
+        if (action === 'login') {
+          e.preventDefault();
+          e.stopPropagation();
+          openLoginModal();
+        } else if (action === 'signup') {
+          e.preventDefault();
+          e.stopPropagation();
+          openSignupModal();
+        } else if (action === 'logout') {
+          e.preventDefault();
+          e.stopPropagation();
+          logout();
+        }
+        return;
+      }
+
+      if (target.hasAttribute('data-close-modal')) {
+        e.preventDefault();
+        e.stopPropagation();
+        closeModal(target.getAttribute('data-close-modal'));
+        return;
+      }
+
+      if (target.hasAttribute('data-open-modal')) {
+        e.preventDefault();
+        e.stopPropagation();
+        var modalId = target.getAttribute('data-open-modal');
+        var openModalEl = document.querySelector('.modal-overlay.is-open');
+        if (openModalEl) closeModal(openModalEl.id);
+        if (modalId === 'loginModal') openLoginModal();
+        else if (modalId === 'signupModal') openSignupModal();
+      }
+    }, true); // 캡처 단계: 다른 리스너보다 먼저 실행
   }
 
   /**

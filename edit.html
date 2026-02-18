@@ -10,7 +10,7 @@
   <a href="#main" class="skip-link">본문으로 건너뛰기</a>
   <header>
     <h1><a href="index.html">가맹점숲</a></h1>
-    <button type="button" class="nav-toggle" aria-label="메뉴 열기" aria-expanded="false" onclick="toggleNav()"><span></span><span></span><span></span></button>
+    <button type="button" class="nav-toggle" aria-label="메뉴 열기" aria-expanded="false" data-toggle-nav><span></span><span></span><span></span></button>
     <nav class="header-nav" id="headerNav" aria-label="메인 메뉴">
       <a href="news.html">뉴스</a>
       <a href="pg.html">PG 수수료</a>
@@ -21,7 +21,7 @@
     <div class="header-auth" id="headerAuth">
       <span class="header-user" id="headerUser" style="display:none;"></span>
       <a href="community.html" class="btn btn-outline">목록으로</a>
-      <button type="button" class="btn btn-outline" id="headerLogoutBtn" style="display:none;" onclick="if(window.app&&window.app.logout)window.app.logout();if(typeof updateHeaderAuth==='function')updateHeaderAuth();">로그아웃</button>
+      <button type="button" class="btn btn-outline" id="headerLogoutBtn" style="display:none;" data-auth="logout">로그아웃</button>
     </div>
   </header>
 

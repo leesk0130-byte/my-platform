@@ -1,0 +1,45 @@
+/**
+ * 전역 레이아웃·타이포·여백 토큰
+ * 모든 페이지에서 일관된 spacing/타이포 적용 (임의 px 금지)
+ */
+:root {
+  /* 레이아웃 */
+  --container-max: 1040px;
+  --px: 20px;
+  --radius: 16px;
+  --card-pad: 24px;
+
+  /* 갭 스케일 (문단·섹션·카드 내부 여백) */
+  --gap-1: 8px;
+  --gap-2: 12px;
+  --gap-3: 16px;
+  --gap-4: 24px;
+  --gap-5: 32px;
+  --gap-6: 48px;
+
+  /* 폰트 스케일 */
+  --fs-1: 13px;   /* meta */
+  --fs-2: 15px;   /* body-small */
+  --fs-3: 16px;   /* body */
+  --fs-4: 18px;   /* lead */
+  --fs-5: 20px;   /* h3 */
+  --fs-6: 24px;   /* h2 */
+  --fs-7: 32px;   /* h1 */
+
+  /* 줄간격 */
+  --lh-body: 1.7;
+  --lh-title: 1.35;
+}
+
+@media (max-width: 768px) {
+  :root {
+    --px: 16px;
+    --card-pad: 20px;
+  }
+}
+
+@media (max-width: 480px) {
+  :root {
+    --card-pad: 16px;
+  }
+}
