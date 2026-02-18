@@ -8,7 +8,7 @@ pages_build_output_dir = "."
 [[d1_databases]]
 binding = "DB"
 database_name = "my-platform-db"
-database_id = "YOUR_D1_DATABASE_ID"
+database_id = "79046550-5f11-4eac-b462-4fc949dd3b9d"
 
 # 환경 변수(비밀값)는 Cloudflare Dashboard → Pages → 설정 → 환경 변수에서 설정하세요.
 # ADMIN_EMAIL, ADMIN_PASSWORD, ADMIN_SECRET(쿠키 서명용 32자 이상)
