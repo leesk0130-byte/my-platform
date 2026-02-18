@@ -275,8 +275,11 @@
    * 7) 초기화
    * ────────────────────────────────────────────────── */
   function purgeLegacyModals() {
-    /* 기존에 HTML에 정적으로 남아있는 modal-overlay 즉시 제거 */
-    document.querySelectorAll('.modal-overlay').forEach(function (m) { m.remove(); });
+    /* 기존에 HTML에 정적으로 남아있는 로그인/회원가입 modal-overlay만 제거 */
+    ['loginModal', 'signupModal'].forEach(function (id) {
+      var el = document.getElementById(id);
+      if (el) el.remove();
+    });
   }
 
   function init() {

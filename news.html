@@ -133,12 +133,12 @@
 
     function openModal() {
       var m = document.getElementById('newsWriteModal');
-      if (m) { m.classList.add('active'); m.removeAttribute('aria-hidden'); document.body.style.overflow = 'hidden'; }
+      if (m) { m.classList.add('is-open'); m.removeAttribute('aria-hidden'); document.body.style.overflow = 'hidden'; }
     }
 
     function closeModal() {
       var m = document.getElementById('newsWriteModal');
-      if (m) { m.classList.remove('active'); m.setAttribute('aria-hidden', 'true'); document.body.style.overflow = ''; }
+      if (m) { m.classList.remove('is-open'); m.setAttribute('aria-hidden', 'true'); document.body.style.overflow = ''; }
       var form = document.getElementById('newsWriteForm');
       if (form) form.reset();
       var err = document.getElementById('news-write-error');
