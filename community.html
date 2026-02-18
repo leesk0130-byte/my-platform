@@ -82,82 +82,7 @@
               <a href="write.html" class="btn btn-primary board-actions-write-mobile">글쓰기</a>
             </div>
             <div id="board-notice" class="board-notice" aria-label="공지" style="display:none;"></div>
-        <div id="view-loading" class="loading-state" aria-live="polite" data-view="loading">
-          <div class="loading-spinner"></div>
-          <p>글 목록을 불러오는 중이에요...</p>
-        </div>
-        <div id="view-list" data-view="list" style="display:none;">
-          <ul class="feed-list" id="community-list" aria-label="게시글 목록"></ul>
-          <div id="posts-more-wrap" class="board-more-wrap" style="display:none;">
-            <button type="button" class="btn btn-outline" id="posts-more-btn">더보기</button>
-          </div>
-        </div>
-        <div id="view-empty" class="empty-state" data-view="empty" style="display:none;">
-          <p class="empty-state-icon" aria-hidden="true">📝</p>
-          <p class="empty-state-title">아직 작성된 글이 없어요!</p>
-          <p class="empty-state-desc">첫 글을 작성해 보세요.</p>
-          <a href="write.html" class="btn btn-primary">첫 글 쓰기</a>
-        </div>
-        <div id="view-not-found" class="empty-state" data-view="notFound" style="display:none; margin:1.5rem 2rem;">
-          <p class="empty-state-icon" aria-hidden="true">🔍</p>
-          <p class="empty-state-title">글이 없거나 삭제되었습니다</p>
-          <p class="empty-state-desc">요청하신 글을 찾을 수 없어요.</p>
-          <a href="community.html" class="btn btn-primary">목록으로</a>
-        </div>
-        <div id="view-error" class="empty-state" data-view="error" style="display:none;">
-          <p class="empty-state-title">일시적인 오류가 났어요</p>
-          <p class="empty-state-desc" id="view-error-message">잠시 후 다시 시도해 주세요.</p>
-          <button type="button" class="btn btn-primary" id="view-error-retry">다시 시도</button>
-        </div>
-            <div id="view-detail" class="post-detail-wrap" data-view="detail" style="display:none;margin-top:1rem;">
-              <div class="post-detail-nav">
-                <a href="community.html" class="btn btn-outline btn-back">← 목록으로</a>
-              </div>
-              <article class="post-detail-card" aria-label="글 본문">
-                <header class="post-detail-header">
-                  <p class="post-detail-title-label" aria-hidden="true">제목</p>
-                  <h1 id="post-detail-title" class="post-detail-title"></h1>
-                  <div id="post-detail-meta" class="post-detail-meta"></div>
-                  <div id="post-detail-bookmark" class="post-detail-actions post-detail-bookmark-row" style="margin-top:0.5rem;"></div>
-                  <div id="post-detail-actions" class="post-detail-actions" style="display:none;margin-top:0.5rem;"></div>
-                </header>
-                <div class="post-body-wrap" aria-label="본문 내용">
-                  <p class="post-body-label">본문</p>
-                  <div id="post-detail-body" class="post-body"></div>
-                </div>
-              </article>
-              <section class="comment-section" id="comment-section" aria-label="댓글">
-                <h2 class="comment-section-title" id="comment-section-title">댓글 <span class="comment-count" id="comment-count">0</span></h2>
-                <ul class="comment-list" id="comment-list"></ul>
-                <div class="comment-form-wrap">
-                  <p class="comment-form-label">댓글 작성</p>
-                  <form id="comment-form" class="comment-form" onsubmit="return false;">
-                    <div class="form-group comment-nickname-row" id="comment-nickname-row">
-                      <span class="comment-nickname-label">닉네임</span>
-                      <span class="comment-nickname-value" id="comment-nickname-value">—</span>
-                    </div>
-                    <div class="form-group form-group-checkbox">
-                      <label for="comment-anonymous"><input type="checkbox" id="comment-anonymous" name="comment-anonymous"> 익명으로 작성</label>
-                    </div>
-                    <div class="form-group">
-                      <label for="comment-body" class="sr-only">댓글 내용</label>
-                      <textarea id="comment-body" placeholder="댓글을 입력하세요" required rows="3"></textarea>
-                    </div>
-                    <div id="comment-error" class="msg-error" style="display:none;"></div>
-                    <div class="form-actions">
-                      <button type="submit" class="btn btn-primary">댓글 등록</button>
-                    </div>
-                  </form>
-                </div>
-              </section>
-              <section class="related-posts-section" id="related-posts-section" aria-label="관련 글" style="margin-top:1.5rem;">
-                <h2 class="section-title">관련 글</h2>
-                <ul class="feed-list" id="related-posts-list"></ul>
-              </section>
-              <div class="post-detail-nav post-detail-nav-bottom">
-                <a href="community.html" class="btn btn-outline btn-back">← 목록으로</a>
-              </div>
-            </div>
+            <div id="page-root" aria-live="polite"></div>
           </div>
         </div>
         
@@ -214,8 +139,6 @@
     </section>
   </main>
 
-  <div class="modal-overlay" id="loginModal"><div class="modal"><div class="modal-header"><h3>로그인</h3><button type="button" class="modal-close" data-close-modal="loginModal" aria-label="닫기">&times;</button></div><div class="modal-body"><form id="loginForm" onsubmit="return false;"><div class="form-group"><label for="login-email">이메일</label><input type="email" id="login-email" required></div><div class="form-group"><label for="login-pw">비밀번호</label><input type="password" id="login-pw" required></div><div id="login-error" class="msg-error" style="display:none;"></div><div id="login-success" class="msg-success" style="display:none;"></div><div class="modal-footer"><button type="submit" class="btn btn-primary" id="login-submit-btn">로그인</button></div></form><p class="modal-switch">아직 회원이 아니신가요? <a href="#" data-open-modal="signupModal">회원가입</a></p></div></div></div>
-  <div class="modal-overlay" id="signupModal"><div class="modal"><div class="modal-header"><h3>회원가입</h3><button type="button" class="modal-close" data-close-modal="signupModal" aria-label="닫기">&times;</button></div><div class="modal-body"><form id="signupForm" onsubmit="return false;"><div class="form-group"><label for="signup-name">이름</label><input type="text" id="signup-name" required></div><div class="form-group"><label for="signup-email">이메일</label><input type="email" id="signup-email" required></div><div class="form-group"><label for="signup-pw">비밀번호</label><input type="password" id="signup-pw" required minlength="8"></div><div class="form-group"><label for="signup-pw2">비밀번호 확인</label><input type="password" id="signup-pw2" required></div><div class="form-group form-agree"><input type="checkbox" id="signup-agree" required> <label for="signup-agree"><a href="terms.html" target="_blank" rel="noopener">이용약관</a>·<a href="privacy.html" target="_blank" rel="noopener">개인정보처리방침</a>에 동의합니다.</label></div><div id="signup-error" class="msg-error" style="display:none;"></div><div id="signup-success" class="msg-success" style="display:none;"></div><div class="modal-footer"><button type="submit" class="btn btn-primary" id="signup-submit-btn">가입하기</button></div></form><p class="modal-switch">이미 회원이신가요? <a href="#" data-open-modal="loginModal">로그인</a></p></div></div></div>
 
   <footer>
     <div class="footer-inner">
@@ -238,6 +161,59 @@
   <script>
     (function() {
       if (window.trackEvent) window.trackEvent('pageview', { page: 'community' });
+
+      /* ── page-root 단일 렌더 헬퍼 ── */
+      var pageRoot = document.getElementById('page-root');
+      function setRoot(html) { if (pageRoot) pageRoot.innerHTML = html; }
+
+      function renderLoading() {
+        setRoot('<div class="loading-state"><div class="loading-spinner"></div><p>글 목록을 불러오는 중이에요...</p></div>');
+      }
+      function renderEmpty() {
+        setRoot('<div class="empty-state"><p class="empty-state-icon" aria-hidden="true">\uD83D\uDCDD</p><p class="empty-state-title">아직 작성된 글이 없어요!</p><p class="empty-state-desc">첫 글을 작성해 보세요.</p><a href="write.html" class="btn btn-primary">첫 글 쓰기</a></div>');
+      }
+      function renderNotFound() {
+        setRoot('<div class="empty-state" style="margin:1.5rem 2rem;"><p class="empty-state-icon" aria-hidden="true">\uD83D\uDD0D</p><p class="empty-state-title">글이 없거나 삭제되었습니다</p><p class="empty-state-desc">요청하신 글을 찾을 수 없어요.</p><a href="community.html" class="btn btn-primary">목록으로</a></div>');
+      }
+      function renderError(msg) {
+        setRoot('<div class="empty-state"><p class="empty-state-title">일시적인 오류가 났어요</p><p class="empty-state-desc">' + (msg || '잠시 후 다시 시도해 주세요.') + '</p><button type="button" class="btn btn-primary" id="view-error-retry">다시 시도</button></div>');
+        var btn = document.getElementById('view-error-retry');
+        if (btn) btn.onclick = function() { loadList(false); };
+      }
+      function renderList(items, hasMore) {
+        var listHtml = window.app && window.app.renderPostsHTML ? window.app.renderPostsHTML(items, 'community.html?id=', true) : '';
+        if (!listHtml) {
+          listHtml = (items || []).map(function(p) {
+            return '<li class="feed-item"><a href="community.html?id=' + (p.id || '') + '" class="feed-title-link">' + (p.title || '') + '</a></li>';
+          }).join('');
+        }
+        var moreBtn = hasMore ? '<div class="board-more-wrap"><button type="button" class="btn btn-outline" id="posts-more-btn">더보기</button></div>' : '';
+        setRoot('<ul class="feed-list" id="community-list" aria-label="게시글 목록">' + listHtml + '</ul>' + moreBtn);
+        var mb = document.getElementById('posts-more-btn');
+        if (mb) mb.onclick = function() {
+          currentShown = Math.min(currentShown + PAGE_SIZE, allFilteredItems.length);
+          renderPage();
+        };
+        /* renderPosts를 사용한 경우 실제 렌더 */
+        if (window.app && window.app.renderPosts) {
+          window.app.renderPosts('community-list', items, 'community.html?id=', true);
+        }
+      }
+
+      /* ── 보드 UI 표시/숨김 (detail에서는 탭/툴바 숨김) ── */
+      function setListUI(show) {
+        var card = document.querySelector('.community-section .card');
+        if (!card) return;
+        var tabs    = card.querySelector('.board-tabs');
+        var toolbar = card.querySelector('#board-toolbar');
+        var actions = card.querySelector('.board-actions');
+        var notice  = document.getElementById('board-notice');
+        if (tabs)    tabs.style.display    = show ? '' : 'none';
+        if (toolbar) toolbar.style.display = show ? 'flex' : 'none';
+        if (actions) actions.style.display = show ? 'flex' : 'none';
+        if (notice && !show) notice.style.display = 'none';
+      }
+
       document.addEventListener('click', function(e) {
         var noticeBtn = e.target && e.target.closest && e.target.closest('.notice-toggle-btn');
         if (noticeBtn) {
@@ -294,61 +270,147 @@
       var allViews = document.querySelectorAll('[data-view]');
       allViews.forEach(function(el) { el.style.display = 'none'; });
 
-      function setViewState(state) {
-        viewState = state;
-        console.log('Setting view state to:', state);
-        
-        // Hide ALL views first
-        var views = document.querySelectorAll('[data-view]');
-        views.forEach(function(el) { 
-          el.style.display = 'none'; 
+      /* ── detail view 렌더 (page-root에 innerHTML) ── */
+      function renderDetail(post) {
+        setListUI(false);
+        var verified = (post.verified === true || (window.app && window.app.isAuthorVerified && window.app.isAuthorVerified(post.author)));
+        var badgeHtml = (window.app && window.app.verifiedBadgeHtml) ? window.app.verifiedBadgeHtml(verified, post.author) : '';
+        var canEdit = window.app && window.app.canEditPost && window.app.canEditPost(post);
+        var actionHtml = canEdit
+          ? '<div class="post-detail-actions" style="margin-top:0.5rem;"><a href="edit.html?id=' + encodeURIComponent(post.id) + '" class="btn btn-outline btn-sm">수정</a> <button type="button" class="post-delete-btn btn btn-outline btn-sm" data-post-id="' + (post.id || '') + '">삭제</button></div>'
+          : '';
+        var saved = window.Bookmarks ? window.Bookmarks.isBookmarked(post.id) : false;
+        var bodyText = (post.body || '(내용 없음)').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/\n/g,'<br>');
+        setRoot(
+          '<div class="post-detail-wrap">' +
+            '<div class="post-detail-nav"><a href="community.html" class="btn btn-outline btn-back">\u2190 목록으로</a></div>' +
+            '<article class="post-detail-card" aria-label="글 본문">' +
+              '<header class="post-detail-header">' +
+                '<p class="post-detail-title-label" aria-hidden="true">제목</p>' +
+                '<h1 id="post-detail-title" class="post-detail-title">' + (post.title || '') + '</h1>' +
+                '<div id="post-detail-meta" class="post-detail-meta">' + (post.author || '익명') + badgeHtml + ' &middot; ' + (post.date || '') + '</div>' +
+                '<div class="post-detail-actions post-detail-bookmark-row" style="margin-top:0.5rem;" id="post-detail-bookmark">' +
+                  '<button type="button" class="btn btn-outline btn-sm" id="post-bookmark-btn" data-post-id="' + (post.id || '') + '">' + (saved ? '저장 취소' : '저장') + '</button>' +
+                  ' <button type="button" class="btn btn-ghost btn-sm" id="post-share-link-btn" aria-label="링크 복사">링크 복사</button>' +
+                '</div>' +
+                actionHtml +
+              '</header>' +
+              '<div class="post-body-wrap" aria-label="본문 내용">' +
+                '<p class="post-body-label">본문</p>' +
+                '<div id="post-detail-body" class="post-body">' + bodyText + '</div>' +
+              '</div>' +
+            '</article>' +
+            '<section class="comment-section" id="comment-section" aria-label="댓글">' +
+              '<h2 class="comment-section-title">댓글 <span class="comment-count" id="comment-count">0</span></h2>' +
+              '<ul class="comment-list" id="comment-list"></ul>' +
+              '<div class="comment-form-wrap">' +
+                '<p class="comment-form-label">댓글 작성</p>' +
+                '<form id="comment-form" class="comment-form">' +
+                  '<div class="form-group comment-nickname-row"><span class="comment-nickname-label">닉네임</span><span class="comment-nickname-value" id="comment-nickname-value">\u2014</span></div>' +
+                  '<div class="form-group form-group-checkbox"><label for="comment-anonymous"><input type="checkbox" id="comment-anonymous"> 익명으로 작성</label></div>' +
+                  '<div class="form-group"><label for="comment-body" class="sr-only">댓글 내용</label><textarea id="comment-body" placeholder="댓글을 입력하세요" required rows="3"></textarea></div>' +
+                  '<div id="comment-error" class="msg-error" style="display:none;"></div>' +
+                  '<div class="form-actions"><button type="submit" class="btn btn-primary">댓글 등록</button></div>' +
+                '</form>' +
+              '</div>' +
+            '</section>' +
+            '<section class="related-posts-section" id="related-posts-section" aria-label="관련 글" style="display:none;margin-top:1.5rem;">' +
+              '<h2 class="section-title">관련 글</h2>' +
+              '<ul class="feed-list" id="related-posts-list"></ul>' +
+            '</section>' +
+            '<div class="post-detail-nav post-detail-nav-bottom"><a href="community.html" class="btn btn-outline btn-back">\u2190 목록으로</a></div>' +
+          '</div>'
+        );
+
+        /* 이벤트 바인딩 */
+        var bookmarkBtn = document.getElementById('post-bookmark-btn');
+        if (bookmarkBtn) bookmarkBtn.addEventListener('click', function() {
+          var id = bookmarkBtn.getAttribute('data-post-id');
+          if (!id || !window.Bookmarks) return;
+          var ns = window.Bookmarks.toggle(id);
+          bookmarkBtn.textContent = ns ? '저장 취소' : '저장';
         });
-        
-        // Show ONLY the current state view
-        var currentView = document.querySelector('[data-view="' + state + '"]');
-        if (currentView) {
-          currentView.style.display = 'block';
+        var shareBtn = document.getElementById('post-share-link-btn');
+        if (shareBtn) shareBtn.addEventListener('click', function() {
+          try { navigator.clipboard.writeText(location.href); shareBtn.textContent = '복사됨'; setTimeout(function() { shareBtn.textContent = '링크 복사'; }, 2000); } catch(e) {}
+        });
+
+        currentDetailPostId = post.id;
+        var currentPostId = post.id;
+
+        function drawComments() {
+          if (!document.getElementById('comment-list')) return;
+          window.app.getComments(currentPostId, function(_, comments) {
+            window.app.renderComments('comment-list', comments, { postId: currentPostId, canDelete: window.app.isOperator && window.app.isOperator() });
+            var ce = document.getElementById('comment-count');
+            if (ce) ce.textContent = comments ? comments.length : 0;
+          });
         }
-        
-        // Control list UI elements (tabs, toolbar, actions, notice)
-        var card = document.querySelector('.community-section .card');
-        if (!card) return;
-        
-        var tabs = card.querySelector('.board-tabs');
-        var toolbar = card.querySelector('#board-toolbar');
-        var actions = card.querySelector('.board-actions');
-        var notice = document.getElementById('board-notice');
-        
-        // Show list UI elements only for list-related states
-        var showListUi = (state === 'loading' || state === 'list' || state === 'empty' || state === 'error');
-        
-        if (tabs) tabs.style.display = showListUi ? 'block' : 'none';
-        if (toolbar) toolbar.style.display = showListUi ? 'flex' : 'none';
-        if (actions) actions.style.display = showListUi ? 'flex' : 'none';
-        if (notice) notice.style.display = (showListUi && notice.innerHTML.trim()) ? 'block' : 'none';
+        drawComments();
+        setTimeout(drawComments, 700);
+        setTimeout(drawComments, 1800);
+
+        var nicknameEl = document.getElementById('comment-nickname-value');
+        var anonCheck  = document.getElementById('comment-anonymous');
+        if (nicknameEl) {
+          var cu = window.app.getUser && window.app.getUser();
+          if (window.app.isLoggedIn && window.app.isLoggedIn() && cu && cu.name) {
+            nicknameEl.textContent = cu.name;
+          } else {
+            nicknameEl.textContent = '비회원 (익명)';
+            if (anonCheck) anonCheck.checked = true;
+          }
+        }
+        var commentForm = document.getElementById('comment-form');
+        if (commentForm) {
+          commentForm.onsubmit = function(e) {
+            e.preventDefault();
+            var body = (document.getElementById('comment-body') || {}).value || '';
+            body = body.trim();
+            var errEl = document.getElementById('comment-error');
+            if (!body) { if (errEl) { errEl.textContent = '댓글 내용을 입력해 주세요.'; errEl.style.display = 'block'; } return; }
+            if (errEl) errEl.style.display = 'none';
+            var author = '익명';
+            if (anonCheck && !anonCheck.checked) {
+              var u2 = window.app.getUser && window.app.getUser();
+              if (u2 && u2.name) author = u2.name;
+            }
+            window.app.addComment(currentPostId, { author: author, body: body }, function(err2) {
+              if (err2) { if (errEl) { errEl.textContent = err2; errEl.style.display = 'block'; } return; }
+              var ta = document.getElementById('comment-body');
+              if (ta) ta.value = '';
+              drawComments();
+            });
+          };
+        }
+
+        if (window.app && window.app.getRelatedPosts) {
+          window.app.getRelatedPosts(currentPostId, 5, function(err3, related) {
+            var sec = document.getElementById('related-posts-section');
+            var rl  = document.getElementById('related-posts-list');
+            if (sec) sec.style.display = (related && related.length) ? 'block' : 'none';
+            if (rl && related && related.length) window.app.renderPosts('related-posts-list', related, 'community.html?id=', true);
+          });
+        }
       }
 
+      /* authStateChanged 후 댓글 삭제 버튼 재렌더 */
       function refreshCommentListWithDeleteFlag() {
         if (!currentDetailPostId || !document.getElementById('comment-list')) return;
         window.app.getComments(currentDetailPostId, function(_, comments) {
           window.app.renderComments('comment-list', comments, { postId: currentDetailPostId, canDelete: window.app.isOperator && window.app.isOperator() });
-          var countEl = document.getElementById('comment-count');
-          if (countEl) countEl.textContent = (comments ? comments.length : 0);
+          var ce = document.getElementById('comment-count');
+          if (ce) ce.textContent = comments ? comments.length : 0;
         });
       }
       window.addEventListener('authStateChanged', refreshCommentListWithDeleteFlag);
 
-      // Handle detail view (when post ID is present)
+      /* ── 상세 보기 ── */
       if (postId) {
-        console.log('Loading post detail for ID:', postId);
-        
-        // First, set loading state
-        setViewState('loading');
-        
-        // Try to get post from local storage first
+        renderLoading();
+        setListUI(false);
         var post = window.app.getLocalPostById(postId);
         if (!post) {
-          // Fallback to mock data
           var MOCK = [
             { id: '1', title: 'PG사 토스 vs 이니시스 vs 나이스 수수료 비교 후기 있어요', author: '가맹점주', date: '2시간 전', body: '각 PG사 수수료 비교해 보신 분들 후기 공유해 주세요.\n\n저는 토스 쓰고 있는데 연회비 11만원에 카드 3.4%라 부담되네요. 이니시스는 연회비 면제라 바꿀까 고민 중이에요.', verified: false },
             { id: '2', title: '쇼핑몰 오픈 3개월 차, 정산 일정 D+5면 괜찮을까요?', author: '초보사장', date: '5시간 전', body: '정산이 D+5인 PG사 고려 중인데, 자금 회전에 무리가 없을지 궁금합니다.', verified: false },
@@ -358,145 +420,31 @@
           ];
           post = MOCK.filter(function(p) { return p.id === postId; })[0];
         }
-        
         if (post) {
-          // Post found - show detail view
-          console.log('Post found, showing detail view');
-          
-          // 조회수 증가 (쿨다운 적용)
-          if (window.app && window.app.incrementPostViews) {
-            var viewIncreased = window.app.incrementPostViews(postId);
-            if (viewIncreased) {
-              console.log('Post view count increased for post:', postId);
-            }
-          }
-          
-          setViewState('detail');
-          
-          // Populate post details
-          document.getElementById('post-detail-title').textContent = post.title;
-          var metaEl = document.getElementById('post-detail-meta');
-          var verified = (post.verified === true || (window.app && window.app.isAuthorVerified && window.app.isAuthorVerified(post.author)));
-          var badgeHtml = (window.app && window.app.verifiedBadgeHtml) ? window.app.verifiedBadgeHtml(verified, post.author) : '';
-          metaEl.innerHTML = (post.author || '익명') + badgeHtml + ' · ' + (post.date || '');
-          document.getElementById('post-detail-body').textContent = post.body || '(내용 없음)';
-          var actionsEl = document.getElementById('post-detail-actions');
-          if (actionsEl && window.app.canEditPost && window.app.canEditPost(post)) {
-            actionsEl.style.display = 'block';
-            actionsEl.innerHTML = '<a href="edit.html?id=' + encodeURIComponent(postId) + '" class="btn btn-outline btn-sm">수정</a> <button type="button" class="post-delete-btn btn btn-outline btn-sm text-red-600 border-red-200" data-post-id="' + (postId || '').replace(/"/g, '&quot;') + '">삭제</button>';
-          } else if (actionsEl) { actionsEl.style.display = 'none'; actionsEl.innerHTML = ''; }
-          var bookmarkEl = document.getElementById('post-detail-bookmark');
-          if (bookmarkEl && window.Bookmarks) {
-            var saved = window.Bookmarks.isBookmarked(postId);
-            bookmarkEl.innerHTML = '<button type="button" class="btn btn-outline btn-sm" id="post-bookmark-btn" data-post-id="' + (postId || '').replace(/"/g, '&quot;') + '">' + (saved ? '저장 취소' : '저장') + '</button> <button type="button" class="btn btn-ghost btn-sm" id="post-share-link-btn" aria-label="링크 복사">링크 복사</button>';
-            bookmarkEl.style.display = 'block';
-            var bookmarkBtn = document.getElementById('post-bookmark-btn');
-            var shareBtn = document.getElementById('post-share-link-btn');
-            if (bookmarkBtn) bookmarkBtn.addEventListener('click', function() {
-              var id = bookmarkBtn.getAttribute('data-post-id');
-              if (!id || !window.Bookmarks) return;
-              var nowSaved = window.Bookmarks.toggle(id);
-              bookmarkBtn.textContent = nowSaved ? '저장 취소' : '저장';
-              if (window.trackEvent) window.trackEvent('bookmark', { postId: id, action: nowSaved ? 'add' : 'remove' });
-            });
-            if (shareBtn) shareBtn.addEventListener('click', function() {
-              try {
-                navigator.clipboard.writeText(location.href);
-                shareBtn.textContent = '복사됨';
-                setTimeout(function() { shareBtn.textContent = '링크 복사'; }, 2000);
-                if (window.trackEvent) window.trackEvent('share', { type: 'link', postId: postId });
-              } catch (e) {}
-            });
-          } else if (bookmarkEl) bookmarkEl.style.display = 'none';
-          if (window.app && window.app.getRelatedPosts) {
-            window.app.getRelatedPosts(postId, 5, function(err, related) {
-              var listEl = document.getElementById('related-posts-list');
-              var sectionEl = document.getElementById('related-posts-section');
-              if (sectionEl) sectionEl.style.display = (related && related.length) ? 'block' : 'none';
-              if (listEl && related && related.length) window.app.renderPosts('related-posts-list', related, 'community.html?id=', true);
-              else if (listEl) listEl.innerHTML = '';
-            });
-          }
-          
-          currentDetailPostId = postId;
-          var currentPostId = postId;
-          
-          // Load comments
-          function drawComments() {
-            window.app.getComments(currentPostId, function(err, comments) {
-              window.app.renderComments('comment-list', comments, { postId: currentPostId, canDelete: window.app.isOperator && window.app.isOperator() });
-              var countEl = document.getElementById('comment-count');
-              if (countEl) countEl.textContent = (comments ? comments.length : 0);
-            });
-          }
-          drawComments();
-          setTimeout(drawComments, 600);
-          setTimeout(drawComments, 1500);
-          
-          // Setup comment form
-          var commentForm = document.getElementById('comment-form');
-          var nicknameEl = document.getElementById('comment-nickname-value');
-          var anonymousCheck = document.getElementById('comment-anonymous');
-          if (nicknameEl) {
-            var user = window.app.getUser && window.app.getUser();
-            if (window.app.isLoggedIn && window.app.isLoggedIn() && user && user.name) {
-              nicknameEl.textContent = user.name;
-            } else {
-              nicknameEl.textContent = '비회원 (익명)';
-              if (anonymousCheck) anonymousCheck.checked = true;
-            }
-          }
-          
-          if (commentForm) {
-            commentForm.onsubmit = function(e) {
-              e.preventDefault();
-              var body = document.getElementById('comment-body').value.trim();
-              var errEl = document.getElementById('comment-error');
-              if (!body) { errEl.textContent = '댓글 내용을 입력해 주세요.'; errEl.style.display = 'block'; return; }
-              errEl.style.display = 'none';
-              var author = '익명';
-              if (anonymousCheck && !anonymousCheck.checked) {
-                var u = window.app.getUser && window.app.getUser();
-                if (u && u.name) author = u.name;
-              }
-              window.app.addComment(currentPostId, { author: author, body: body }, function(err, comment) {
-                if (err) { errEl.textContent = err; errEl.style.display = 'block'; return; }
-                document.getElementById('comment-body').value = '';
-                window.app.getComments(currentPostId, function(_, comments) {
-                  window.app.renderComments('comment-list', comments, { postId: currentPostId, canDelete: window.app.isOperator && window.app.isOperator() });
-                  var countEl = document.getElementById('comment-count');
-                  if (countEl) countEl.textContent = (comments ? comments.length : 0);
-                });
-              });
-            };
-          }
-          return;
+          if (window.app && window.app.incrementPostViews) window.app.incrementPostViews(postId);
+          renderDetail(post);
         } else {
-          // Post not found - show not found view
-          console.log('Post not found, showing notFound view');
-          setViewState('notFound');
-          return;
+          renderNotFound();
         }
+        return;
       }
 
+      /* ── 목록 보기 ── */
       var board = params.get('board') || 'all';
       var searchQ = params.get('q') || '';
       var sortBy = params.get('sort') || 'latest';
-      var tabLinks = document.querySelectorAll('.board-tabs a');
-      tabLinks.forEach(function(a) {
+      document.querySelectorAll('.board-tabs a').forEach(function(a) {
         a.classList.remove('active');
         var href = a.getAttribute('href') || '';
         if (board === 'all' && href === 'community.html') a.classList.add('active');
         else if (href.indexOf('board=' + board) !== -1) a.classList.add('active');
       });
       var searchInput = document.getElementById('board-search-input');
-      var searchBtn = document.getElementById('board-search-btn');
-      var sortSelect = document.getElementById('board-sort-select');
-      var moreWrap = document.getElementById('posts-more-wrap');
-      var moreBtn = document.getElementById('posts-more-btn');
-      var noticeEl = document.getElementById('board-notice');
+      var searchBtn   = document.getElementById('board-search-btn');
+      var sortSelect  = document.getElementById('board-sort-select');
+      var noticeEl    = document.getElementById('board-notice');
       if (searchInput) searchInput.value = searchQ;
-      if (sortSelect) sortSelect.value = sortBy;
+      if (sortSelect)  sortSelect.value  = sortBy;
 
       var allFilteredItems = [];
       var currentShown = 0;
@@ -504,80 +452,40 @@
 
       function applyFilterAndSort(items) {
         if (!items) return [];
-        var q = (searchInput && searchInput.value) ? searchInput.value.trim().toLowerCase() : '';
-        var list = q ? items.filter(function(p) { return (p.title || '').toLowerCase().indexOf(q) !== -1 || (p.body || '').toLowerCase().indexOf(q) !== -1; }) : items.slice();
+        var q = searchInput && searchInput.value ? searchInput.value.trim().toLowerCase() : '';
+        var list = q ? items.filter(function(p) { return (p.title||'').toLowerCase().indexOf(q)!==-1||(p.body||'').toLowerCase().indexOf(q)!==-1; }) : items.slice();
         var s = (sortSelect && sortSelect.value) || 'latest';
-        if (s === 'hits') list.sort(function(a, b) { return (b.hits || 0) - (a.hits || 0); });
+        if (s === 'hits') list.sort(function(a,b){ return (b.hits||0)-(a.hits||0); });
         return list;
       }
 
       function renderPage() {
         var toShow = allFilteredItems.slice(0, currentShown);
-        if (listEl) window.app.renderPosts('community-list', toShow, 'community.html?id=', true);
-        
-        // Determine correct state based on data
-        if (toShow.length > 0) {
-          console.log('Showing list with', toShow.length, 'items');
-          setViewState('list');
-        } else {
-          console.log('No items to show, showing empty state');
-          setViewState('empty');
+        var hasMore = currentShown < allFilteredItems.length;
+        setListUI(true);
+        if (!toShow.length) { renderEmpty(); return; }
+        renderList(toShow, hasMore);
+        if (window.app && window.app.renderPosts) {
+          window.app.renderPosts('community-list', toShow, 'community.html?id=', true);
         }
-        
-        // Show/hide more button
-        if (moreWrap) moreWrap.style.display = (currentShown < allFilteredItems.length) ? 'block' : 'none';
       }
 
       function loadList(append) {
-        if (!listEl) return;
-        
-        // Only show loading if not appending (initial load or refresh)
-        if (!append) {
-          console.log('Loading posts, showing loading state');
-          setViewState('loading');
-        }
-        
+        if (!append) renderLoading();
+        setListUI(true);
         window.app.fetchPosts(board, 500, 0, function(err, items) {
-          if (err) {
-            console.log('Error loading posts:', err);
-            setViewState('error');
-            var errorMsg = document.getElementById('view-error-message');
-            if (errorMsg) errorMsg.textContent = err;
-            return;
-          }
-          
-          console.log('Posts loaded successfully:', items ? items.length : 0, 'items');
+          if (err) { setListUI(true); renderError(err); return; }
           allFilteredItems = applyFilterAndSort(items || []);
-          
-          if (!append) {
-            currentShown = Math.min(PAGE_SIZE, allFilteredItems.length);
-          } else {
-            currentShown = Math.min(currentShown + PAGE_SIZE, allFilteredItems.length);
-          }
-          
+          if (!append) currentShown = Math.min(PAGE_SIZE, allFilteredItems.length);
+          else currentShown = Math.min(currentShown + PAGE_SIZE, allFilteredItems.length);
           renderPage();
         });
-      }
-
-      if (moreBtn) {
-        moreBtn.onclick = function() { 
-          console.log('Loading more posts');
-          currentShown = Math.min(currentShown + PAGE_SIZE, allFilteredItems.length); 
-          renderPage(); 
-        };
-      }
-      var errorRetry = document.getElementById('view-error-retry');
-      if (errorRetry) {
-        errorRetry.onclick = function() { 
-          console.log('Retrying to load posts');
-          loadList(false); 
-        };
       }
 
       if (searchBtn && searchInput) {
         searchBtn.onclick = function() {
           var q = searchInput.value.trim();
-          var url = 'community.html?board=' + (board || 'all');
+          var url = 'community.html?board=' + (board||'all');
           if (q) url += '&q=' + encodeURIComponent(q);
           if (sortSelect && sortSelect.value) url += '&sort=' + sortSelect.value;
           location.href = url;
@@ -585,8 +493,7 @@
         searchInput.onkeydown = function(e) { if (e.key === 'Enter') searchBtn.click(); };
       }
       if (sortSelect) {
-        sortSelect.onchange = function() { 
-          console.log('Sort changed to:', sortSelect.value);
+        sortSelect.onchange = function() {
           allFilteredItems = applyFilterAndSort(allFilteredItems);
           currentShown = Math.min(PAGE_SIZE, allFilteredItems.length);
           renderPage();
@@ -600,150 +507,26 @@
           if (notices && notices.length) {
             noticeEl.style.display = 'block';
             noticeEl.innerHTML = notices.map(function(n) {
-              return '<a href="community.html?id=' + (n.id || '') + '" class="board-notice-item"><span class="board-notice-label">공지</span> ' + (n.title || '') + '</a>';
+              return '<a href="community.html?id=' + (n.id||'') + '" class="board-notice-item"><span class="board-notice-label">공지</span> ' + (n.title||'') + '</a>';
             }).join('');
           }
         });
       }
-      
-      // Load popular posts for sidebar
       loadPopularPosts();
     })();
-    
+
     function loadPopularPosts() {
       if (!window.app || !window.app.fetchPosts) return;
-      
       window.app.fetchPosts('all', 100, 0, function(err, items) {
         if (err || !items || !items.length) return;
-        
-        // Sort by view count + comment count (popularity)
-        var popular = items.sort(function(a, b) {
-          var scoreA = (a.hits || 0) + (a.commentCount || 0) * 3;
-          var scoreB = (b.hits || 0) + (b.commentCount || 0) * 3;
-          return scoreB - scoreA;
-        }).slice(0, 5);
-        
-        var popularEl = document.getElementById('popular-posts');
-        if (!popularEl) return;
-        
-        var html = popular.map(function(post) {
-          var title = post.title || '제목 없음';
-          if (title.length > 30) title = title.substring(0, 30) + '...';
-          
-          var hits = post.hits || 0;
-          var comments = post.commentCount || 0;
-          var meta = '조회 ' + hits;
-          if (comments > 0) meta += ' · 댓글 ' + comments;
-          
-          return '<li class="sidebar-item">' +
-            '<a href="community.html?id=' + post.id + '" class="sidebar-link">' +
-              '<span class="sidebar-title">' + title + '</span>' +
-              '<span class="sidebar-meta">' + meta + '</span>' +
-            '</a>' +
-          '</li>';
+        var popular = items.sort(function(a,b){ return ((b.hits||0)+(b.commentCount||0)*3)-((a.hits||0)+(a.commentCount||0)*3); }).slice(0,5);
+        var el = document.getElementById('popular-posts');
+        if (!el) return;
+        el.innerHTML = popular.map(function(p) {
+          var t = (p.title||'').slice(0,30);
+          var m = '조회 ' + (p.hits||0) + (p.commentCount ? ' · 댓글 ' + p.commentCount : '');
+          return '<li class="sidebar-item"><a href="community.html?id=' + p.id + '" class="sidebar-link"><span class="sidebar-title">' + t + '</span><span class="sidebar-meta">' + m + '</span></a></li>';
         }).join('');
-        
-        popularEl.innerHTML = html;
-      });
-    }
-    function openModal(id) {
-      var el = document.getElementById(id);
-      if (el) { el.classList.add('is-open'); el.setAttribute('aria-hidden', 'false'); }
-      document.body.style.overflow = 'hidden';
-    }
-    function closeModal(id) {
-      var el = document.getElementById(id);
-      if (el) { el.classList.remove('is-open'); el.setAttribute('aria-hidden', 'true'); }
-      document.body.style.overflow = '';
-    }
-    document.querySelectorAll('.modal-overlay').forEach(function(el) {
-      el.setAttribute('aria-hidden', 'true');
-      el.setAttribute('aria-modal', 'true');
-      el.setAttribute('role', 'dialog');
-      el.addEventListener('click', function(e) { if (e.target === el) closeModal(el.id); });
-    });
-    document.addEventListener('keydown', function(e) {
-      if (e.key === 'Escape') {
-        var open = document.querySelector('.modal-overlay.is-open');
-        if (open) closeModal(open.id);
-      }
-    });
-    function updateHeaderAuth() {
-      var guestEl = document.getElementById('headerAuthGuest');
-      var userEl = document.getElementById('headerAuthUser');
-      var nameEl = document.getElementById('headerUser');
-      if (!guestEl || !userEl) return;
-      var loggedIn = window.app && window.app.isLoggedIn && window.app.isLoggedIn();
-      var user = window.app && window.app.getUser && window.app.getUser();
-      if (loggedIn && user) {
-        guestEl.style.display = 'none';
-        userEl.style.display = '';
-        if (nameEl) nameEl.textContent = (user.name || user.email || '회원') + '님';
-      } else {
-        guestEl.style.display = '';
-        userEl.style.display = 'none';
-      }
-    }
-    window.addEventListener('authStateChanged', updateHeaderAuth);
-    if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', updateHeaderAuth); else updateHeaderAuth();
-    var loginForm = document.getElementById('loginForm');
-    var loginErrorEl = document.getElementById('login-error');
-    var loginSuccessEl = document.getElementById('login-success');
-    var loginBtn = document.getElementById('login-submit-btn');
-    if (loginForm) {
-      loginForm.addEventListener('submit', function(e) {
-        e.preventDefault();
-        var email = document.getElementById('login-email').value.trim();
-        var pw = document.getElementById('login-pw').value;
-        if (loginErrorEl) { loginErrorEl.style.display = 'none'; loginErrorEl.textContent = ''; }
-        if (loginSuccessEl) loginSuccessEl.style.display = 'none';
-        if (!email || !pw) { if (loginErrorEl) { loginErrorEl.textContent = '이메일과 비밀번호를 입력해 주세요.'; loginErrorEl.style.display = 'block'; } return; }
-        if (loginBtn) { loginBtn.disabled = true; loginBtn.textContent = '로그인 중...'; }
-        window.app.login(email, pw, function(err, data) {
-          if (loginBtn) { loginBtn.disabled = false; loginBtn.textContent = '로그인'; }
-          if (err) { if (loginErrorEl) { loginErrorEl.textContent = err; loginErrorEl.style.display = 'block'; } return; }
-          if (loginErrorEl) loginErrorEl.style.display = 'none';
-          if (loginSuccessEl) {
-            var userName = (data && data.user && data.user.name) ? data.user.name : (window.app.getUser && window.app.getUser() && window.app.getUser().name) ? window.app.getUser().name : '';
-            loginSuccessEl.textContent = userName ? userName + '님, 로그인되었습니다. 환영해요!' : '로그인되었습니다. 환영해요!';
-            loginSuccessEl.style.display = 'block';
-          }
-          setTimeout(function() {
-            closeModal('loginModal');
-            if (loginSuccessEl) loginSuccessEl.style.display = 'none';
-            updateHeaderAuth();
-          }, 1500);
-        });
-      });
-    }
-    var signupForm = document.getElementById('signupForm');
-    var signupErrorEl = document.getElementById('signup-error');
-    var signupSuccessEl = document.getElementById('signup-success');
-    var signupBtn = document.getElementById('signup-submit-btn');
-    if (signupForm) {
-      signupForm.addEventListener('submit', function(e) {
-        e.preventDefault();
-        var name = document.getElementById('signup-name').value.trim();
-        var email = document.getElementById('signup-email').value.trim();
-        var pw = document.getElementById('signup-pw').value;
-        var pw2 = document.getElementById('signup-pw2').value;
-        if (signupErrorEl) signupErrorEl.style.display = 'none';
-        if (signupSuccessEl) signupSuccessEl.style.display = 'none';
-        if (pw !== pw2) { if (signupErrorEl) { signupErrorEl.textContent = '비밀번호가 일치하지 않아요.'; signupErrorEl.style.display = 'block'; } return; }
-        if (pw.length < 8) { if (signupErrorEl) { signupErrorEl.textContent = '비밀번호는 8자 이상이에요.'; signupErrorEl.style.display = 'block'; } return; }
-        if (signupBtn) { signupBtn.disabled = true; signupBtn.textContent = '가입 중...'; }
-        window.app.signup(name, email, pw, function(err) {
-          if (signupBtn) { signupBtn.disabled = false; signupBtn.textContent = '가입하기'; }
-          if (err) { if (signupErrorEl) { signupErrorEl.textContent = err; signupErrorEl.style.display = 'block'; } return; }
-          if (signupSuccessEl) { signupSuccessEl.textContent = '회원가입이 완료되었어요. 잠시 후 로그인 화면으로 이동합니다.'; signupSuccessEl.style.display = 'block'; }
-          setTimeout(function() {
-            closeModal('signupModal');
-            if (signupErrorEl) signupErrorEl.style.display = 'none';
-            if (signupSuccessEl) signupSuccessEl.style.display = 'none';
-            openModal('loginModal');
-            if (document.getElementById('login-email')) document.getElementById('login-email').value = email;
-          }, 1800);
-        });
       });
     }
   </script>

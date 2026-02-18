@@ -1,69 +1,126 @@
 /**
- * 전역 인증 상태 관리 시스템 (단일 소스 오브 트루스)
- * 헤더 Auth 영역을 상태에 따라 1세트만 렌더링
+ * auth.js - 전역 인증 시스템
+ * - 헤더 auth 1세트만 렌더 (loggedOut: 로그인/회원가입, loggedIn: 닉네임+로그아웃)
+ * - 모달: open 시 body에 inject, close 시 remove (DOM에 항상 존재 X)
  */
-
-(function() {
+(function () {
   'use strict';
 
-  var authState = 'loggedOut'; // 'loggedOut' | 'loggedIn'
-  var currentUser = null;
+  /* ──────────────────────────────────────────────────
+   * 1) 모달 HTML 템플릿 (열 때만 DOM에 추가)
+   * ────────────────────────────────────────────────── */
+  function loginModalHTML() {
+    return '<div class="modal-overlay is-open" id="loginModal" role="dialog" aria-modal="true" aria-label="로그인">' +
+      '<div class="modal">' +
+        '<div class="modal-header"><h3>로그인</h3><button type="button" class="modal-close" data-close-modal="loginModal" aria-label="닫기">&times;</button></div>' +
+        '<div class="modal-body">' +
+          '<form id="loginForm" autocomplete="on">' +
+            '<div class="form-group"><label for="login-email">이메일</label><input type="email" id="login-email" required autocomplete="email"></div>' +
+            '<div class="form-group"><label for="login-pw">비밀번호</label><input type="password" id="login-pw" required autocomplete="current-password"></div>' +
+            '<div id="login-error" class="msg-error" style="display:none;"></div>' +
+            '<div id="login-success" class="msg-success" style="display:none;"></div>' +
+            '<div class="modal-footer"><button type="submit" class="btn btn-primary" id="login-submit-btn">로그인</button></div>' +
+          '</form>' +
+          '<p class="modal-switch">아직 회원이 아니신가요? <a href="#" data-open-modal="signupModal">회원가입</a></p>' +
+        '</div>' +
+      '</div>' +
+    '</div>';
+  }
 
-  /**
-   * 인증 상태 확인 및 업데이트
-   */
-  function checkAuthState() {
-    if (!window.app) {
-      authState = 'loggedOut';
-      currentUser = null;
-      return;
-    }
-    
-    var isLoggedIn = window.app.isLoggedIn && window.app.isLoggedIn();
-    var user = window.app.getUser && window.app.getUser();
-    
-    if (isLoggedIn && user) {
-      authState = 'loggedIn';
-      currentUser = user;
-    } else {
-      authState = 'loggedOut';
-      currentUser = null;
+  function signupModalHTML() {
+    return '<div class="modal-overlay is-open" id="signupModal" role="dialog" aria-modal="true" aria-label="회원가입">' +
+      '<div class="modal">' +
+        '<div class="modal-header"><h3>회원가입</h3><button type="button" class="modal-close" data-close-modal="signupModal" aria-label="닫기">&times;</button></div>' +
+        '<div class="modal-body">' +
+          '<form id="signupForm" autocomplete="on">' +
+            '<div class="form-group"><label for="signup-name">이름</label><input type="text" id="signup-name" required autocomplete="name"></div>' +
+            '<div class="form-group"><label for="signup-email">이메일</label><input type="email" id="signup-email" required autocomplete="email"></div>' +
+            '<div class="form-group"><label for="signup-pw">비밀번호</label><input type="password" id="signup-pw" required minlength="8" autocomplete="new-password"></div>' +
+            '<div class="form-group"><label for="signup-pw2">비밀번호 확인</label><input type="password" id="signup-pw2" required autocomplete="new-password"></div>' +
+            '<div class="form-group form-agree"><input type="checkbox" id="signup-agree" required> <label for="signup-agree"><a href="terms.html" target="_blank" rel="noopener">이용약관</a>&#xB7;<a href="privacy.html" target="_blank" rel="noopener">개인정보처리방침</a>에 동의합니다.</label></div>' +
+            '<div id="signup-error" class="msg-error" style="display:none;"></div>' +
+            '<div id="signup-success" class="msg-success" style="display:none;"></div>' +
+            '<div class="modal-footer"><button type="submit" class="btn btn-primary" id="signup-submit-btn">가입하기</button></div>' +
+          '</form>' +
+          '<p class="modal-switch">이미 회원이신가요? <a href="#" data-open-modal="loginModal">로그인</a></p>' +
+        '</div>' +
+      '</div>' +
+    '</div>';
+  }
+
+  /* ──────────────────────────────────────────────────
+   * 2) 모달 열기/닫기 (inject / remove)
+   * ────────────────────────────────────────────────── */
+  function removeAllModals() {
+    document.querySelectorAll('.modal-overlay').forEach(function (m) { m.remove(); });
+  }
+
+  function injectModal(html) {
+    removeAllModals();
+    var wrap = document.createElement('div');
+    wrap.innerHTML = html;
+    var el = wrap.firstElementChild;
+    document.body.appendChild(el);
+    document.body.style.overflow = 'hidden';
+    return el;
+  }
+
+  function openLoginModal() {
+    var el = injectModal(loginModalHTML());
+    var firstInput = el.querySelector('input');
+    if (firstInput) setTimeout(function () { firstInput.focus(); }, 80);
+    bindLoginSignupForms();
+  }
+
+  function openSignupModal() {
+    var el = injectModal(signupModalHTML());
+    var firstInput = el.querySelector('input');
+    if (firstInput) setTimeout(function () { firstInput.focus(); }, 80);
+    bindLoginSignupForms();
+  }
+
+  function closeModal(modalId) {
+    var el = document.getElementById(modalId);
+    if (el) el.remove();
+    if (!document.querySelector('.modal-overlay')) {
+      document.body.style.overflow = '';
     }
   }
 
-  /**
-   * 헤더 Auth Actions 렌더링 (상태에 따라 1세트만)
-   */
-  function renderAuthActions() {
-    var authContainer = document.getElementById('auth-actions');
-    if (!authContainer) return;
-    
-    checkAuthState();
-    
-    var html = '';
-    
-    if (authState === 'loggedIn') {
-      var displayName = (currentUser.name || currentUser.email || '회원') + '님';
-      html = '<span class="header-user">' + displayName + '</span>' +
-             '<button type="button" class="btn btn-outline" data-auth="logout">로그아웃</button>';
-    } else {
-      html = '<button type="button" class="btn btn-outline" data-auth="login">로그인</button>' +
-             '<button type="button" class="btn btn-primary" data-auth="signup">회원가입</button>';
-    }
-    
-    authContainer.innerHTML = html;
+  /* ──────────────────────────────────────────────────
+   * 3) 헤더 auth 렌더 (단일 세트)
+   * ────────────────────────────────────────────────── */
+  function getAuthState() {
+    if (!window.app || !window.app.isLoggedIn) return { loggedIn: false, user: null };
+    return { loggedIn: !!window.app.isLoggedIn(), user: window.app.getUser ? window.app.getUser() : null };
+  }
 
-    /* 드로어 auth 섹션도 동기화 */
-    var drawerAuth = document.getElementById('drawerAuth');
-    if (drawerAuth) {
-      if (authState === 'loggedIn') {
-        var displayName2 = (currentUser.name || currentUser.email || '회원') + '님';
-        drawerAuth.innerHTML =
+  function renderAuthActions() {
+    var el = document.getElementById('auth-actions');
+    if (!el) return;
+    var s = getAuthState();
+    if (s.loggedIn && s.user) {
+      var name = (s.user.name || s.user.email || '회원') + '님';
+      el.innerHTML =
+        '<span class="header-user">' + name + '</span>' +
+        '<button type="button" class="btn btn-outline" data-auth="logout">로그아웃</button>';
+    } else {
+      el.innerHTML =
+        '<button type="button" class="btn btn-outline" data-auth="login">로그인</button>' +
+        '<button type="button" class="btn btn-primary" data-auth="signup">회원가입</button>';
+    }
+
+    /* 드로어 auth 동기화 */
+    var da = document.getElementById('drawerAuth');
+    if (da) {
+      if (s.loggedIn && s.user) {
+        var name2 = (s.user.name || s.user.email || '회원') + '님';
+        da.innerHTML =
           '<p class="drawer-auth-label">계정</p>' +
-          '<span class="drawer-auth-user">' + displayName2 + '</span>' +
+          '<span class="drawer-auth-user">' + name2 + '</span>' +
           '<button type="button" class="drawer-auth-btn" data-auth="logout">로그아웃</button>';
       } else {
-        drawerAuth.innerHTML =
+        da.innerHTML =
           '<p class="drawer-auth-label">계정</p>' +
           '<button type="button" class="drawer-auth-btn" data-auth="login">로그인</button>' +
           '<button type="button" class="drawer-auth-btn drawer-auth-btn--primary" data-auth="signup">회원가입</button>';
@@ -71,343 +128,193 @@
     }
   }
 
-  /**
-   * 로그인 모달 열기
-   */
-  function openLoginModal() {
-    var modal = document.getElementById('loginModal');
-    if (!modal) {
-      console.error('Login modal not found');
-      return;
-    }
-    
-    modal.classList.add('is-open');
-    modal.setAttribute('aria-hidden', 'false');
-    document.body.style.overflow = 'hidden';
-    
-    // 포커스 트랩
-    var focusableElements = modal.querySelectorAll(
-      'button, [href], input, select, textarea, [tabindex]:not([tabindex="-1"])'
-    );
-    if (focusableElements.length > 0) {
-      setTimeout(function() {
-        focusableElements[0].focus();
-      }, 100);
-    }
-  }
-
-  /**
-   * 회원가입 모달 열기
-   */
-  function openSignupModal() {
-    var modal = document.getElementById('signupModal');
-    if (!modal) {
-      console.error('Signup modal not found');
-      return;
-    }
-    
-    modal.classList.add('is-open');
-    modal.setAttribute('aria-hidden', 'false');
-    document.body.style.overflow = 'hidden';
-    
-    // 포커스 트랩
-    var focusableElements = modal.querySelectorAll(
-      'button, [href], input, select, textarea, [tabindex]:not([tabindex="-1"])'
-    );
-    if (focusableElements.length > 0) {
-      setTimeout(function() {
-        focusableElements[0].focus();
-      }, 100);
-    }
-  }
-
-  /**
-   * 모달 닫기
-   */
-  function closeModal(modalId) {
-    var modal = document.getElementById(modalId);
-    if (!modal) return;
-    
-    modal.classList.remove('is-open');
-    modal.setAttribute('aria-hidden', 'true');
-    document.body.style.overflow = '';
-  }
-
-  /**
-   * 로그아웃
-   */
+  /* ──────────────────────────────────────────────────
+   * 4) 로그아웃
+   * ────────────────────────────────────────────────── */
   function logout() {
-    if (window.app && window.app.logout) {
-      window.app.logout();
-    }
-    authState = 'loggedOut';
-    currentUser = null;
+    if (window.app && window.app.logout) window.app.logout();
     renderAuthActions();
-    if (typeof window.updateHeaderAuth === 'function') {
-      window.updateHeaderAuth();
-    }
     window.dispatchEvent(new Event('authStateChanged'));
   }
 
-  /**
-   * 로그인 성공 처리
-   */
-  function onLoginSuccess() {
-    checkAuthState();
-    renderAuthActions();
-    
-    // authStateChanged 이벤트 발생
-    window.dispatchEvent(new Event('authStateChanged'));
-  }
-
-  /**
-   * 모달 초기화 (ESC 키, 오버레이 클릭)
-   */
-  function initModals() {
-    // 모든 모달에 기본 속성 설정
-    document.querySelectorAll('.modal-overlay').forEach(function(modal) {
-      modal.setAttribute('aria-hidden', 'true');
-      modal.setAttribute('aria-modal', 'true');
-      modal.setAttribute('role', 'dialog');
-      
-      // 오버레이 클릭으로 닫기
-      modal.addEventListener('click', function(e) {
-        if (e.target === modal) {
-          closeModal(modal.id);
-        }
-      });
-    });
-
-    // ESC 키로 모달 닫기
-    document.addEventListener('keydown', function(e) {
-      if (e.key === 'Escape') {
-        var openModal = document.querySelector('.modal-overlay.is-open');
-        if (openModal) {
-          closeModal(openModal.id);
-        }
-      }
-    });
-  }
-
-  /**
-   * 네비게이션 토글 (모바일)
-   */
-  function toggleNav() {
-    /* drawer.js 가 로드된 경우 드로어 사용 */
-    if (typeof window.openDrawer === 'function') {
-      var btn = document.querySelector('[data-toggle-nav]');
-      var isExpanded = btn && btn.getAttribute('aria-expanded') === 'true';
-      if (isExpanded) { window.closeDrawer(); } else { window.openDrawer(); }
-      return;
-    }
-    /* 폴백: 기존 드롭다운 방식 */
-    var nav = document.getElementById('headerNav');
-    var btn = document.querySelector('.nav-toggle');
-    if (!nav || !btn) return;
-    var isOpen = nav.classList.toggle('is-open');
-    btn.setAttribute('aria-expanded', isOpen);
-    btn.setAttribute('aria-label', isOpen ? '메뉴 닫기' : '메뉴 열기');
-  }
-
-  /**
-   * 전역 함수 등록
-   */
-  window.authSystem = {
-    renderAuthActions: renderAuthActions,
-    openLoginModal: openLoginModal,
-    openSignupModal: openSignupModal,
-    closeModal: closeModal,
-    logout: logout,
-    onLoginSuccess: onLoginSuccess,
-    checkAuthState: checkAuthState
-  };
-  
-  // 하위 호환성을 위한 전역 함수
-  window.openModal = function(modalId) {
-    if (modalId === 'loginModal') {
-      openLoginModal();
-    } else if (modalId === 'signupModal') {
-      openSignupModal();
-    }
-  };
-  window.closeModal = closeModal;
-  window.toggleNav = toggleNav;
-
-  /**
-   * 로그인/회원가입 폼 바인딩 (모든 페이지에서 #loginForm, #signupForm 있으면 동작)
-   */
+  /* ──────────────────────────────────────────────────
+   * 5) 폼 바인딩 (모달 inject 후 호출)
+   * ────────────────────────────────────────────────── */
   function bindLoginSignupForms() {
-    if (!window.app || !window.app.login || !window.app.signup) return;
+    if (!window.app) return;
 
     var loginForm = document.getElementById('loginForm');
-    var loginErrorEl = document.getElementById('login-error');
-    var loginSuccessEl = document.getElementById('login-success');
-    var loginBtn = document.getElementById('login-submit-btn');
     if (loginForm && !loginForm._authBound) {
       loginForm._authBound = true;
-      loginForm.addEventListener('submit', function(e) {
+      loginForm.addEventListener('submit', function (e) {
         e.preventDefault();
-        var email = document.getElementById('login-email');
-        var pwEl = document.getElementById('login-pw');
-        var emailVal = email ? email.value.trim() : '';
-        var pw = pwEl ? pwEl.value : '';
-        if (loginErrorEl) { loginErrorEl.style.display = 'none'; loginErrorEl.textContent = ''; }
-        if (loginSuccessEl) loginSuccessEl.style.display = 'none';
-        if (!emailVal || !pw) {
-          if (loginErrorEl) { loginErrorEl.textContent = '이메일과 비밀번호를 입력해 주세요.'; loginErrorEl.style.display = 'block'; }
+        var loginErr = document.getElementById('login-error');
+        var loginOk  = document.getElementById('login-success');
+        var loginBtn = document.getElementById('login-submit-btn');
+        var email = (document.getElementById('login-email') || {}).value || '';
+        var pw    = (document.getElementById('login-pw')    || {}).value || '';
+        if (loginErr) { loginErr.style.display = 'none'; loginErr.textContent = ''; }
+        if (loginOk)  loginOk.style.display  = 'none';
+        if (!email || !pw) {
+          if (loginErr) { loginErr.textContent = '이메일과 비밀번호를 입력해 주세요.'; loginErr.style.display = 'block'; }
           return;
         }
         if (loginBtn) { loginBtn.disabled = true; loginBtn.textContent = '로그인 중...'; }
-        window.app.login(emailVal, pw, function(err, data) {
+        window.app.login(email, pw, function (err, data) {
           if (loginBtn) { loginBtn.disabled = false; loginBtn.textContent = '로그인'; }
           if (err) {
-            if (loginErrorEl) { loginErrorEl.textContent = err; loginErrorEl.style.display = 'block'; }
+            if (loginErr) { loginErr.textContent = err; loginErr.style.display = 'block'; }
             return;
           }
-          if (loginErrorEl) loginErrorEl.style.display = 'none';
-          if (loginSuccessEl) {
-            var userName = (data && data.user && data.user.name) ? data.user.name : (window.app.getUser && window.app.getUser() && window.app.getUser().name) ? window.app.getUser().name : '';
-            loginSuccessEl.textContent = userName ? userName + '님, 로그인되었습니다.' : '로그인되었습니다.';
-            loginSuccessEl.style.display = 'block';
-          }
-          setTimeout(function() {
+          var u = (data && data.user && data.user.name) || (window.app.getUser && window.app.getUser() && window.app.getUser().name) || '';
+          if (loginOk) { loginOk.textContent = (u ? u + '님, ' : '') + '로그인되었습니다.'; loginOk.style.display = 'block'; }
+          setTimeout(function () {
             closeModal('loginModal');
-            if (loginSuccessEl) loginSuccessEl.style.display = 'none';
             renderAuthActions();
-          }, 1200);
+            window.dispatchEvent(new Event('authStateChanged'));
+          }, 1000);
         });
       });
     }
 
     var signupForm = document.getElementById('signupForm');
-    var signupErrorEl = document.getElementById('signup-error');
-    var signupSuccessEl = document.getElementById('signup-success');
-    var signupBtn = document.getElementById('signup-submit-btn');
     if (signupForm && !signupForm._authBound) {
       signupForm._authBound = true;
-      signupForm.addEventListener('submit', function(e) {
+      signupForm.addEventListener('submit', function (e) {
         e.preventDefault();
-        var nameEl = document.getElementById('signup-name');
-        var emailEl = document.getElementById('signup-email');
-        var pwEl = document.getElementById('signup-pw');
-        var pw2El = document.getElementById('signup-pw2');
-        var name = nameEl ? nameEl.value.trim() : '';
-        var emailVal = emailEl ? emailEl.value.trim() : '';
-        var pw = pwEl ? pwEl.value : '';
-        var pw2 = pw2El ? pw2El.value : '';
-        if (signupErrorEl) signupErrorEl.style.display = 'none';
-        if (signupSuccessEl) signupSuccessEl.style.display = 'none';
-        if (pw !== pw2) { if (signupErrorEl) { signupErrorEl.textContent = '비밀번호가 일치하지 않아요.'; signupErrorEl.style.display = 'block'; } return; }
-        if (pw.length < 8) { if (signupErrorEl) { signupErrorEl.textContent = '비밀번호는 8자 이상이에요.'; signupErrorEl.style.display = 'block'; } return; }
-        if (signupBtn) { signupBtn.disabled = true; signupBtn.textContent = '가입 중...'; }
-        window.app.signup(name, emailVal, pw, function(err) {
-          if (signupBtn) { signupBtn.disabled = false; signupBtn.textContent = '가입하기'; }
-          if (err) { if (signupErrorEl) { signupErrorEl.textContent = err; signupErrorEl.style.display = 'block'; } return; }
-          if (signupSuccessEl) { signupSuccessEl.textContent = '회원가입이 완료되었어요. 로그인해 주세요.'; signupSuccessEl.style.display = 'block'; }
-          setTimeout(function() {
+        var suErr = document.getElementById('signup-error');
+        var suOk  = document.getElementById('signup-success');
+        var suBtn = document.getElementById('signup-submit-btn');
+        var name  = (document.getElementById('signup-name')  || {}).value || '';
+        var email = (document.getElementById('signup-email') || {}).value || '';
+        var pw    = (document.getElementById('signup-pw')    || {}).value || '';
+        var pw2   = (document.getElementById('signup-pw2')   || {}).value || '';
+        if (suErr) suErr.style.display = 'none';
+        if (suOk)  suOk.style.display  = 'none';
+        if (pw !== pw2) { if (suErr) { suErr.textContent = '비밀번호가 일치하지 않아요.'; suErr.style.display = 'block'; } return; }
+        if (pw.length < 8) { if (suErr) { suErr.textContent = '비밀번호는 8자 이상이에요.'; suErr.style.display = 'block'; } return; }
+        if (suBtn) { suBtn.disabled = true; suBtn.textContent = '가입 중...'; }
+        window.app.signup(name, email, pw, function (err) {
+          if (suBtn) { suBtn.disabled = false; suBtn.textContent = '가입하기'; }
+          if (err) { if (suErr) { suErr.textContent = err; suErr.style.display = 'block'; } return; }
+          if (suOk) { suOk.textContent = '회원가입 완료! 로그인해 주세요.'; suOk.style.display = 'block'; }
+          setTimeout(function () {
             closeModal('signupModal');
-            if (signupErrorEl) signupErrorEl.style.display = 'none';
-            if (signupSuccessEl) signupSuccessEl.style.display = 'none';
             openLoginModal();
-            if (document.getElementById('login-email')) document.getElementById('login-email').value = emailVal;
-          }, 1800);
+            var ei = document.getElementById('login-email');
+            if (ei) ei.value = email;
+          }, 1500);
         });
       });
     }
   }
 
-  /**
-   * 헤더 로그인/회원가입/로그아웃 + 모달 닫기·전환 — document 위임 (인라인 onclick 제거로 deprecated 경고 해소)
-   */
-  function setupAuthClickDelegation() {
-    document.addEventListener('click', function(e) {
-      var target = e.target && e.target.closest && e.target.closest('[data-auth], [data-close-modal], [data-open-modal], [data-toggle-nav]');
-      if (!target) return;
-
-      if (target.hasAttribute('data-toggle-nav')) {
-        e.preventDefault();
-        e.stopPropagation();
-        toggleNav();
-        return;
-      }
-
-      if (target.hasAttribute('data-auth')) {
-        var action = target.getAttribute('data-auth');
-        if (action === 'login') {
-          e.preventDefault();
-          e.stopPropagation();
-          openLoginModal();
-        } else if (action === 'signup') {
-          e.preventDefault();
-          e.stopPropagation();
-          openSignupModal();
-        } else if (action === 'logout') {
-          e.preventDefault();
-          e.stopPropagation();
-          logout();
-        }
-        return;
-      }
-
-      if (target.hasAttribute('data-close-modal')) {
-        e.preventDefault();
-        e.stopPropagation();
-        closeModal(target.getAttribute('data-close-modal'));
-        return;
-      }
-
-      if (target.hasAttribute('data-open-modal')) {
-        e.preventDefault();
-        e.stopPropagation();
-        var modalId = target.getAttribute('data-open-modal');
-        var openModalEl = document.querySelector('.modal-overlay.is-open');
-        if (openModalEl) closeModal(openModalEl.id);
-        if (modalId === 'loginModal') openLoginModal();
-        else if (modalId === 'signupModal') openSignupModal();
-      }
-    }, true); // 캡처 단계: 다른 리스너보다 먼저 실행
+  /* ──────────────────────────────────────────────────
+   * 6) 이벤트 위임 (캡처 단계 - 가장 먼저 실행)
+   * ────────────────────────────────────────────────── */
+  function toggleNav() {
+    if (typeof window.openDrawer === 'function') {
+      var btn = document.querySelector('[data-toggle-nav]');
+      var expanded = btn && btn.getAttribute('aria-expanded') === 'true';
+      if (expanded) window.closeDrawer(); else window.openDrawer();
+      return;
+    }
+    var nav = document.getElementById('headerNav');
+    var btn2 = document.querySelector('.nav-toggle');
+    if (!nav || !btn2) return;
+    var isOpen = nav.classList.toggle('is-open');
+    btn2.setAttribute('aria-expanded', isOpen);
+    btn2.setAttribute('aria-label', isOpen ? '메뉴 닫기' : '메뉴 열기');
   }
 
-  /**
-   * 초기화
-   */
-  function init() {
-    setupAuthClickDelegation();
+  document.addEventListener('click', function (e) {
+    var t = e.target && e.target.closest && e.target.closest('[data-auth],[data-close-modal],[data-open-modal],[data-toggle-nav]');
+    if (!t) return;
 
-    // DOM 로드 완료 후 실행
-    if (document.readyState === 'loading') {
-      document.addEventListener('DOMContentLoaded', function() {
-        initModals();
-        renderAuthActions();
-        bindLoginSignupForms();
-      });
-    } else {
-      initModals();
-      renderAuthActions();
-      bindLoginSignupForms();
+    if (t.hasAttribute('data-toggle-nav')) { e.preventDefault(); e.stopPropagation(); toggleNav(); return; }
+
+    if (t.hasAttribute('data-auth')) {
+      var a = t.getAttribute('data-auth');
+      e.preventDefault(); e.stopPropagation();
+      if (a === 'login')  openLoginModal();
+      else if (a === 'signup') openSignupModal();
+      else if (a === 'logout') logout();
+      return;
     }
 
-    // 인증 상태 변경 이벤트 리스너
-    window.addEventListener('authStateChanged', renderAuthActions);
-    
-    // 주기적으로 상태 확인 (Firebase 등 비동기 인증 대응) + 폼 바인딩 재시도 (app 지연 로드 대비)
-    var checkCount = 0;
-    var checkInterval = setInterval(function() {
-      checkCount++;
-      if (window.app && window.app.isLoggedIn) {
-        var oldState = authState;
-        checkAuthState();
-        if (oldState !== authState) {
-          renderAuthActions();
-        }
-      }
-      bindLoginSignupForms();
-      if (window.app && window.app.isLoggedIn !== undefined) clearInterval(checkInterval);
-      if (checkCount >= 20) clearInterval(checkInterval);
-    }, 500);
+    if (t.hasAttribute('data-close-modal')) {
+      e.preventDefault(); e.stopPropagation();
+      closeModal(t.getAttribute('data-close-modal'));
+      return;
+    }
+
+    if (t.hasAttribute('data-open-modal')) {
+      e.preventDefault(); e.stopPropagation();
+      var id = t.getAttribute('data-open-modal');
+      if (id === 'loginModal') openLoginModal();
+      else if (id === 'signupModal') openSignupModal();
+    }
+  }, true);
+
+  /* ESC 닫기 */
+  document.addEventListener('keydown', function (e) {
+    if (e.key === 'Escape') {
+      var open = document.querySelector('.modal-overlay');
+      if (open) closeModal(open.id);
+    }
+  });
+
+  /* 오버레이 배경 클릭 닫기 */
+  document.addEventListener('click', function (e) {
+    if (e.target && e.target.classList && e.target.classList.contains('modal-overlay')) {
+      closeModal(e.target.id);
+    }
+  });
+
+  /* ──────────────────────────────────────────────────
+   * 7) 초기화
+   * ────────────────────────────────────────────────── */
+  function purgeLegacyModals() {
+    /* 기존에 HTML에 정적으로 남아있는 modal-overlay 즉시 제거 */
+    document.querySelectorAll('.modal-overlay').forEach(function (m) { m.remove(); });
   }
 
-  // 즉시 초기화
-  init();
+  function init() {
+    if (document.readyState === 'loading') {
+      document.addEventListener('DOMContentLoaded', function () {
+        purgeLegacyModals();
+        renderAuthActions();
+      });
+    } else {
+      purgeLegacyModals();
+      renderAuthActions();
+    }
 
+    window.addEventListener('authStateChanged', renderAuthActions);
+
+    /* Firebase 비동기 완료 후 재렌더 (최대 9초 대기) */
+    var tries = 0;
+    var iv = setInterval(function () {
+      tries++;
+      if (window.app && window.app.isLoggedIn !== undefined) {
+        renderAuthActions();
+        clearInterval(iv);
+      }
+      if (tries >= 30) clearInterval(iv);
+    }, 300);
+  }
+
+  /* 전역 API */
+  window.authSystem = {
+    renderAuthActions: renderAuthActions,
+    openLoginModal: openLoginModal,
+    openSignupModal: openSignupModal,
+    closeModal: closeModal,
+    logout: logout
+  };
+  window.openModal  = function (id) { if (id === 'loginModal') openLoginModal(); else if (id === 'signupModal') openSignupModal(); };
+  window.closeModal = closeModal;
+  window.toggleNav  = toggleNav;
+
+  init();
 })();

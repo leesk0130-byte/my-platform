@@ -251,8 +251,6 @@
     </section>
   </main>
 
-  <div class="modal-overlay" id="loginModal"><div class="modal"><div class="modal-header"><h3>로그인</h3><button type="button" class="modal-close" data-close-modal="loginModal" aria-label="닫기">&times;</button></div><div class="modal-body"><form id="loginForm" onsubmit="return false;"><div class="form-group"><label for="login-email">이메일</label><input type="email" id="login-email" required></div><div class="form-group"><label for="login-pw">비밀번호</label><input type="password" id="login-pw" required></div><div class="modal-footer"><button type="submit" class="btn btn-primary">로그인</button></div></form><p class="modal-switch">아직 회원이 아니신가요? <a href="#" data-open-modal="signupModal">회원가입</a></p></div></div></div>
-  <div class="modal-overlay" id="signupModal"><div class="modal"><div class="modal-header"><h3>회원가입</h3><button type="button" class="modal-close" data-close-modal="signupModal" aria-label="닫기">&times;</button></div><div class="modal-body"><form id="signupForm" onsubmit="return false;"><div class="form-group"><label for="signup-name">이름</label><input type="text" id="signup-name" required></div><div class="form-group"><label for="signup-email">이메일</label><input type="email" id="signup-email" required></div><div class="form-group"><label for="signup-pw">비밀번호</label><input type="password" id="signup-pw" required minlength="8"></div><div class="form-group"><label for="signup-pw2">비밀번호 확인</label><input type="password" id="signup-pw2" required></div><div class="form-group"><input type="checkbox" id="signup-agree" required> <label for="signup-agree"><a href="terms.html" target="_blank" rel="noopener">이용약관</a>·<a href="privacy.html" target="_blank" rel="noopener">개인정보처리방침</a>에 동의합니다.</label></div><div class="modal-footer"><button type="submit" class="btn btn-primary">가입하기</button></div></form><p class="modal-switch">이미 회원이신가요? <a href="#" data-open-modal="loginModal">로그인</a></p></div></div></div>
 
   <footer>
     <div class="footer-inner">
@@ -308,53 +306,7 @@
     } else {
       initAccordion();
     }
-    function openModal(id) {
-      document.getElementById(id).classList.add('is-open');
-      document.body.style.overflow = 'hidden';
-    }
-    function closeModal(id) {
-      document.getElementById(id).classList.remove('is-open');
-      document.body.style.overflow = '';
-    }
-    document.querySelectorAll('.modal-overlay').forEach(function(el) {
-      el.addEventListener('click', function(e) { if (e.target === el) closeModal(el.id); });
-    });
-    var loginForm = document.querySelector('#loginModal form');
-    if (loginForm) {
-      loginForm.addEventListener('submit', function(e) {
-        e.preventDefault();
-        var email = loginForm.querySelector('input[type=email]').value;
-        var pw = loginForm.querySelector('input[type=password]').value;
-        window.app.login(email, pw, function(err) {
-          if (err) { alert(err); return; }
-          closeModal('loginModal');
-        });
-      });
-    }
-    var signupForm = document.querySelector('#signupModal form');
-    if (signupForm) {
-      signupForm.addEventListener('submit', function(e) {
-        e.preventDefault();
-        var inputs = signupForm.querySelectorAll('input[type=text], input[type=email], input[type=password]');
-        var name = inputs[0] ? inputs[0].value : '';
-        var email = inputs[1] ? inputs[1].value : '';
-        var pw = inputs[2] ? inputs[2].value : '';
-        var pw2 = inputs[3] ? inputs[3].value : '';
-        if (pw !== pw2) { alert('비밀번호가 일치하지 않아요.'); return; }
-        window.app.signup(name, email, pw, function(err) {
-          if (err) { alert(err); return; }
-          closeModal('signupModal');
-        });
-      });
-    }
-    function toggleNav() {
-      var nav = document.getElementById('headerNav');
-      var btn = document.querySelector('.nav-toggle');
-      if (!nav || !btn) return;
-      var open = nav.classList.toggle('is-open');
-      btn.setAttribute('aria-expanded', open);
-      btn.setAttribute('aria-label', open ? '메뉴 닫기' : '메뉴 열기');
-    }
+    /* modal 및 toggleNav는 auth.js/drawer.js가 처리 */
   </script>
 </body>
 </html>
