@@ -345,8 +345,9 @@
         });
     },
 
-    fetchPosts: function (board, limit, offset, callback) {
+    fetchPosts: function (board, limit, offset, callback, sort) {
       // API·목업 사용 안 함. 로컬 저장 글만 표시(비어 있음, 글쓰기로 올리면 그만 보임)
+      // sort: 'latest' | 'hits' | 'comments' (기본 최신순)
       var local = getLocalPosts();
       var list = local.map(function (p) {
         var localComments = getLocalComments(p.id);
@@ -366,8 +367,78 @@
         };
       });
       var filtered = (board && board !== 'all') ? list.filter(function (p) { return p.board === board; }) : list;
-      filtered.sort(function (a, b) { return (b.notice ? 1 : 0) - (a.notice ? 1 : 0); });
+      filtered.sort(function (a, b) {
+        if (b.notice && !a.notice) return 1;
+        if (a.notice && !b.notice) return -1;
+        var order = sort || 'latest';
+        if (order === 'hits') return (b.hits || 0) - (a.hits || 0);
+        if (order === 'comments') return (b.commentCount || 0) - (a.commentCount || 0);
+        var ta = (a.createdAt && new Date(a.createdAt).getTime()) || 0;
+        var tb = (b.createdAt && new Date(b.createdAt).getTime()) || 0;
+        return tb - ta;
+      });
       if (callback) callback(null, filtered.slice(offset || 0, (offset || 0) + (limit || 20)), filtered.length);
+    },
+
+    getPostsByIds: function (ids, callback) {
+      if (!ids || !ids.length) { if (callback) callback(null, []); return; }
+      var local = getLocalPosts();
+      var withComments = local.map(function (p) {
+        var localComments = getLocalComments(p.id);
+        var additionalViews = typeof getPostViewCount === 'function' ? getPostViewCount(p.id) : 0;
+        return {
+          id: p.id,
+          title: p.title,
+          author: p.author,
+          date: p.date,
+          board: p.board || 'free',
+          hits: (p.hits != null ? p.hits : 0) + additionalViews,
+          verified: p.verified,
+          notice: !!p.notice,
+          commentCount: localComments.length,
+          body: p.body,
+          createdAt: p.createdAt
+        };
+      });
+      var idSet = {};
+      ids.forEach(function (id) { idSet[id] = true; });
+      var ordered = ids.map(function (id) {
+        return withComments.filter(function (p) { return p.id === id; })[0];
+      }).filter(Boolean);
+      if (callback) callback(null, ordered);
+    },
+
+    getRelatedPosts: function (postId, limit, callback) {
+      var post = getLocalPostById(postId);
+      if (!post) { if (callback) callback(null, []); return; }
+      var board = post.board || 'free';
+      var local = getLocalPosts();
+      var withComments = local.map(function (p) {
+        var localComments = getLocalComments(p.id);
+        var additionalViews = typeof getPostViewCount === 'function' ? getPostViewCount(p.id) : 0;
+        return {
+          id: p.id,
+          title: p.title,
+          author: p.author,
+          date: p.date,
+          board: p.board || 'free',
+          hits: (p.hits != null ? p.hits : 0) + additionalViews,
+          verified: p.verified,
+          notice: !!p.notice,
+          commentCount: localComments.length,
+          body: p.body,
+          createdAt: p.createdAt
+        };
+      });
+      var related = withComments
+        .filter(function (p) { return p.id !== postId && (p.board || 'free') === board; })
+        .sort(function (a, b) {
+          var ta = (a.createdAt && new Date(a.createdAt).getTime()) || 0;
+          var tb = (b.createdAt && new Date(b.createdAt).getTime()) || 0;
+          return tb - ta;
+        })
+        .slice(0, limit || 5);
+      if (callback) callback(null, related);
     },
 
     getLocalPosts: getLocalPosts,

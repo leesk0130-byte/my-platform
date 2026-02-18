@@ -22,6 +22,7 @@
   {"@context":"https://schema.org","@type":"WebPage","name":"가맹점 커뮤니티 | 가맹점숲","description":"온라인 가맹점·쇼핑몰 커뮤니티. 수수료·정산·운영 정보 나누고 질문하는 게시판.","url":"https://my-platform.pages.dev/community.html","isPartOf":{"@type":"WebSite","name":"가맹점숲","url":"https://my-platform.pages.dev/"}}
   </script>
   <link rel="stylesheet" href="css/common.css">
+  <script src="js/analytics-stub.js"></script>
   <script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-3006893636342653" crossorigin="anonymous"></script>
 </head>
 <body>
@@ -30,12 +31,11 @@
     <h1><a href="index.html">가맹점숲</a></h1>
     <button type="button" class="nav-toggle" aria-label="메뉴 열기" aria-expanded="false" data-toggle-nav><span></span><span></span><span></span></button>
     <nav class="header-nav" id="headerNav" aria-label="메인 메뉴">
-      <a href="about.html">가맹점숲이란?</a>
-      <a href="news.html">뉴스</a>
-      <a href="pg.html">PG 수수료</a>
-      <a href="calculator.html">수수료 계산기</a>
-      <a href="must-know.html">꼭 알아야 할 것</a>
       <a href="community.html" class="active">커뮤니티</a>
+      <a href="pg.html">PG 수수료</a>
+      <a href="calculator.html">수수료 비교 계산기</a>
+      <a href="news.html">최신 공지/뉴스</a>
+      <a href="verify.html">인증/제휴 문의</a>
     </nav>
     <div class="header-auth" id="headerAuth" aria-label="로그인 상태">
       <div id="auth-actions"></div>
@@ -73,6 +73,7 @@
               </div>
             </div>
             <div class="board-actions" style="justify-content:flex-end;">
+              <a href="bookmarks.html" class="btn btn-ghost btn-sm">저장한 글</a>
               <a href="write.html" class="btn btn-primary">글쓰기</a>
             </div>
             <div id="board-notice" class="board-notice" aria-label="공지" style="display:none;"></div>
@@ -112,6 +113,7 @@
                   <p class="post-detail-title-label" aria-hidden="true">제목</p>
                   <h1 id="post-detail-title" class="post-detail-title"></h1>
                   <div id="post-detail-meta" class="post-detail-meta"></div>
+                  <div id="post-detail-bookmark" class="post-detail-actions post-detail-bookmark-row" style="margin-top:0.5rem;"></div>
                   <div id="post-detail-actions" class="post-detail-actions" style="display:none;margin-top:0.5rem;"></div>
                 </header>
                 <div class="post-body-wrap" aria-label="본문 내용">
@@ -142,6 +144,10 @@
                     </div>
                   </form>
                 </div>
+              </section>
+              <section class="related-posts-section" id="related-posts-section" aria-label="관련 글" style="margin-top:1.5rem;">
+                <h2 class="section-title">관련 글</h2>
+                <ul class="feed-list" id="related-posts-list"></ul>
               </section>
               <div class="post-detail-nav post-detail-nav-bottom">
                 <a href="community.html" class="btn btn-outline btn-back">← 목록으로</a>
@@ -208,7 +214,7 @@
 
   <footer>
     <div class="footer-inner">
-      <p><a href="terms.html">이용약관</a> | <a href="privacy.html">개인정보처리방침</a> | <a href="verify.html">인증 안내</a></p>
+      <p><a href="about.html">가맹점숲이란?</a> | <a href="must-know.html">꼭 알아야 할 것</a> | <a href="terms.html">이용약관</a> | <a href="privacy.html">개인정보처리방침</a> | <a href="verify.html">인증/제휴 문의</a></p>
       <p>© 2025–2026 가맹점숲. 온라인 가맹점 정보 & 커뮤니티. All rights reserved.</p>
       <div class="footer-contact">
         <h4>문의</h4>
@@ -221,10 +227,12 @@
   <script src="https://www.gstatic.com/firebasejs/10.7.0/firebase-app-compat.js"></script>
   <script src="https://www.gstatic.com/firebasejs/10.7.0/firebase-auth-compat.js"></script>
   <script src="js/config.js"></script>
+  <script src="js/bookmarks.js"></script>
   <script src="js/app.js"></script>
   <script src="js/auth.js"></script>
   <script>
     (function() {
+      if (window.trackEvent) window.trackEvent('pageview', { page: 'community' });
       document.addEventListener('click', function(e) {
         var noticeBtn = e.target && e.target.closest && e.target.closest('.notice-toggle-btn');
         if (noticeBtn) {
@@ -372,6 +380,38 @@
             actionsEl.style.display = 'block';
             actionsEl.innerHTML = '<a href="edit.html?id=' + encodeURIComponent(postId) + '" class="btn btn-outline btn-sm">수정</a> <button type="button" class="post-delete-btn btn btn-outline btn-sm text-red-600 border-red-200" data-post-id="' + (postId || '').replace(/"/g, '&quot;') + '">삭제</button>';
           } else if (actionsEl) { actionsEl.style.display = 'none'; actionsEl.innerHTML = ''; }
+          var bookmarkEl = document.getElementById('post-detail-bookmark');
+          if (bookmarkEl && window.Bookmarks) {
+            var saved = window.Bookmarks.isBookmarked(postId);
+            bookmarkEl.innerHTML = '<button type="button" class="btn btn-outline btn-sm" id="post-bookmark-btn" data-post-id="' + (postId || '').replace(/"/g, '&quot;') + '">' + (saved ? '저장 취소' : '저장') + '</button> <button type="button" class="btn btn-ghost btn-sm" id="post-share-link-btn" aria-label="링크 복사">링크 복사</button>';
+            bookmarkEl.style.display = 'block';
+            var bookmarkBtn = document.getElementById('post-bookmark-btn');
+            var shareBtn = document.getElementById('post-share-link-btn');
+            if (bookmarkBtn) bookmarkBtn.addEventListener('click', function() {
+              var id = bookmarkBtn.getAttribute('data-post-id');
+              if (!id || !window.Bookmarks) return;
+              var nowSaved = window.Bookmarks.toggle(id);
+              bookmarkBtn.textContent = nowSaved ? '저장 취소' : '저장';
+              if (window.trackEvent) window.trackEvent('bookmark', { postId: id, action: nowSaved ? 'add' : 'remove' });
+            });
+            if (shareBtn) shareBtn.addEventListener('click', function() {
+              try {
+                navigator.clipboard.writeText(location.href);
+                shareBtn.textContent = '복사됨';
+                setTimeout(function() { shareBtn.textContent = '링크 복사'; }, 2000);
+                if (window.trackEvent) window.trackEvent('share', { type: 'link', postId: postId });
+              } catch (e) {}
+            });
+          } else if (bookmarkEl) bookmarkEl.style.display = 'none';
+          if (window.app && window.app.getRelatedPosts) {
+            window.app.getRelatedPosts(postId, 5, function(err, related) {
+              var listEl = document.getElementById('related-posts-list');
+              var sectionEl = document.getElementById('related-posts-section');
+              if (sectionEl) sectionEl.style.display = (related && related.length) ? 'block' : 'none';
+              if (listEl && related && related.length) window.app.renderPosts('related-posts-list', related, 'community.html?id=', true);
+              else if (listEl) listEl.innerHTML = '';
+            });
+          }
           
           currentDetailPostId = postId;
           var currentPostId = postId;

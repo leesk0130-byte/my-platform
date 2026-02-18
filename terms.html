@@ -12,22 +12,23 @@
   <script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-3006893636342653" crossorigin="anonymous"></script>
 </head>
 <body class="legal-page">
+  <a href="#main" class="skip-link">본문으로 건너뛰기</a>
   <header>
     <h1><a href="index.html">가맹점숲</a></h1>
-    <nav class="header-nav">
-      <a href="about.html">가맹점숲이란?</a>
-      <a href="news.html">뉴스</a>
-      <a href="pg.html">PG 수수료</a>
-      <a href="calculator.html">수수료 계산기</a>
-      <a href="must-know.html">꼭 알아야 할 것</a>
+    <button type="button" class="nav-toggle" aria-label="메뉴 열기" aria-expanded="false" data-toggle-nav><span></span><span></span><span></span></button>
+    <nav class="header-nav" id="headerNav" aria-label="메인 메뉴">
       <a href="community.html">커뮤니티</a>
+      <a href="pg.html">PG 수수료</a>
+      <a href="calculator.html">수수료 비교 계산기</a>
+      <a href="news.html">최신 공지/뉴스</a>
+      <a href="verify.html">인증/제휴 문의</a>
     </nav>
-    <div class="header-auth">
+    <div class="header-auth" id="headerAuth" aria-label="로그인 상태">
       <a href="index.html" class="btn btn-outline">홈으로</a>
     </div>
   </header>
 
-  <div class="container">
+  <main id="main" class="container">
     <nav class="breadcrumb" aria-label="breadcrumb"><a href="index.html">홈</a> <span class="bc-sep">/</span> <strong>이용약관</strong></nav>
     <div class="card card-content prose">
       <h1 class="page-title">가맹점숲 이용약관</h1>
@@ -116,11 +117,11 @@
       <h2>제12조 (준거법 및 관할)</h2>
       <p>본 약관의 해석 및 서비스와 이용자 간 분쟁에 대하여는 대한민국 법률을 적용하며, 관할 법원은 서비스의 본사 소재지 관할 법원으로 합니다.</p>
     </div>
-  </div>
+  </main>
 
   <footer>
     <div class="footer-inner">
-      <p><a href="terms.html">이용약관</a> | <a href="privacy.html">개인정보처리방침</a> | <a href="verify.html">인증 안내</a></p>
+      <p><a href="about.html">가맹점숲이란?</a> | <a href="must-know.html">꼭 알아야 할 것</a> | <a href="terms.html">이용약관</a> | <a href="privacy.html">개인정보처리방침</a> | <a href="verify.html">인증/제휴 문의</a></p>
       <p>© 2025–2026 가맹점숲. 온라인 가맹점 정보 & 커뮤니티. All rights reserved.</p>
       <div class="footer-contact">
         <h4>문의</h4>
@@ -129,5 +130,18 @@
       </div>
     </div>
   </footer>
+  <script>
+    (function() {
+      var btn = document.querySelector('.nav-toggle');
+      var nav = document.getElementById('headerNav');
+      if (btn && nav) {
+        btn.addEventListener('click', function() {
+          var open = nav.classList.toggle('is-open');
+          btn.setAttribute('aria-expanded', open);
+          btn.setAttribute('aria-label', open ? '메뉴 닫기' : '메뉴 열기');
+        });
+      }
+    })();
+  </script>
 </body>
 </html>

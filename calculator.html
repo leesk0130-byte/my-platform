@@ -59,6 +59,8 @@
     .calc-mode-btn:first-child { border-radius: 12px 0 0 12px; }
     .calc-mode-btn:last-child { border-radius: 0 12px 12px 0; border-left: none; }
     .calc-mode-btn.active { background: #0d9488; color: #fff; border-color: #0d9488; }
+    .calc-type-btn { padding: 0.5rem 1rem; border: 1px solid #e2e8f0; background: #f8fafc; font-size: 0.875rem; font-weight: 600; cursor: pointer; border-radius: 8px; margin-right: 0.5rem; }
+    .calc-type-btn.active { background: #0d9488; color: #fff; border-color: #0d9488; }
     .calc-desc { font-size: 0.875rem; color: #64748b; margin-bottom: 1rem; }
     .calc-panel { margin-bottom: 1.5rem; }
     .calc-fee-rates { margin-bottom: 1.5rem; padding-top: 1rem; border-top: 1px solid #f1f5f9; }
@@ -104,6 +106,7 @@
       margin-left: 0.5rem;
     }
   </style>
+  <script src="js/analytics-stub.js"></script>
   <script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-3006893636342653" crossorigin="anonymous"></script>
 </head>
 <body>
@@ -112,12 +115,11 @@
     <h1><a href="index.html">가맹점숲</a></h1>
     <button type="button" class="nav-toggle" aria-label="메뉴 열기" aria-expanded="false" data-toggle-nav><span></span><span></span><span></span></button>
     <nav class="header-nav" id="headerNav" aria-label="메인 메뉴">
-      <a href="about.html">가맹점숲이란?</a>
-      <a href="news.html">뉴스</a>
-      <a href="pg.html">PG 수수료</a>
-      <a href="calculator.html" class="active">수수료 계산기</a>
-      <a href="must-know.html">꼭 알아야 할 것</a>
       <a href="community.html">커뮤니티</a>
+      <a href="pg.html">PG 수수료</a>
+      <a href="calculator.html" class="active">수수료 비교 계산기</a>
+      <a href="news.html">최신 공지/뉴스</a>
+      <a href="verify.html">인증/제휴 문의</a>
     </nav>
     <div class="header-auth" id="headerAuth" aria-label="로그인 상태">
       <div id="auth-actions"></div>
@@ -134,9 +136,14 @@
 
     <section class="section">
       <div class="card card-content">
-        <div class="calc-mode-tabs">
+        <p class="calc-desc" style="margin-bottom:0.75rem;"><a href="calculator-saved.html">저장한 계산 목록</a></p>
+        <div class="calc-mode-tabs" style="margin-bottom:0.5rem;">
           <button type="button" class="calc-mode-btn active" data-mode="ratio">비율로 입력</button>
           <button type="button" class="calc-mode-btn" data-mode="amount">금액으로 입력</button>
+        </div>
+        <div class="calc-mode-tabs">
+          <button type="button" class="calc-type-btn active" data-type="single">단일 계산</button>
+          <button type="button" class="calc-type-btn" data-type="compare">A vs B 비교</button>
         </div>
 
         <div id="calc-ratio" class="calc-panel">
@@ -180,7 +187,7 @@
           </div>
         </div>
 
-        <div class="calc-fee-rates">
+        <div id="calc-fee-single" class="calc-fee-rates">
           <p class="calc-desc">본인 PG 계약 조건에 맞는 수수료율(%)을 입력하세요. <a href="pg.html">PG 수수료 참고</a></p>
           <div class="form-row">
             <div class="form-group">
@@ -193,14 +200,39 @@
             </div>
           </div>
         </div>
+        <div id="calc-fee-compare" class="calc-fee-rates" style="display:none;">
+          <p class="calc-desc">PG A와 B의 수수료율을 각각 입력하세요. <a href="pg.html">PG 수수료 참고</a></p>
+          <div class="form-row">
+            <div class="form-group">
+              <label for="card-rate-a">PG A 카드 수수료율 (%)</label>
+              <input type="number" id="card-rate-a" placeholder="예: 3.2" min="0" max="100" step="0.01" value="3.2">
+            </div>
+            <div class="form-group">
+              <label for="cash-rate-a">PG A 현금 수수료율 (%)</label>
+              <input type="number" id="cash-rate-a" placeholder="예: 2" min="0" max="100" step="0.01" value="2">
+            </div>
+          </div>
+          <div class="form-row">
+            <div class="form-group">
+              <label for="card-rate-b">PG B 카드 수수료율 (%)</label>
+              <input type="number" id="card-rate-b" placeholder="예: 2.8" min="0" max="100" step="0.01" value="2.8">
+            </div>
+            <div class="form-group">
+              <label for="cash-rate-b">PG B 현금 수수료율 (%)</label>
+              <input type="number" id="cash-rate-b" placeholder="예: 1.5" min="0" max="100" step="0.01" value="1.5">
+            </div>
+          </div>
+        </div>
 
         <div class="calc-actions">
           <button type="button" class="btn btn-primary" id="calc-do">수수료 계산하기</button>
+          <button type="button" class="btn btn-outline" id="calc-save">저장</button>
+          <button type="button" class="btn btn-outline" id="calc-share">공유 URL 복사</button>
         </div>
 
         <div id="calc-result" class="calc-result" style="display:none;">
           <h4 class="calc-result-title">계산 결과</h4>
-          <dl class="calc-result-list">
+          <dl class="calc-result-list" id="calc-result-single">
             <dt>총 거래액</dt>
             <dd id="result-total-amount">0원</dd>
             <dt>카드 거래액</dt>
@@ -216,6 +248,16 @@
             <dt>실 수령 예상</dt>
             <dd id="result-net">0원</dd>
           </dl>
+          <dl class="calc-result-list" id="calc-result-compare" style="display:none;">
+            <dt>총 거래액</dt>
+            <dd id="result-comp-total">0원</dd>
+            <dt>PG A 총 수수료</dt>
+            <dd id="result-fee-a">0원</dd>
+            <dt>PG B 총 수수료</dt>
+            <dd id="result-fee-b">0원</dd>
+            <dt class="calc-result-total">절감액 (B 기준)</dt>
+            <dd class="calc-result-total" id="result-save-amount">0원</dd>
+          </dl>
         </div>
       </div>
     </section>
@@ -223,7 +265,7 @@
 
   <footer>
     <div class="footer-inner">
-      <p><a href="terms.html">이용약관</a> | <a href="privacy.html">개인정보처리방침</a> | <a href="verify.html">인증 안내</a></p>
+      <p><a href="about.html">가맹점숲이란?</a> | <a href="must-know.html">꼭 알아야 할 것</a> | <a href="terms.html">이용약관</a> | <a href="privacy.html">개인정보처리방침</a> | <a href="verify.html">인증/제휴 문의</a></p>
       <p>© 2025–2026 가맹점숲. All rights reserved.</p>
       <div class="footer-contact">
         <h4>문의</h4>
@@ -239,8 +281,22 @@
   <script src="js/app.js"></script>
   <script src="js/auth.js"></script>
   <script>
-    // 계산기 페이지 전용 스크립트
     (function() {
+      if (window.trackEvent) window.trackEvent('pageview', { page: 'calculator' });
+      var CALC_SAVED_KEY = 'gmp_calc_saved';
+      var typeBtns = document.querySelectorAll('.calc-type-btn');
+      var isCompare = function() { return document.querySelector('.calc-type-btn.active').getAttribute('data-type') === 'compare'; };
+      typeBtns.forEach(function(btn) {
+        btn.addEventListener('click', function() {
+          typeBtns.forEach(function(b) { b.classList.remove('active'); });
+          btn.classList.add('active');
+          var compare = isCompare();
+          document.getElementById('calc-fee-single').style.display = compare ? 'none' : 'block';
+          document.getElementById('calc-fee-compare').style.display = compare ? 'block' : 'none';
+          document.getElementById('calc-result-single').style.display = compare ? 'none' : 'block';
+          document.getElementById('calc-result-compare').style.display = compare ? 'block' : 'none';
+        });
+      });
       var btns = document.querySelectorAll('.calc-mode-btn');
       btns.forEach(function(btn) {
         btn.addEventListener('click', function() {
@@ -302,6 +358,29 @@
         updateAmountKr(id);
       });
 
+      function getAmounts() {
+        var isRatio = document.querySelector('.calc-mode-btn.active').getAttribute('data-mode') === 'ratio';
+        var totalAmount = 0, cardAmount = 0, cashAmount = 0;
+        if (isRatio) {
+          totalAmount = toNum(document.getElementById('total-amount').value);
+          var cardRatio = toNum(document.getElementById('card-ratio').value);
+          var cashRatio = toNum(document.getElementById('cash-ratio').value);
+          cardAmount = Math.round(totalAmount * cardRatio / 100);
+          cashAmount = totalAmount - cardAmount;
+        } else {
+          cardAmount = toNum(document.getElementById('card-amount').value);
+          cashAmount = toNum(document.getElementById('cash-amount').value);
+          totalAmount = cardAmount + cashAmount;
+        }
+        return { totalAmount: totalAmount, cardAmount: cardAmount, cashAmount: cashAmount };
+      }
+      function fmt(n) { return n.toLocaleString('ko-KR') + '원'; }
+      function setResult(id, n) {
+        var el = document.getElementById(id);
+        if (!el) return;
+        el.innerHTML = fmt(n) + '<span class="calc-result-kr">' + toKoreanAmount(n) + '</span>';
+      }
+
       document.getElementById('calc-do').addEventListener('click', function() {
         var isRatio = document.querySelector('.calc-mode-btn.active').getAttribute('data-mode') === 'ratio';
         var totalAmount = 0, cardAmount = 0, cashAmount = 0;
@@ -319,26 +398,142 @@
           totalAmount = cardAmount + cashAmount;
           if (totalAmount <= 0) { alert('카드 또는 현금 거래액을 입력해 주세요.'); return; }
         }
-        var cardRate = toNum(document.getElementById('card-rate').value) / 100;
-        var cashRate = toNum(document.getElementById('cash-rate').value) / 100;
-        var cardFee = Math.round(cardAmount * cardRate);
-        var cashFee = Math.round(cashAmount * cashRate);
-        var totalFee = cardFee + cashFee;
-        var net = totalAmount - totalFee;
-        function fmt(n) { return n.toLocaleString('ko-KR') + '원'; }
-        function setResult(id, n) {
-          var el = document.getElementById(id);
-          el.innerHTML = fmt(n) + '<span class="calc-result-kr">' + toKoreanAmount(n) + '</span>';
-        }
-        setResult('result-total-amount', totalAmount);
-        setResult('result-card-amount', cardAmount);
-        setResult('result-cash-amount', cashAmount);
-        setResult('result-card-fee', cardFee);
-        setResult('result-cash-fee', cashFee);
-        setResult('result-total-fee', totalFee);
-        setResult('result-net', net);
+        var compare = isCompare();
         document.getElementById('calc-result').style.display = 'block';
+        document.getElementById('calc-result-single').style.display = compare ? 'none' : 'block';
+        document.getElementById('calc-result-compare').style.display = compare ? 'block' : 'none';
+        if (compare) {
+          var cardRateA = toNum(document.getElementById('card-rate-a').value) / 100;
+          var cashRateA = toNum(document.getElementById('cash-rate-a').value) / 100;
+          var cardRateB = toNum(document.getElementById('card-rate-b').value) / 100;
+          var cashRateB = toNum(document.getElementById('cash-rate-b').value) / 100;
+          var feeA = Math.round(cardAmount * cardRateA + cashAmount * cashRateA);
+          var feeB = Math.round(cardAmount * cardRateB + cashAmount * cashRateB);
+          var saveAmount = feeA - feeB;
+          setResult('result-comp-total', totalAmount);
+          setResult('result-fee-a', feeA);
+          setResult('result-fee-b', feeB);
+          setResult('result-save-amount', saveAmount);
+        } else {
+          var cardRate = toNum(document.getElementById('card-rate').value) / 100;
+          var cashRate = toNum(document.getElementById('cash-rate').value) / 100;
+          var cardFee = Math.round(cardAmount * cardRate);
+          var cashFee = Math.round(cashAmount * cashRate);
+          var totalFee = cardFee + cashFee;
+          var net = totalAmount - totalFee;
+          setResult('result-total-amount', totalAmount);
+          setResult('result-card-amount', cardAmount);
+          setResult('result-cash-amount', cashAmount);
+          setResult('result-card-fee', cardFee);
+          setResult('result-cash-fee', cashFee);
+          setResult('result-total-fee', totalFee);
+          setResult('result-net', net);
+        }
+        if (window.trackEvent) window.trackEvent('calc_run', {});
       });
+
+      function getSavedList() {
+        try {
+          var raw = localStorage.getItem(CALC_SAVED_KEY);
+          return raw ? JSON.parse(raw) : [];
+        } catch (e) { return []; }
+      }
+      function setSavedList(list) {
+        try { localStorage.setItem(CALC_SAVED_KEY, JSON.stringify(list)); } catch (e) {}
+      }
+      function getFormState() {
+        var isRatio = document.querySelector('.calc-mode-btn.active').getAttribute('data-mode') === 'ratio';
+        var compare = isCompare();
+        var state = {
+          mode: isRatio ? 'ratio' : 'amount',
+          type: compare ? 'compare' : 'single',
+          totalAmount: toNum(document.getElementById('total-amount').value),
+          cardRatio: toNum(document.getElementById('card-ratio').value),
+          cashRatio: toNum(document.getElementById('cash-ratio').value),
+          cardAmount: toNum(document.getElementById('card-amount').value),
+          cashAmount: toNum(document.getElementById('cash-amount').value),
+          cardRate: toNum(document.getElementById('card-rate').value),
+          cashRate: toNum(document.getElementById('cash-rate').value),
+          cardRateA: toNum(document.getElementById('card-rate-a').value),
+          cashRateA: toNum(document.getElementById('cash-rate-a').value),
+          cardRateB: toNum(document.getElementById('card-rate-b').value),
+          cashRateB: toNum(document.getElementById('cash-rate-b').value)
+        };
+        return state;
+      }
+      function setFormState(state) {
+        if (!state) return;
+        document.querySelector('.calc-mode-btn[data-mode="' + (state.mode || 'ratio') + '"]').click();
+        document.querySelector('.calc-type-btn[data-type="' + (state.type || 'single') + '"]').click();
+        document.getElementById('total-amount').value = formatWithComma(String(state.totalAmount || 0));
+        document.getElementById('card-ratio').value = state.cardRatio != null ? state.cardRatio : 70;
+        document.getElementById('cash-ratio').value = state.cashRatio != null ? state.cashRatio : 30;
+        document.getElementById('card-amount').value = formatWithComma(String(state.cardAmount || 0));
+        document.getElementById('cash-amount').value = formatWithComma(String(state.cashAmount || 0));
+        document.getElementById('card-rate').value = state.cardRate != null ? state.cardRate : 3.2;
+        document.getElementById('cash-rate').value = state.cashRate != null ? state.cashRate : 2;
+        document.getElementById('card-rate-a').value = state.cardRateA != null ? state.cardRateA : 3.2;
+        document.getElementById('cash-rate-a').value = state.cashRateA != null ? state.cashRateA : 2;
+        document.getElementById('card-rate-b').value = state.cardRateB != null ? state.cardRateB : 2.8;
+        document.getElementById('cash-rate-b').value = state.cashRateB != null ? state.cashRateB : 1.5;
+        amountInputIds.forEach(function(id) { updateAmountKr(id); });
+      }
+      document.getElementById('calc-save').addEventListener('click', function() {
+        var name = prompt('저장할 이름을 입력하세요.', 'PG 비교 ' + new Date().toLocaleDateString('ko-KR'));
+        if (name == null || (name = (name || '').trim()) === '') return;
+        var list = getSavedList();
+        var item = { id: 'calc_' + Date.now(), name: name, createdAt: Date.now(), params: getFormState() };
+        list.unshift(item);
+        setSavedList(list);
+        alert('저장되었습니다.');
+      });
+      document.getElementById('calc-share').addEventListener('click', function() {
+        var s = getFormState();
+        var q = [];
+        q.push('mode=' + encodeURIComponent(s.mode || 'ratio'));
+        q.push('type=' + encodeURIComponent(s.type || 'single'));
+        q.push('total=' + (s.totalAmount || 0));
+        q.push('cardRatio=' + (s.cardRatio || 70));
+        q.push('cashRatio=' + (s.cashRatio || 30));
+        q.push('cardRate=' + (s.cardRate || 3.2));
+        q.push('cashRate=' + (s.cashRate || 2));
+        q.push('cardRateA=' + (s.cardRateA != null ? s.cardRateA : 3.2));
+        q.push('cashRateA=' + (s.cashRateA != null ? s.cashRateA : 2));
+        q.push('cardRateB=' + (s.cardRateB != null ? s.cardRateB : 2.8));
+        q.push('cashRateB=' + (s.cashRateB != null ? s.cashRateB : 1.5));
+        var url = location.origin + location.pathname + '?' + q.join('&');
+        try {
+          navigator.clipboard.writeText(url);
+          this.textContent = '복사됨';
+          var btn = this;
+          setTimeout(function() { btn.textContent = '공유 URL 복사'; }, 2000);
+        } catch (e) { prompt('아래 URL을 복사하세요', url); }
+      });
+      var params = new URLSearchParams(location.search);
+      var loadId = params.get('load');
+      if (loadId) {
+        var list = getSavedList();
+        var found = list.filter(function(x) { return x.id === loadId; })[0];
+        if (found && found.params) setFormState(found.params);
+      } else {
+        var total = params.get('total');
+        if (total != null) {
+          var state = {
+            mode: params.get('mode') || 'ratio',
+            type: params.get('type') || 'single',
+            totalAmount: toNum(total),
+            cardRatio: toNum(params.get('cardRatio')) || 70,
+            cashRatio: toNum(params.get('cashRatio')) || 30,
+            cardRate: toNum(params.get('cardRate')) || 3.2,
+            cashRate: toNum(params.get('cashRate')) || 2,
+            cardRateA: toNum(params.get('cardRateA')) || 3.2,
+            cashRateA: toNum(params.get('cashRateA')) || 2,
+            cardRateB: toNum(params.get('cardRateB')) || 2.8,
+            cashRateB: toNum(params.get('cashRateB')) || 1.5
+          };
+          setFormState(state);
+        }
+      }
     })();
     function toggleNav() {
       var nav = document.getElementById('headerNav');

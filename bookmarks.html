@@ -1,0 +1,98 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="theme-color" content="#0f172a">
+  <title>내가 저장한 글 | 가맹점숲</title>
+  <meta name="description" content="가맹점숲 커뮤니티에서 저장한 글 목록입니다.">
+  <link rel="canonical" href="https://my-platform.pages.dev/bookmarks.html">
+  <link rel="stylesheet" href="css/common.css">
+  <script src="js/analytics-stub.js"></script>
+</head>
+<body>
+  <a href="#main" class="skip-link">본문으로 건너뛰기</a>
+  <header>
+    <h1><a href="index.html">가맹점숲</a></h1>
+    <button type="button" class="nav-toggle" aria-label="메뉴 열기" aria-expanded="false" data-toggle-nav><span></span><span></span><span></span></button>
+    <nav class="header-nav" id="headerNav" aria-label="메인 메뉴">
+      <a href="community.html">커뮤니티</a>
+      <a href="pg.html">PG 수수료</a>
+      <a href="calculator.html">수수료 비교 계산기</a>
+      <a href="news.html">최신 공지/뉴스</a>
+      <a href="verify.html">인증/제휴 문의</a>
+    </nav>
+    <div class="header-auth" id="headerAuth" aria-label="로그인 상태">
+      <div id="auth-actions"></div>
+    </div>
+  </header>
+
+  <main id="main" class="container">
+    <nav class="breadcrumb" aria-label="breadcrumb"><a href="index.html">홈</a> <span class="bc-sep">/</span> <a href="community.html">커뮤니티</a> <span class="bc-sep">/</span> <strong>내가 저장한 글</strong></nav>
+    <div class="hero">
+      <h2>내가 저장한 글</h2>
+      <p>커뮤니티에서 북마크한 글을 모아봤어요. 저장은 글 상세에서 별/북마크 버튼으로 할 수 있습니다.</p>
+    </div>
+    <section class="section">
+      <div class="card">
+        <ul class="feed-list" id="bookmarks-list" aria-label="저장한 글 목록"></ul>
+        <div id="bookmarks-empty" class="empty-state" style="display:none;">
+          <p class="empty-state-icon" aria-hidden="true">📌</p>
+          <p class="empty-state-title">저장한 글이 없어요</p>
+          <p class="empty-state-desc">커뮤니티에서 마음에 드는 글에 북마크를 눌러 보세요.</p>
+          <a href="community.html" class="btn btn-primary">커뮤니티 가기</a>
+        </div>
+      </div>
+    </section>
+  </main>
+
+  <footer>
+    <div class="footer-inner">
+      <p><a href="about.html">가맹점숲이란?</a> | <a href="must-know.html">꼭 알아야 할 것</a> | <a href="terms.html">이용약관</a> | <a href="privacy.html">개인정보처리방침</a> | <a href="verify.html">인증/제휴 문의</a></p>
+      <p>© 2025–2026 가맹점숲. 온라인 가맹점 정보 & 커뮤니티. All rights reserved.</p>
+      <div class="footer-contact">
+        <h4>문의</h4>
+        <p>이메일: <a href="mailto:leesk0130@naver.com?subject=가맹점숲 문의">leesk0130@naver.com</a></p>
+        <p class="footer-hours">운영 시간: 평일 09:00–18:00 (답변은 1–2 영업일 내)</p>
+      </div>
+    </div>
+  </footer>
+
+  <script src="js/bookmarks.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/10.7.0/firebase-app-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/10.7.0/firebase-auth-compat.js"></script>
+  <script src="js/config.js"></script>
+  <script src="js/app.js"></script>
+  <script src="js/auth.js"></script>
+  <script>
+    (function() {
+      if (window.trackEvent) window.trackEvent('pageview', { page: 'bookmarks' });
+      var listEl = document.getElementById('bookmarks-list');
+      var emptyEl = document.getElementById('bookmarks-empty');
+      var ids = window.Bookmarks ? window.Bookmarks.getIds() : [];
+      if (!ids.length) {
+        if (listEl) listEl.innerHTML = '';
+        if (emptyEl) emptyEl.style.display = 'block';
+        return;
+      }
+      if (window.app && window.app.getPostsByIds) {
+        window.app.getPostsByIds(ids, function(err, items) {
+          if (emptyEl) emptyEl.style.display = (items && items.length) ? 'none' : 'block';
+          if (listEl && items && items.length) {
+            window.app.renderPosts('bookmarks-list', items, 'community.html?id=', true);
+          } else if (listEl) listEl.innerHTML = '';
+        });
+      } else {
+        if (emptyEl) emptyEl.style.display = 'block';
+      }
+      var nav = document.getElementById('headerNav');
+      var btn = document.querySelector('.nav-toggle');
+      if (btn && nav) btn.addEventListener('click', function() {
+        var open = nav.classList.toggle('is-open');
+        btn.setAttribute('aria-expanded', open);
+        btn.setAttribute('aria-label', open ? '메뉴 닫기' : '메뉴 열기');
+      });
+    })();
+  </script>
+</body>
+</html>
