@@ -43,17 +43,32 @@
     var html = '';
     
     if (authState === 'loggedIn') {
-      // 로그인 상태: [닉네임] [로그아웃]
       var displayName = (currentUser.name || currentUser.email || '회원') + '님';
       html = '<span class="header-user">' + displayName + '</span>' +
              '<button type="button" class="btn btn-outline" data-auth="logout">로그아웃</button>';
     } else {
-      // 비로그인 상태: [로그인] [회원가입] — data-auth로 클릭 위임 처리 (onclick 의존 제거)
       html = '<button type="button" class="btn btn-outline" data-auth="login">로그인</button>' +
              '<button type="button" class="btn btn-primary" data-auth="signup">회원가입</button>';
     }
     
     authContainer.innerHTML = html;
+
+    /* 드로어 auth 섹션도 동기화 */
+    var drawerAuth = document.getElementById('drawerAuth');
+    if (drawerAuth) {
+      if (authState === 'loggedIn') {
+        var displayName2 = (currentUser.name || currentUser.email || '회원') + '님';
+        drawerAuth.innerHTML =
+          '<p class="drawer-auth-label">계정</p>' +
+          '<span class="drawer-auth-user">' + displayName2 + '</span>' +
+          '<button type="button" class="drawer-auth-btn" data-auth="logout">로그아웃</button>';
+      } else {
+        drawerAuth.innerHTML =
+          '<p class="drawer-auth-label">계정</p>' +
+          '<button type="button" class="drawer-auth-btn" data-auth="login">로그인</button>' +
+          '<button type="button" class="drawer-auth-btn drawer-auth-btn--primary" data-auth="signup">회원가입</button>';
+      }
+    }
   }
 
   /**

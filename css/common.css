@@ -2827,3 +2827,58 @@ img, video, iframe { max-width: 100%; height: auto; }
   outline: 2px solid var(--color-primary);
   outline-offset: -2px;
 }
+
+/* ── Drawer Auth (로그인/회원가입) ── */
+.drawer-auth {
+  padding: 16px 20px 24px;
+  border-top: 1px solid #334155;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  flex-shrink: 0;
+}
+.drawer-auth-label {
+  font-size: 0.75rem;
+  font-weight: 600;
+  color: var(--color-header-muted);
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  margin-bottom: 2px;
+}
+.drawer-auth-btn {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 100%;
+  min-height: 44px;
+  padding: 0 16px;
+  border-radius: 10px;
+  font-size: 0.9375rem;
+  font-weight: 600;
+  cursor: pointer;
+  border: 1px solid #475569;
+  background: transparent;
+  color: var(--color-header-muted);
+  transition: background 0.2s, color 0.2s, border-color 0.2s;
+}
+.drawer-auth-btn:hover {
+  background: #334155;
+  color: #fff;
+  border-color: #475569;
+}
+.drawer-auth-btn--primary {
+  background: var(--color-primary);
+  color: #fff;
+  border-color: var(--color-primary);
+}
+.drawer-auth-btn--primary:hover {
+  background: var(--color-primary-hover);
+  border-color: var(--color-primary-hover);
+}
+.drawer-auth-user {
+  display: block;
+  font-size: 0.9375rem;
+  font-weight: 600;
+  color: #fff;
+  padding: 4px 0 8px;
+}
