@@ -49,6 +49,10 @@
               <option value="info">정보공유</option>
             </select>
           </div>
+          <div class="form-group" id="write-notice-wrap">
+            <label><input type="checkbox" id="write-notice" value="1"> 공지로 등록</label>
+            <span id="write-notice-hint" class="form-hint">로그인한 운영자만 체크할 수 있어요. 목록 상단에 고정돼요.</span>
+          </div>
           <div class="form-group">
             <label for="write-title">제목</label>
             <input type="text" id="write-title" placeholder="제목을 입력하세요" required maxlength="200">
@@ -97,6 +101,20 @@
     window.addEventListener('authStateChanged', updateHeaderAuth);
     if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', updateHeaderAuth); else updateHeaderAuth();
     (function() {
+      function showNoticeCheck() {
+        var wrap = document.getElementById('write-notice-wrap');
+        var cb = document.getElementById('write-notice');
+        var hint = document.getElementById('write-notice-hint');
+        if (!wrap || !cb) return;
+        var isOp = window.app && window.app.isOperator && window.app.isOperator();
+        wrap.style.display = 'block';
+        cb.disabled = !isOp;
+        if (hint) hint.textContent = isOp ? '목록 상단에 고정돼요. (운영자)' : '로그인한 운영자만 체크할 수 있어요. 목록 상단에 고정돼요.';
+      }
+      if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', showNoticeCheck); else showNoticeCheck();
+      window.addEventListener('authStateChanged', showNoticeCheck);
+    })();
+    (function() {
       var params = new URLSearchParams(location.search);
       var board = params.get('board');
       if (board) {
@@ -120,7 +138,8 @@
         errEl.style.display = 'none';
         var submitBtn = form.querySelector('button[type="submit"]');
         if (submitBtn) { submitBtn.disabled = true; submitBtn.textContent = '등록 중...'; }
-        window.app.createPost({ title: title, body: body, author: nickname || '익명', board: boardVal }, function(err, post) {
+        var isNotice = document.getElementById('write-notice') && document.getElementById('write-notice').checked;
+        window.app.createPost({ title: title, body: body, author: nickname || '익명', board: boardVal, notice: isNotice }, function(err, post) {
           if (submitBtn) { submitBtn.disabled = false; submitBtn.textContent = '등록하기'; }
           if (err) {
             errEl.textContent = err;

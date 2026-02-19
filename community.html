@@ -4,35 +4,45 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <meta name="theme-color" content="#0f172a">
-  <title>커뮤니티 | 가맹점숲</title>
-  <meta name="description" content="온라인 가맹점·쇼핑몰 커뮤니티. 수수료·정산·운영 정보 나누고 질문하는 게시판.">
+  <title>가맹점 커뮤니티 | 가맹점숲 - 온라인 쇼핑몰 정보 나눔</title>
+  <meta name="description" content="온라인 가맹점·쇼핑몰 커뮤니티. PG 수수료·정산·운영 정보 나누고 질문하는 가맹점숲 게시판.">
+  <meta name="keywords" content="가맹점숲, 가맹점 커뮤니티, 온라인 가맹점, 쇼핑몰 커뮤니티, PG 수수료">
+  <meta name="robots" content="index, follow">
   <link rel="canonical" href="https://my-platform.pages.dev/community.html">
   <meta property="og:type" content="website">
   <meta property="og:title" content="커뮤니티 | 가맹점숲">
   <meta property="og:description" content="온라인 가맹점·쇼핑몰 커뮤니티. 수수료·정산·운영 정보 나누고 질문하는 게시판.">
   <meta property="og:url" content="https://my-platform.pages.dev/community.html">
   <meta property="og:locale" content="ko_KR">
-  <meta property="og:image" content="https://my-platform.pages.dev/og-image.png">
+  <meta property="og:image" content="https://my-platform.pages.dev/og-image.svg">
   <meta name="twitter:card" content="summary_large_image">
   <meta name="twitter:title" content="커뮤니티 | 가맹점숲">
   <meta name="twitter:description" content="온라인 가맹점·쇼핑몰 커뮤니티. 수수료·정산·운영 정보 나누고 질문하는 게시판.">
-  <meta name="twitter:image" content="https://my-platform.pages.dev/og-image.png">
+  <meta name="twitter:image" content="https://my-platform.pages.dev/og-image.svg">
+  <script type="application/ld+json">
+  {"@context":"https://schema.org","@type":"WebPage","name":"가맹점 커뮤니티 | 가맹점숲","description":"온라인 가맹점·쇼핑몰 커뮤니티. 수수료·정산·운영 정보 나누고 질문하는 게시판.","url":"https://my-platform.pages.dev/community.html","isPartOf":{"@type":"WebSite","name":"가맹점숲","url":"https://my-platform.pages.dev/"}}
+  </script>
   <link rel="stylesheet" href="css/common.css">
+  <script src="js/analytics-stub.js"></script>
   <script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-3006893636342653" crossorigin="anonymous"></script>
 </head>
 <body>
   <a href="#main" class="skip-link">본문으로 건너뛰기</a>
   <header>
     <h1><a href="index.html">가맹점숲</a></h1>
-    <button type="button" class="nav-toggle" aria-label="메뉴 열기" aria-expanded="false" onclick="toggleNav()"><span></span><span></span><span></span></button>
+    <button type="button" class="nav-toggle" aria-label="메뉴 열기" aria-expanded="false" data-toggle-nav><span></span><span></span><span></span></button>
     <nav class="header-nav" id="headerNav" aria-label="메인 메뉴">
-      <a href="about.html">가맹점숲이란?</a>
-      <a href="news.html">뉴스</a>
-      <a href="pg.html">PG 수수료</a>
-      <a href="calculator.html">수수료 계산기</a>
-      <a href="must-know.html">꼭 알아야 할 것</a>
       <a href="community.html" class="active">커뮤니티</a>
+      <a href="pg.html">PG 수수료</a>
+      <a href="calculator.html">수수료 비교 계산기</a>
+      <a href="news.html">최신 공지/뉴스</a>
+      <a href="verify.html">인증/제휴 문의</a>
     </nav>
+    <form class="header-search" action="community.html" method="get" role="search" aria-label="사이트 검색">
+      <label for="header-search-q" class="sr-only">뉴스·가이드·커뮤니티 검색</label>
+      <input type="search" id="header-search-q" name="q" placeholder="검색" autocomplete="off" aria-label="검색어">
+      <button type="submit" class="btn btn-outline btn-sm">검색</button>
+    </form>
     <div class="header-auth" id="headerAuth" aria-label="로그인 상태">
       <div id="auth-actions"></div>
     </div>
@@ -40,18 +50,110 @@
 
   <main id="main" class="container page-community">
     <nav class="breadcrumb" aria-label="breadcrumb"><a href="index.html">홈</a> <span class="bc-sep">/</span> <strong>커뮤니티</strong></nav>
+    <div class="community-intro" style="padding:1rem 0 0.5rem;">
+      <h2 style="font-size:clamp(1.1rem,3.5vw,1.5rem);margin-bottom:6px;">가맹점 커뮤니티</h2>
+      <p style="font-size:0.9375rem;line-height:1.65;color:var(--color-text-muted,#64748b);">온라인 쇼핑몰·가맹점 사장님들이 PG 수수료, 정산, 오류, 운영 노하우를 나누는 곳입니다. 수수료/정산, 자유게시판, Q&amp;A, 정보공유 카테고리로 운영됩니다.</p>
+      <p class="community-rules-notice" style="font-size:0.8125rem;color:#b45309;background:#fef3c7;border:1px solid #f59e0b;border-radius:8px;padding:0.6rem 0.9rem;margin-top:0.75rem;">⚠️ 금지: 상업적 광고·도배·개인정보 노출. 위반 시 블라인드·삭제·이용 제한될 수 있습니다.</p>
+    </div>
     <section class="section community-section">
-      <div id="page-root"></div>
+      <!-- Famous Community 2-Column Layout -->
+      <div class="community-layout">
+        <!-- Left Column (Main) -->
+        <div class="community-main">
+          <div class="card">
+            <div class="board-tabs">
+              <a href="community.html" class="active">전체</a>
+              <a href="community.html?board=free">자유게시판</a>
+              <a href="community.html?board=fee">수수료/정산</a>
+              <a href="community.html?board=qna">질문답변</a>
+              <a href="community.html?board=info">정보공유</a>
+            </div>
+            <div class="board-toolbar" id="board-toolbar">
+              <div class="board-search">
+                <label for="board-search-input" class="sr-only">제목으로 검색</label>
+                <input type="search" id="board-search-input" placeholder="제목으로 검색" aria-label="제목으로 검색" autocomplete="off">
+                <button type="button" class="btn btn-outline btn-sm" id="board-search-btn" aria-label="찾기">찾기</button>
+              </div>
+              <div class="board-sort">
+                <label for="board-sort-select" class="sr-only">정렬</label>
+                <select id="board-sort-select" aria-label="정렬 기준">
+                  <option value="latest">최신순</option>
+                  <option value="hits">조회순</option>
+                  <option value="comments">댓글순</option>
+                </select>
+              </div>
+            </div>
+            <div class="board-actions" style="justify-content:flex-end;">
+              <a href="bookmarks.html" class="btn btn-ghost btn-sm">저장한 글</a>
+              <a href="write.html" class="btn btn-primary board-actions-write-mobile">글쓰기</a>
+            </div>
+            <div id="board-notice" class="board-notice" aria-label="공지" style="display:none;"></div>
+            <div id="page-root" aria-live="polite"></div>
+          </div>
+        </div>
+        
+        <!-- Right Column (Sidebar) -->
+        <div class="community-sidebar">
+          <!-- Popular Posts -->
+          <div class="sidebar-widget">
+            <h3 class="sidebar-widget-title">🔥 인기글</h3>
+            <ul class="sidebar-list" id="popular-posts">
+              <!-- 동적으로 로드됨 -->
+            </ul>
+          </div>
+
+          <!-- Notices -->
+          <div class="sidebar-widget">
+            <h3 class="sidebar-widget-title">📢 공지사항</h3>
+            <ul class="sidebar-list">
+              <li class="sidebar-item">
+                <a href="community.html?id=4" class="sidebar-link">
+                  <span class="sidebar-title">결제 오류 시 PG사 대응 팁 공유합니다</span>
+                  <span class="sidebar-meta">운영자 · 2일 전</span>
+                </a>
+              </li>
+            </ul>
+          </div>
+
+          <!-- Writing Guide -->
+          <div class="sidebar-widget">
+            <h3 class="sidebar-widget-title">✍️ 작성 가이드</h3>
+            <div class="sidebar-content">
+              <ul class="guide-list">
+                <li>• 수수료·정산 관련 질문은 <strong>구체적인 상황</strong>을 포함해 주세요</li>
+                <li>• PG사명, 업종, 월 매출 규모를 명시하면 더 정확한 답변을 받을 수 있어요</li>
+                <li>• 개인정보(사업자등록번호, 계좌번호 등)는 절대 공개하지 마세요</li>
+              </ul>
+            </div>
+          </div>
+
+          <!-- Verification Guide -->
+          <div class="sidebar-widget">
+            <h3 class="sidebar-widget-title">✅ 인증 안내</h3>
+            <div class="sidebar-content">
+              <p class="guide-text">
+                <strong>인증된 아이디</strong>로 더 신뢰할 수 있는 정보를 나누세요.
+              </p>
+              <p class="guide-text">
+                4대보험 가입이력을 <a href="mailto:leesk0130@naver.com">leesk0130@naver.com</a>으로 보내주시면 인증해 드려요.
+              </p>
+              <a href="verify.html" class="btn btn-outline btn-sm">자세히 보기</a>
+            </div>
+          </div>
+        </div>
+      </div>
     </section>
   </main>
 
+
   <footer>
     <div class="footer-inner">
-      <p><a href="terms.html">이용약관</a> | <a href="privacy.html">개인정보처리방침</a> | <a href="verify.html">인증 안내</a></p>
+      <p><a href="about.html">가맹점숲이란?</a> | <a href="must-know.html">꼭 알아야 할 것</a> | <a href="terms.html">이용약관</a> | <a href="privacy.html">개인정보처리방침</a> | <a href="verify.html">인증/제휴 문의</a></p>
       <p>© 2025–2026 가맹점숲. 온라인 가맹점 정보 & 커뮤니티. All rights reserved.</p>
       <div class="footer-contact">
-        <h4>문의하기</h4>
-        <p>문의: <a href="mailto:leesk0130@naver.com?subject=가맹점숲 문의">leesk0130@naver.com</a></p>
+        <h4>문의</h4>
+        <p>이메일: <a href="mailto:leesk0130@naver.com?subject=가맹점숲 문의">leesk0130@naver.com</a></p>
+        <p class="footer-hours">운영 시간: 평일 09:00–18:00 (답변은 1–2 영업일 내)</p>
       </div>
     </div>
   </footer>
@@ -59,9 +161,403 @@
   <script src="https://www.gstatic.com/firebasejs/10.7.0/firebase-app-compat.js"></script>
   <script src="https://www.gstatic.com/firebasejs/10.7.0/firebase-auth-compat.js"></script>
   <script src="js/config.js"></script>
+  <script src="js/bookmarks.js"></script>
   <script src="js/app.js"></script>
   <script src="js/auth.js"></script>
-  <script src="js/components.js"></script>
-  <script src="js/community-render.js"></script>
+  <script>
+    (function() {
+      if (window.trackEvent) window.trackEvent('pageview', { page: 'community' });
+
+      /* ── page-root 단일 렌더 헬퍼 ── */
+      var pageRoot = document.getElementById('page-root');
+      function setRoot(html) { if (pageRoot) pageRoot.innerHTML = html; }
+
+      function renderLoading() {
+        setRoot('<div class="loading-state"><div class="loading-spinner"></div><p>글 목록을 불러오는 중이에요...</p></div>');
+      }
+      function renderEmpty() {
+        setRoot('<div class="empty-state"><p class="empty-state-icon" aria-hidden="true">\uD83D\uDCDD</p><p class="empty-state-title">아직 작성된 글이 없어요!</p><p class="empty-state-desc">첫 글을 작성해 보세요.</p><a href="write.html" class="btn btn-primary">첫 글 쓰기</a></div>');
+      }
+      function renderNotFound() {
+        setRoot('<div class="empty-state" style="margin:1.5rem 2rem;"><p class="empty-state-icon" aria-hidden="true">\uD83D\uDD0D</p><p class="empty-state-title">글이 없거나 삭제되었습니다</p><p class="empty-state-desc">요청하신 글을 찾을 수 없어요.</p><a href="community.html" class="btn btn-primary">목록으로</a></div>');
+      }
+      function renderError(msg) {
+        setRoot('<div class="empty-state"><p class="empty-state-title">일시적인 오류가 났어요</p><p class="empty-state-desc">' + (msg || '잠시 후 다시 시도해 주세요.') + '</p><button type="button" class="btn btn-primary" id="view-error-retry">다시 시도</button></div>');
+        var btn = document.getElementById('view-error-retry');
+        if (btn) btn.onclick = function() { loadList(false); };
+      }
+      function renderList(items, hasMore) {
+        var listHtml = window.app && window.app.renderPostsHTML ? window.app.renderPostsHTML(items, 'community.html?id=', true) : '';
+        if (!listHtml) {
+          listHtml = (items || []).map(function(p) {
+            return '<li class="feed-item"><a href="community.html?id=' + (p.id || '') + '" class="feed-title-link">' + (p.title || '') + '</a></li>';
+          }).join('');
+        }
+        var moreBtn = hasMore ? '<div class="board-more-wrap"><button type="button" class="btn btn-outline" id="posts-more-btn">더보기</button></div>' : '';
+        setRoot('<ul class="feed-list" id="community-list" aria-label="게시글 목록">' + listHtml + '</ul>' + moreBtn);
+        var mb = document.getElementById('posts-more-btn');
+        if (mb) mb.onclick = function() {
+          currentShown = Math.min(currentShown + PAGE_SIZE, allFilteredItems.length);
+          renderPage();
+        };
+        /* renderPosts를 사용한 경우 실제 렌더 */
+        if (window.app && window.app.renderPosts) {
+          window.app.renderPosts('community-list', items, 'community.html?id=', true);
+        }
+      }
+
+      /* ── 보드 UI 표시/숨김 (detail에서는 탭/툴바 숨김) ── */
+      function setListUI(show) {
+        var card = document.querySelector('.community-section .card');
+        if (!card) return;
+        var tabs    = card.querySelector('.board-tabs');
+        var toolbar = card.querySelector('#board-toolbar');
+        var actions = card.querySelector('.board-actions');
+        var notice  = document.getElementById('board-notice');
+        if (tabs)    tabs.style.display    = show ? '' : 'none';
+        if (toolbar) toolbar.style.display = show ? 'flex' : 'none';
+        if (actions) actions.style.display = show ? 'flex' : 'none';
+        if (notice && !show) notice.style.display = 'none';
+      }
+
+      document.addEventListener('click', function(e) {
+        var noticeBtn = e.target && e.target.closest && e.target.closest('.notice-toggle-btn');
+        if (noticeBtn) {
+          e.preventDefault();
+          e.stopPropagation();
+          var id = noticeBtn.getAttribute('data-post-id');
+          if (id && window.app && window.app.togglePostNotice) {
+            if (!window.app.isOperator || !window.app.isOperator()) { alert('운영자만 공지 설정할 수 있어요.'); return; }
+            window.app.togglePostNotice(id, function(err) {
+              if (err) { alert(err); return; }
+              var loadListFn = typeof loadList === 'function' ? loadList : (window.loadList || function() { location.reload(); });
+              loadListFn(false);
+            });
+          }
+          return;
+        }
+        var postDeleteBtn = e.target && e.target.closest && e.target.closest('.post-delete-btn');
+        if (postDeleteBtn) {
+          e.preventDefault();
+          e.stopPropagation();
+          var id = postDeleteBtn.getAttribute('data-post-id');
+          if (id && window.app && window.app.deletePost) {
+            if (!confirm('정말 삭제할까요?')) return;
+            window.app.deletePost(id, function(err) {
+              if (err) { alert(err); return; }
+              location.href = 'community.html';
+            });
+          }
+          return;
+        }
+        var btn = e.target && e.target.closest && e.target.closest('.comment-delete-btn');
+        if (!btn) return;
+        e.preventDefault();
+        var postId = btn.getAttribute('data-post-id');
+        var commentId = btn.getAttribute('data-comment-id');
+        if (!postId || !commentId || !window.app || !window.app.deleteComment) return;
+        window.app.deleteComment(postId, commentId, function() {
+          window.app.getComments(postId, function(_, comments) {
+            window.app.renderComments('comment-list', comments, { postId: postId, canDelete: window.app.isOperator && window.app.isOperator() });
+            var countEl = document.getElementById('comment-count');
+            if (countEl) countEl.textContent = (comments ? comments.length : 0);
+          });
+        });
+      });
+
+      var params = new URLSearchParams(location.search);
+      var postId = params.get('id');
+      var currentDetailPostId = null;
+
+      /* ── detail view 렌더 (page-root에 innerHTML) ── */
+      function renderDetail(post) {
+        setListUI(false);
+        var verified = (post.verified === true || (window.app && window.app.isAuthorVerified && window.app.isAuthorVerified(post.author)));
+        var badgeHtml = (window.app && window.app.verifiedBadgeHtml) ? window.app.verifiedBadgeHtml(verified, post.author) : '';
+        var canEdit = window.app && window.app.canEditPost && window.app.canEditPost(post);
+        var actionHtml = canEdit
+          ? '<div class="post-detail-actions" style="margin-top:0.5rem;"><a href="edit.html?id=' + encodeURIComponent(post.id) + '" class="btn btn-outline btn-sm">수정</a> <button type="button" class="post-delete-btn btn btn-outline btn-sm" data-post-id="' + (post.id || '') + '">삭제</button></div>'
+          : '';
+        var saved = window.Bookmarks ? window.Bookmarks.isBookmarked(post.id) : false;
+        var bodyText = (post.body || '(내용 없음)').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/\n/g,'<br>');
+        setRoot(
+          '<div class="post-detail-wrap">' +
+            '<div class="post-detail-nav"><a href="community.html" class="btn btn-outline btn-back">\u2190 목록으로</a></div>' +
+            '<article class="post-detail-card" aria-label="글 본문">' +
+              '<header class="post-detail-header">' +
+                '<p class="post-detail-title-label" aria-hidden="true">제목</p>' +
+                '<h1 id="post-detail-title" class="post-detail-title">' + (post.title || '') + '</h1>' +
+                '<div id="post-detail-meta" class="post-detail-meta">' + (post.author || '익명') + badgeHtml + ' &middot; ' + (post.date || '') + '</div>' +
+                '<div class="post-detail-actions post-detail-bookmark-row" style="margin-top:0.5rem;" id="post-detail-bookmark">' +
+                  '<button type="button" class="btn btn-outline btn-sm" id="post-bookmark-btn" data-post-id="' + (post.id || '') + '">' + (saved ? '저장 취소' : '저장') + '</button>' +
+                  ' <button type="button" class="btn btn-ghost btn-sm" id="post-share-link-btn" aria-label="링크 복사">링크 복사</button>' +
+                  ' <button type="button" class="btn btn-ghost btn-sm post-report-btn" data-post-id="' + (post.id || '') + '" aria-label="신고">신고</button>' +
+                '</div>' +
+                actionHtml +
+              '</header>' +
+              '<div class="post-body-wrap" aria-label="본문 내용">' +
+                '<p class="post-body-label">본문</p>' +
+                '<div id="post-detail-body" class="post-body">' + bodyText + '</div>' +
+              '</div>' +
+            '</article>' +
+            '<section class="comment-section" id="comment-section" aria-label="댓글">' +
+              '<h2 class="comment-section-title">댓글 <span class="comment-count" id="comment-count">0</span></h2>' +
+              '<ul class="comment-list" id="comment-list"></ul>' +
+              '<div class="comment-form-wrap">' +
+                '<p class="comment-form-label">댓글 작성</p>' +
+                '<form id="comment-form" class="comment-form">' +
+                  '<div class="form-group comment-nickname-row"><span class="comment-nickname-label">닉네임</span><span class="comment-nickname-value" id="comment-nickname-value">\u2014</span></div>' +
+                  '<div class="form-group form-group-checkbox"><label for="comment-anonymous"><input type="checkbox" id="comment-anonymous"> 익명으로 작성</label></div>' +
+                  '<div class="form-group"><label for="comment-body" class="sr-only">댓글 내용</label><textarea id="comment-body" placeholder="댓글을 입력하세요" required rows="3"></textarea></div>' +
+                  '<div id="comment-error" class="msg-error" style="display:none;"></div>' +
+                  '<div class="form-actions"><button type="submit" class="btn btn-primary">댓글 등록</button></div>' +
+                '</form>' +
+              '</div>' +
+            '</section>' +
+            '<section class="related-posts-section" id="related-posts-section" aria-label="관련 글" style="display:none;margin-top:1.5rem;">' +
+              '<h2 class="section-title">관련 글</h2>' +
+              '<ul class="feed-list" id="related-posts-list"></ul>' +
+            '</section>' +
+            '<div class="post-detail-nav post-detail-nav-bottom"><a href="community.html" class="btn btn-outline btn-back">\u2190 목록으로</a></div>' +
+          '</div>'
+        );
+
+        /* 이벤트 바인딩 */
+        var bookmarkBtn = document.getElementById('post-bookmark-btn');
+        if (bookmarkBtn) bookmarkBtn.addEventListener('click', function() {
+          var id = bookmarkBtn.getAttribute('data-post-id');
+          if (!id || !window.Bookmarks) return;
+          var ns = window.Bookmarks.toggle(id);
+          bookmarkBtn.textContent = ns ? '저장 취소' : '저장';
+        });
+        var shareBtn = document.getElementById('post-share-link-btn');
+        if (shareBtn) shareBtn.addEventListener('click', function() {
+          try { navigator.clipboard.writeText(location.href); shareBtn.textContent = '복사됨'; setTimeout(function() { shareBtn.textContent = '링크 복사'; }, 2000); } catch(e) {}
+        });
+        var reportBtn = document.querySelector('.post-report-btn');
+        if (reportBtn) reportBtn.addEventListener('click', function() {
+          var id = reportBtn.getAttribute('data-post-id');
+          if (window.app && typeof window.app.reportPost === 'function') {
+            window.app.reportPost(id, function(err) { alert(err || '신고 접수되었습니다.'); });
+          } else {
+            alert('신고 기능은 준비 중입니다. 불편한 글이 있다면 인증/제휴 문의로 알려 주세요.');
+          }
+        });
+
+        currentDetailPostId = post.id;
+        var currentPostId = post.id;
+
+        function drawComments() {
+          if (!document.getElementById('comment-list')) return;
+          window.app.getComments(currentPostId, function(_, comments) {
+            window.app.renderComments('comment-list', comments, { postId: currentPostId, canDelete: window.app.isOperator && window.app.isOperator() });
+            var ce = document.getElementById('comment-count');
+            if (ce) ce.textContent = comments ? comments.length : 0;
+          });
+        }
+        drawComments();
+        setTimeout(drawComments, 700);
+        setTimeout(drawComments, 1800);
+
+        var nicknameEl = document.getElementById('comment-nickname-value');
+        var anonCheck  = document.getElementById('comment-anonymous');
+        if (nicknameEl) {
+          var cu = window.app.getUser && window.app.getUser();
+          if (window.app.isLoggedIn && window.app.isLoggedIn() && cu && cu.name) {
+            nicknameEl.textContent = cu.name;
+          } else {
+            nicknameEl.textContent = '비회원 (익명)';
+            if (anonCheck) anonCheck.checked = true;
+          }
+        }
+        var commentForm = document.getElementById('comment-form');
+        if (commentForm) {
+          commentForm.onsubmit = function(e) {
+            e.preventDefault();
+            var body = (document.getElementById('comment-body') || {}).value || '';
+            body = body.trim();
+            var errEl = document.getElementById('comment-error');
+            if (!body) { if (errEl) { errEl.textContent = '댓글 내용을 입력해 주세요.'; errEl.style.display = 'block'; } return; }
+            if (errEl) errEl.style.display = 'none';
+            var author = '익명';
+            if (anonCheck && !anonCheck.checked) {
+              var u2 = window.app.getUser && window.app.getUser();
+              if (u2 && u2.name) author = u2.name;
+            }
+            window.app.addComment(currentPostId, { author: author, body: body }, function(err2) {
+              if (err2) { if (errEl) { errEl.textContent = err2; errEl.style.display = 'block'; } return; }
+              var ta = document.getElementById('comment-body');
+              if (ta) ta.value = '';
+              drawComments();
+            });
+          };
+        }
+
+        if (window.app && window.app.getRelatedPosts) {
+          window.app.getRelatedPosts(currentPostId, 5, function(err3, related) {
+            var sec = document.getElementById('related-posts-section');
+            var rl  = document.getElementById('related-posts-list');
+            if (sec) sec.style.display = (related && related.length) ? 'block' : 'none';
+            if (rl && related && related.length) window.app.renderPosts('related-posts-list', related, 'community.html?id=', true);
+          });
+        }
+      }
+
+      /* authStateChanged 후 댓글 삭제 버튼 재렌더 */
+      function refreshCommentListWithDeleteFlag() {
+        if (!currentDetailPostId || !document.getElementById('comment-list')) return;
+        window.app.getComments(currentDetailPostId, function(_, comments) {
+          window.app.renderComments('comment-list', comments, { postId: currentDetailPostId, canDelete: window.app.isOperator && window.app.isOperator() });
+          var ce = document.getElementById('comment-count');
+          if (ce) ce.textContent = comments ? comments.length : 0;
+        });
+      }
+      window.addEventListener('authStateChanged', refreshCommentListWithDeleteFlag);
+
+      /* ── 상세 보기 ── */
+      if (postId) {
+        renderLoading();
+        setListUI(false);
+        var post = window.app.getLocalPostById(postId);
+        if (!post) {
+          var MOCK = [
+            { id: '1', title: 'PG사 토스 vs 이니시스 vs 나이스 수수료 비교 후기 있어요', author: '가맹점주', date: '2시간 전', body: '각 PG사 수수료 비교해 보신 분들 후기 공유해 주세요.\n\n저는 토스 쓰고 있는데 연회비 11만원에 카드 3.4%라 부담되네요. 이니시스는 연회비 면제라 바꿀까 고민 중이에요.', verified: false },
+            { id: '2', title: '쇼핑몰 오픈 3개월 차, 정산 일정 D+5면 괜찮을까요?', author: '초보사장', date: '5시간 전', body: '정산이 D+5인 PG사 고려 중인데, 자금 회전에 무리가 없을지 궁금합니다.', verified: false },
+            { id: '3', title: '전자세금계산서 자동 발행 연동 PG 추천 부탁드려요', author: '회원', date: '어제', body: '전자세금계산서 자동 발행 잘 되는 PG 추천해 주세요.', verified: false },
+            { id: '4', title: '결제 오류 시 PG사 대응 팁 공유합니다', author: '운영자', date: '2일 전', body: '결제 오류 발생 시 PG사 고객센터 연락 요령, 로그 확인 방법 등을 정리해 두었어요.', verified: true },
+            { id: '5', title: '영세사업자 수수료 우대 받은 분 계신가요?', author: '가맹점주', date: '3일 전', body: '영세사업자로 수수료 우대 받고 계신 분 후기 부탁드려요.', verified: false }
+          ];
+          post = MOCK.filter(function(p) { return p.id === postId; })[0];
+        }
+        if (post) {
+          if (window.app && window.app.incrementPostViews) window.app.incrementPostViews(postId);
+          renderDetail(post);
+        } else {
+          renderNotFound();
+        }
+        return;
+      }
+
+      /* ── 목록 보기 ── */
+      var board = params.get('board') || 'all';
+      var searchQ = params.get('q') || '';
+      var sortBy = params.get('sort') || 'latest';
+      document.querySelectorAll('.board-tabs a').forEach(function(a) {
+        a.classList.remove('active');
+        var href = a.getAttribute('href') || '';
+        if (board === 'all' && href === 'community.html') a.classList.add('active');
+        else if (href.indexOf('board=' + board) !== -1) a.classList.add('active');
+      });
+      var searchInput = document.getElementById('board-search-input');
+      var searchBtn   = document.getElementById('board-search-btn');
+      var sortSelect  = document.getElementById('board-sort-select');
+      var noticeEl    = document.getElementById('board-notice');
+      if (searchInput) searchInput.value = searchQ;
+      if (sortSelect)  sortSelect.value  = sortBy;
+
+      var allFilteredItems = [];
+      var currentShown = 0;
+      var PAGE_SIZE = 20;
+
+      function applyFilterAndSort(items) {
+        if (!items) return [];
+        var q = searchInput && searchInput.value ? searchInput.value.trim().toLowerCase() : '';
+        var list = q ? items.filter(function(p) { return (p.title||'').toLowerCase().indexOf(q)!==-1||(p.body||'').toLowerCase().indexOf(q)!==-1; }) : items.slice();
+        var s = (sortSelect && sortSelect.value) || 'latest';
+        if (s === 'hits') list.sort(function(a,b){ return (b.hits||0)-(a.hits||0); });
+        return list;
+      }
+
+      function renderPage() {
+        var toShow = allFilteredItems.slice(0, currentShown);
+        var hasMore = currentShown < allFilteredItems.length;
+        setListUI(true);
+        if (!toShow.length) { renderEmpty(); return; }
+        renderList(toShow, hasMore);
+        if (window.app && window.app.renderPosts) {
+          window.app.renderPosts('community-list', toShow, 'community.html?id=', true);
+        }
+      }
+
+      function loadList(append) {
+        if (!append) renderLoading();
+        setListUI(true);
+        window.app.fetchPosts(board, 500, 0, function(err, items) {
+          if (err) { setListUI(true); renderError(err); return; }
+          allFilteredItems = applyFilterAndSort(items || []);
+          if (!append) currentShown = Math.min(PAGE_SIZE, allFilteredItems.length);
+          else currentShown = Math.min(currentShown + PAGE_SIZE, allFilteredItems.length);
+          renderPage();
+        });
+      }
+
+      if (searchBtn && searchInput) {
+        searchBtn.onclick = function() {
+          var q = searchInput.value.trim();
+          var url = 'community.html?board=' + (board||'all');
+          if (q) url += '&q=' + encodeURIComponent(q);
+          if (sortSelect && sortSelect.value) url += '&sort=' + sortSelect.value;
+          location.href = url;
+        };
+        searchInput.onkeydown = function(e) { if (e.key === 'Enter') searchBtn.click(); };
+      }
+      if (sortSelect) {
+        sortSelect.onchange = function() {
+          allFilteredItems = applyFilterAndSort(allFilteredItems);
+          currentShown = Math.min(PAGE_SIZE, allFilteredItems.length);
+          renderPage();
+        };
+      }
+
+      loadList(false);
+
+      if (noticeEl && window.app.getNoticePosts) {
+        window.app.getNoticePosts(board, function(err, notices) {
+          if (notices && notices.length) {
+            noticeEl.style.display = 'block';
+            noticeEl.innerHTML = notices.map(function(n) {
+              return '<a href="community.html?id=' + (n.id||'') + '" class="board-notice-item"><span class="board-notice-label">공지</span> ' + (n.title||'') + '</a>';
+            }).join('');
+          }
+        });
+      }
+      loadPopularPosts();
+    })();
+
+    function loadPopularPosts() {
+      if (!window.app || !window.app.fetchPosts) return;
+      window.app.fetchPosts('all', 100, 0, function(err, items) {
+        if (err || !items || !items.length) return;
+        var popular = items.sort(function(a,b){ return ((b.hits||0)+(b.commentCount||0)*3)-((a.hits||0)+(a.commentCount||0)*3); }).slice(0,5);
+        var el = document.getElementById('popular-posts');
+        if (!el) return;
+        el.innerHTML = popular.map(function(p) {
+          var t = (p.title||'').slice(0,30);
+          var m = '조회 ' + (p.hits||0) + (p.commentCount ? ' · 댓글 ' + p.commentCount : '');
+          return '<li class="sidebar-item"><a href="community.html?id=' + p.id + '" class="sidebar-link"><span class="sidebar-title">' + t + '</span><span class="sidebar-meta">' + m + '</span></a></li>';
+        }).join('');
+      });
+    }
+  </script>
+  <!-- 모바일 플로팅 글쓰기 버튼 -->
+  <a href="write.html" class="fab-write" aria-label="글쓰기">＋</a>
+  <!-- 모바일 드로어 -->
+  <div id="drawerOverlay" hidden aria-hidden="true"></div>
+  <aside id="mobileDrawer" hidden aria-hidden="true" role="dialog" aria-modal="true" aria-label="메뉴">
+    <div class="drawer-header">
+      <span class="drawer-logo">가맹점숲</span>
+      <button type="button" class="drawer-close" aria-label="메뉴 닫기">
+        <svg width="20" height="20" viewBox="0 0 20 20" fill="none" aria-hidden="true"><path d="M4 4L16 16M16 4L4 16" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg>
+      </button>
+    </div>
+    <nav class="drawer-nav" aria-label="모바일 메뉴">
+      <a href="community.html"  class="drawer-link active">커뮤니티</a>
+      <a href="pg.html"         class="drawer-link">PG 수수료 표</a>
+      <a href="calculator.html" class="drawer-link">수수료 계산기</a>
+      <a href="news.html"       class="drawer-link">뉴스</a>
+      <a href="verify.html"     class="drawer-link">인증/문의</a>
+    </nav>
+  </aside>
+  <script src="js/drawer.js"></script>
 </body>
 </html>

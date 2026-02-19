@@ -85,20 +85,25 @@
       case 'list':
         var list = data || [];
         var show = list.slice(0, currentShown || PAGE_SIZE);
+        var isOp = window.app && window.app.isOperator && window.app.isOperator();
         var listItems = show.map(function(p) {
+          var noticeBtn = isOp ? '<button type="button" class="notice-toggle-btn px-2 py-1 text-xs font-medium rounded border border-slate-300 hover:bg-slate-100" data-post-id="' + (p.id || '') + '">' + (p.notice ? '공지 해제' : '공지') + '</button>' : '';
           return C.ListItem({
             href: 'community.html?id=' + p.id,
             title: p.title,
             meta: (p.nickname || p.author || '익명') + ' · ' + (p.date || p.createdAt || '') + ' · 조회 ' + (p.hits || 0),
             commentCount: p.commentCount != null ? p.commentCount : 0,
-            categoryLabel: getBoardLabel(p.board)
+            categoryLabel: getBoardLabel(p.board),
+            noticeBadge: !!p.notice,
+            operatorActions: noticeBtn
           });
         }).join('');
         var moreHtml = list.length > currentShown
           ? '<div class="p-4 border-t border-slate-100"><button type="button" id="posts-more-btn" class="w-full py-3 border border-slate-200 rounded-xl font-semibold text-[15px] hover:bg-slate-50">더보기</button></div>'
           : '';
         cardBody = tabsHtml + toolbarHtml + '<ul class="divide-y divide-slate-100">' + listItems + '</ul>' + moreHtml;
-        sidebarData = buildSidebarData(list, []);
+        var noticePosts = list.filter(function(p) { return !!p.notice; });
+        sidebarData = buildSidebarData(list, noticePosts);
         break;
       case 'empty':
         cardBody = tabsHtml + toolbarHtml + C.EmptyState({ title: '아직 작성된 글이 없어요!', ctaLabel: '첫 글 쓰기', ctaHref: 'write.html' });
@@ -116,11 +121,14 @@
         if (!post) {
           cardBody = C.NotFoundState({ backHref: 'community.html' });
         } else {
+          var canEdit = window.app && window.app.canEditPost && window.app.canEditPost(post);
+          var editDeleteBtns = canEdit ? '<div class="flex gap-2 mt-4 mb-2"><a href="edit.html?id=' + (post.id || '').replace(/"/g, '&quot;') + '" class="btn btn-outline btn-sm">수정</a><button type="button" class="post-delete-btn btn btn-outline btn-sm text-red-600 border-red-200 hover:bg-red-50" data-post-id="' + (post.id || '').replace(/"/g, '&quot;') + '">삭제</button></div>' : '';
           var detailBody = (post.body || '').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/\n/g, '<br>');
           cardBody = '<div class="p-4 sm:p-6">' +
             '<a href="community.html" class="inline-flex items-center gap-2 text-[15px] font-semibold text-emerald-600 hover:underline mb-4">← 목록으로</a>' +
             '<h1 class="text-xl sm:text-2xl font-bold text-slate-800 leading-snug mb-2">' + (post.title || '제목 없음').replace(/</g, '&lt;') + '</h1>' +
             '<p class="text-xs text-slate-500 mb-4">' + (post.nickname || post.author || '익명') + ' · ' + (post.date || post.createdAt || '') + ' · 조회 ' + (post.hits || 0) + '</p>' +
+            editDeleteBtns +
             '<div class="text-[15px] leading-relaxed text-slate-700 max-w-prose" style="margin-bottom: 1rem;">' + detailBody + '</div>' +
             '<section class="mt-8 pt-6 border-t border-slate-200">' +
               '<h2 class="text-lg font-semibold text-slate-800 mb-3">댓글 <span id="comment-count">' + (post.commentCount || 0) + '</span></h2>' +
@@ -256,6 +264,32 @@
   }
 
   document.addEventListener('click', function(e) {
+    var noticeBtn = e.target && e.target.closest && e.target.closest('.notice-toggle-btn');
+    if (noticeBtn) {
+      e.preventDefault();
+      e.stopPropagation();
+      var postId = noticeBtn.getAttribute('data-post-id');
+      if (!postId || !window.app || !window.app.togglePostNotice) return;
+      if (!window.app.isOperator || !window.app.isOperator()) { alert('운영자만 공지 설정할 수 있어요.'); return; }
+      window.app.togglePostNotice(postId, function(err) {
+        if (err) { alert(err); return; }
+        loadList();
+      });
+      return;
+    }
+    var postDeleteBtn = e.target && e.target.closest && e.target.closest('.post-delete-btn');
+    if (postDeleteBtn) {
+      e.preventDefault();
+      e.stopPropagation();
+      var postId = postDeleteBtn.getAttribute('data-post-id');
+      if (!postId || !window.app || !window.app.deletePost) return;
+      if (!confirm('정말 삭제할까요?')) return;
+      window.app.deletePost(postId, function(err) {
+        if (err) { alert(err); return; }
+        location.href = 'community.html';
+      });
+      return;
+    }
     var btn = e.target && e.target.closest && e.target.closest('.comment-delete-btn');
     if (!btn) return;
     e.preventDefault();

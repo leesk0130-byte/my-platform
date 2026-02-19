@@ -4,19 +4,24 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <meta name="theme-color" content="#0f172a">
-  <title>온라인 쇼핑몰 뉴스 | 가맹점숲</title>
-  <meta name="description" content="온라인 쇼핑몰·가맹점 관련 뉴스. PG 수수료, 전자상거래, 쇼핑몰 정책·시장 소식을 한곳에서.">
+  <title>쇼핑몰 뉴스 | 가맹점숲 - 온라인 가맹점 뉴스</title>
+  <meta name="description" content="온라인 쇼핑몰·가맹점 관련 쇼핑몰 뉴스. PG 수수료, 전자상거래, 쇼핑몰 정책·시장 소식을 가맹점숲에서 한곳에.">
+  <meta name="keywords" content="가맹점숲, 쇼핑몰 뉴스, 온라인쇼핑몰 뉴스, PG 수수료, 온라인 가맹점, 전자상거래">
+  <meta name="robots" content="index, follow">
   <link rel="canonical" href="https://my-platform.pages.dev/news.html">
   <meta property="og:type" content="website">
   <meta property="og:title" content="온라인 쇼핑몰 뉴스 | 가맹점숲">
   <meta property="og:description" content="온라인 쇼핑몰·가맹점 관련 뉴스. PG 수수료, 전자상거래, 쇼핑몰 정책·시장 소식.">
   <meta property="og:url" content="https://my-platform.pages.dev/news.html">
   <meta property="og:locale" content="ko_KR">
-  <meta property="og:image" content="https://my-platform.pages.dev/og-image.png">
+  <meta property="og:image" content="https://my-platform.pages.dev/og-image.svg">
   <meta name="twitter:card" content="summary_large_image">
   <meta name="twitter:title" content="온라인 쇼핑몰 뉴스 | 가맹점숲">
   <meta name="twitter:description" content="온라인 쇼핑몰·가맹점 관련 뉴스. PG 수수료, 전자상거래, 쇼핑몰 정책·시장 소식.">
-  <meta name="twitter:image" content="https://my-platform.pages.dev/og-image.png">
+  <meta name="twitter:image" content="https://my-platform.pages.dev/og-image.svg">
+  <script type="application/ld+json">
+  {"@context":"https://schema.org","@type":"CollectionPage","name":"쇼핑몰 뉴스 | 가맹점숲","description":"온라인 쇼핑몰·가맹점 관련 뉴스. PG 수수료, 전자상거래, 쇼핑몰 정책·시장 소식.","url":"https://my-platform.pages.dev/news.html","isPartOf":{"@type":"WebSite","name":"가맹점숲","url":"https://my-platform.pages.dev/"}}
+  </script>
   <link rel="stylesheet" href="css/common.css">
   <script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-3006893636342653" crossorigin="anonymous"></script>
 </head>
@@ -24,15 +29,19 @@
   <a href="#main" class="skip-link">본문으로 건너뛰기</a>
   <header>
     <h1><a href="index.html">가맹점숲</a></h1>
-    <button type="button" class="nav-toggle" aria-label="메뉴 열기" aria-expanded="false" onclick="toggleNav()"><span></span><span></span><span></span></button>
+    <button type="button" class="nav-toggle" aria-label="메뉴 열기" aria-expanded="false" data-toggle-nav><span></span><span></span><span></span></button>
     <nav class="header-nav" id="headerNav" aria-label="메인 메뉴">
-      <a href="about.html">가맹점숲이란?</a>
-      <a href="news.html" class="active">뉴스</a>
-      <a href="pg.html">PG 수수료</a>
-      <a href="calculator.html">수수료 계산기</a>
-      <a href="must-know.html">꼭 알아야 할 것</a>
       <a href="community.html">커뮤니티</a>
+      <a href="pg.html">PG 수수료</a>
+      <a href="calculator.html">수수료 비교 계산기</a>
+      <a href="news.html" class="active">최신 공지/뉴스</a>
+      <a href="verify.html">인증/제휴 문의</a>
     </nav>
+    <form class="header-search" action="community.html" method="get" role="search" aria-label="사이트 검색">
+      <label for="header-search-q" class="sr-only">뉴스·가이드·커뮤니티 검색</label>
+      <input type="search" id="header-search-q" name="q" placeholder="검색" autocomplete="off" aria-label="검색어">
+      <button type="submit" class="btn btn-outline btn-sm">검색</button>
+    </form>
     <div class="header-auth" id="headerAuth" aria-label="로그인 상태">
       <div id="auth-actions"></div>
     </div>
@@ -40,25 +49,30 @@
 
   <main id="main" class="container page-news">
     <nav class="breadcrumb" aria-label="breadcrumb"><a href="index.html">홈</a> <span class="bc-sep">/</span> <strong>뉴스</strong></nav>
-    <div class="hero">
-      <h2>온라인 쇼핑몰 · 가맹점 뉴스</h2>
-      <p><strong>쇼핑몰·결제(PG)·전자상거래</strong> 관련 뉴스만 모은 코너예요. 수수료 정책, 법·제도, 가맹점 지원 소식 등을 확인하세요.</p>
+    <div class="hero" style="text-align:left;">
+      <h2 style="font-size:clamp(1.2rem,4vw,1.75rem);margin-bottom:8px;">온라인 쇼핑몰 · 가맹점 뉴스</h2>
+      <p class="hero-desc" style="font-size:0.9375rem;line-height:1.65;"><strong>쇼핑몰·결제(PG)·전자상거래</strong> 관련 뉴스만 모은 코너예요. 수수료 정책, 법·제도, 가맹점 지원 소식을 확인하세요.</p>
     </div>
     <section class="section">
       <div class="card">
-        <h3 class="section-title">최신 뉴스</h3>
+        <h3 class="section-title">
+          <span>최신 뉴스</span>
+          <span id="news-write-slot"></span>
+        </h3>
         <div id="page-root"></div>
       </div>
     </section>
   </main>
 
+
   <footer>
     <div class="footer-inner">
-      <p><a href="terms.html">이용약관</a> | <a href="privacy.html">개인정보처리방침</a> | <a href="verify.html">인증 안내</a></p>
+      <p><a href="about.html">가맹점숲이란?</a> | <a href="must-know.html">꼭 알아야 할 것</a> | <a href="terms.html">이용약관</a> | <a href="privacy.html">개인정보처리방침</a> | <a href="verify.html">인증/제휴 문의</a></p>
       <p>© 2025–2026 가맹점숲. 온라인 가맹점 정보 & 커뮤니티. All rights reserved.</p>
       <div class="footer-contact">
-        <h4>문의하기</h4>
-        <p>문의: <a href="mailto:leesk0130@naver.com?subject=가맹점숲 문의">leesk0130@naver.com</a></p>
+        <h4>문의</h4>
+        <p>이메일: <a href="mailto:leesk0130@naver.com?subject=가맹점숲 문의">leesk0130@naver.com</a></p>
+        <p class="footer-hours">운영 시간: 평일 09:00–18:00 (답변은 1–2 영업일 내)</p>
       </div>
     </div>
   </footer>
@@ -69,5 +83,122 @@
   <script src="js/app.js"></script>
   <script src="js/auth.js"></script>
   <script src="js/news-render.js"></script>
+  <script>
+  (function () {
+    var OPERATOR_EMAIL = 'leesk0130@point3.team';
+    var slot = document.getElementById('news-write-slot');
+
+    function isOperator() {
+      var u = window.app && window.app.getUser && window.app.getUser();
+      if (!u) return false;
+      return (u.email || '').toLowerCase() === OPERATOR_EMAIL.toLowerCase();
+    }
+
+    function newsWriteModalHTML() {
+      return '<div class="modal-overlay" id="newsWriteModal" aria-hidden="true" role="dialog" aria-modal="true" aria-label="뉴스 작성">' +
+        '<div class="modal" style="max-width:560px;">' +
+          '<div class="modal-header"><h3>뉴스 작성</h3><button type="button" class="modal-close" id="news-modal-close" aria-label="닫기">&times;</button></div>' +
+          '<div class="modal-body">' +
+            '<form id="newsWriteForm" onsubmit="return false;">' +
+              '<div class="form-group"><label for="news-title">제목 <span style="color:#dc2626;">*</span></label><input type="text" id="news-title" placeholder="뉴스 제목을 입력하세요" required style="width:100%;"></div>' +
+              '<div class="form-group"><label for="news-category">카테고리</label><select id="news-category" style="width:100%;padding:10px;border:1px solid #e2e8f0;border-radius:8px;">' +
+                '<option value="공지">공지</option><option value="PG수수료">PG수수료</option><option value="전자상거래">전자상거래</option><option value="정책/제도">정책/제도</option><option value="쇼핑몰뉴스">쇼핑몰뉴스</option><option value="일반">일반</option></select></div>' +
+              '<div class="form-group"><label for="news-content">본문 <span style="color:#dc2626;">*</span></label><textarea id="news-content" rows="10" placeholder="뉴스 본문을 입력하세요" required style="width:100%;padding:12px;border:1px solid #e2e8f0;border-radius:8px;font-size:0.9375rem;line-height:1.7;resize:vertical;"></textarea></div>' +
+              '<div id="news-write-error" style="display:none;color:#dc2626;font-size:0.875rem;margin-bottom:8px;"></div>' +
+              '<div class="modal-footer" style="gap:8px;"><button type="button" class="btn btn-outline" id="news-modal-cancel">취소</button><button type="submit" class="btn btn-primary" id="news-submit-btn">등록하기</button></div>' +
+            '</form></div></div></div>';
+    }
+
+    function openModal() {
+      var m = document.getElementById('newsWriteModal');
+      if (m) { m.classList.add('is-open'); m.removeAttribute('aria-hidden'); document.body.style.overflow = 'hidden'; }
+    }
+    function closeModal() {
+      var m = document.getElementById('newsWriteModal');
+      if (m) { m.classList.remove('is-open'); m.setAttribute('aria-hidden', 'true'); document.body.style.overflow = ''; }
+      var form = document.getElementById('newsWriteForm');
+      if (form) form.reset();
+      var err = document.getElementById('news-write-error');
+      if (err) { err.textContent = ''; err.style.display = 'none'; }
+    }
+    function bindModalEvents() {
+      var btn = document.getElementById('news-write-btn');
+      if (btn && !btn._bound) { btn._bound = true; btn.addEventListener('click', openModal); }
+      var closeBtn = document.getElementById('news-modal-close');
+      if (closeBtn && !closeBtn._bound) { closeBtn._bound = true; closeBtn.addEventListener('click', closeModal); }
+      var cancelBtn = document.getElementById('news-modal-cancel');
+      if (cancelBtn && !cancelBtn._bound) { cancelBtn._bound = true; cancelBtn.addEventListener('click', closeModal); }
+      var modal = document.getElementById('newsWriteModal');
+      if (modal && !modal._bound) { modal._bound = true; modal.addEventListener('click', function (e) { if (e.target === modal) closeModal(); }); }
+      var form = document.getElementById('newsWriteForm');
+      if (form && !form._bound) {
+        form._bound = true;
+        form.addEventListener('submit', function (e) {
+          e.preventDefault();
+          var title = (document.getElementById('news-title').value || '').trim();
+          var category = (document.getElementById('news-category').value || '');
+          var content = (document.getElementById('news-content').value || '').trim();
+          var errEl = document.getElementById('news-write-error');
+          var submitBtn = document.getElementById('news-submit-btn');
+          if (!title || !content) { if (errEl) { errEl.textContent = '제목과 본문을 입력해주세요.'; errEl.style.display = 'block'; } return; }
+          var token = window.app && window.app.getToken && window.app.getToken();
+          if (!token) { if (errEl) { errEl.textContent = '로그인이 필요합니다.'; errEl.style.display = 'block'; } return; }
+          if (submitBtn) { submitBtn.disabled = true; submitBtn.textContent = '등록 중...'; }
+          fetch('/api/news', { method: 'POST', headers: { 'Content-Type': 'application/json', 'Authorization': 'Bearer ' + token }, body: JSON.stringify({ title: title, category: category, content: content }) })
+            .then(function (r) { return r.json().then(function (d) { return { ok: r.ok, data: d }; }); })
+            .then(function (res) {
+              if (!res.ok) throw new Error(res.data.error || '등록 실패');
+              closeModal();
+              if (window.newsRender && window.newsRender.reload) window.newsRender.reload(); else location.reload();
+            })
+            .catch(function (err) {
+              if (errEl) { errEl.textContent = err.message || '오류가 발생했습니다.'; errEl.style.display = 'block'; }
+              if (submitBtn) { submitBtn.disabled = false; submitBtn.textContent = '등록하기'; }
+            });
+        });
+      }
+    }
+    function removeOperatorUI() {
+      if (slot) slot.innerHTML = '';
+      var m = document.getElementById('newsWriteModal');
+      if (m) m.remove();
+    }
+    function renderOperatorUI() {
+      if (!slot) return;
+      slot.innerHTML = '<button type="button" id="news-write-btn" class="btn btn-primary btn-sm">+ 뉴스 작성</button>';
+      var wrap = document.createElement('div');
+      wrap.innerHTML = newsWriteModalHTML();
+      var modal = wrap.firstElementChild;
+      document.body.appendChild(modal);
+      bindModalEvents();
+    }
+    function updateByAuth() {
+      if (isOperator()) renderOperatorUI();
+      else removeOperatorUI();
+    }
+    updateByAuth();
+    window.addEventListener('authStateChanged', updateByAuth);
+    setTimeout(updateByAuth, 500);
+    setTimeout(updateByAuth, 2000);
+  })();
+  </script>
+  <!-- 모바일 드로어 -->
+  <div id="drawerOverlay" hidden aria-hidden="true"></div>
+  <aside id="mobileDrawer" hidden aria-hidden="true" role="dialog" aria-modal="true" aria-label="메뉴">
+    <div class="drawer-header">
+      <span class="drawer-logo">가맹점숲</span>
+      <button type="button" class="drawer-close" aria-label="메뉴 닫기">
+        <svg width="20" height="20" viewBox="0 0 20 20" fill="none" aria-hidden="true"><path d="M4 4L16 16M16 4L4 16" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg>
+      </button>
+    </div>
+    <nav class="drawer-nav" aria-label="모바일 메뉴">
+      <a href="community.html"  class="drawer-link">커뮤니티</a>
+      <a href="pg.html"         class="drawer-link">PG 수수료 표</a>
+      <a href="calculator.html" class="drawer-link">수수료 계산기</a>
+      <a href="news.html"       class="drawer-link active">뉴스</a>
+      <a href="verify.html"     class="drawer-link">인증/문의</a>
+    </nav>
+  </aside>
+  <script src="js/drawer.js"></script>
 </body>
 </html>
