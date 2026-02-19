@@ -206,6 +206,24 @@ header h1 a:hover { text-decoration: none; opacity: 0.9; }
 }
 .header-nav a:hover { color: #fff; }
 .header-nav a.active { color: #fff; border-bottom-color: var(--color-primary); }
+/* 헤더 검색: 뉴스·가이드·커뮤니티 통합 */
+.header-search { display: flex; align-items: center; gap: var(--space-2); }
+.header-search input {
+  width: 140px; min-width: 0;
+  padding: var(--space-2) var(--space-3);
+  border-radius: var(--radius-md);
+  border: 1px solid #475569;
+  background: #1e293b;
+  color: #fff;
+  font-size: var(--text-sm);
+}
+.header-search input::placeholder { color: #94a3b8; }
+.header-search input:focus { outline: none; border-color: var(--color-primary); }
+.header-search .btn { padding: var(--space-2) var(--space-3); font-size: var(--text-xs); }
+.header-search-suggest { display: flex; flex-wrap: wrap; gap: var(--space-2); margin-top: var(--space-2); font-size: var(--text-xs); }
+.header-search-suggest a { color: var(--color-header-muted); }
+.header-search-suggest a:hover { color: #fff; }
+
 .header-auth { display: flex; align-items: center; gap: var(--space-2); }
 #auth-actions { display: flex; align-items: center; gap: var(--space-2); }
 .header-user { font-size: var(--text-sm); font-weight: 600; color: var(--color-header-text); margin-right: var(--space-1); }
@@ -364,6 +382,11 @@ a.ad-slot:hover { background: #cbd5e1; }
 
 /* ===== 문서형 페이지 (이용약관·개인정보처리방침) ===== */
 .legal-page .container { max-width: 72ch; }
+/* 문서형 가독성 (must-know 등) */
+.card.prose .accordion-body,
+.page-mustknow .accordion-body { max-width: 72ch; line-height: 1.75; }
+.card.prose .section-desc { max-width: 72ch; }
+
 .legal-page .card.prose { padding: var(--card-pad); }
 .legal-page h2 { font-size: var(--fs-4); color: #1e40af; margin: var(--gap-4) 0 var(--gap-2); line-height: var(--lh-title); }
 .legal-page h2:first-of-type { margin-top: 0; }
@@ -2690,8 +2713,9 @@ img, video, iframe { max-width: 100%; height: auto; }
     gap: 0;
     overflow: visible;    /* 드롭다운 등 잘림 방지 */
   }
-  /* Hide desktop nav + auth on mobile */
+  /* Hide desktop nav + auth + search on mobile (검색은 홈/커뮤니티에서) */
   .header-nav { display: none !important; }
+  .header-search { display: none !important; }
   .header-auth { display: none !important; }
   /* Show hamburger */
   .nav-toggle {

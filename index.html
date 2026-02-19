@@ -43,6 +43,11 @@
       <a href="news.html" title="최신 공지/뉴스">최신 공지/뉴스</a>
       <a href="verify.html" title="인증/제휴 문의">인증/제휴 문의</a>
     </nav>
+    <form class="header-search" action="community.html" method="get" role="search" aria-label="사이트 검색">
+      <label for="header-search-q" class="sr-only">뉴스·가이드·커뮤니티 검색</label>
+      <input type="search" id="header-search-q" name="q" placeholder="검색" autocomplete="off" aria-label="검색어">
+      <button type="submit" class="btn btn-outline btn-sm">검색</button>
+    </form>
     <div class="header-auth" id="headerAuth" aria-label="로그인 상태">
       <div id="auth-actions"></div>
     </div>
@@ -58,6 +63,14 @@
         <input type="search" id="hero-search-input" name="q" placeholder="PG 수수료 / 정산 / 오류 검색" autocomplete="off" aria-label="검색어">
         <button type="submit" class="btn btn-primary">검색</button>
       </form>
+      <p class="header-search-suggest" style="margin-top:10px;margin-bottom:0;">
+        <span style="color:#94a3b8;">추천:</span>
+        <a href="community.html?q=정산+지연">정산 지연</a>
+        <a href="community.html?q=환불">환불</a>
+        <a href="community.html?q=가상계좌">가상계좌</a>
+        <a href="community.html?q=세금계산서">세금계산서</a>
+        <a href="community.html?q=심사">심사</a>
+      </p>
       <div class="hero-cta" style="margin-top:14px;">
         <a href="community.html" class="btn btn-hero">커뮤니티</a>
         <a href="calculator.html" class="btn btn-hero">수수료 계산기</a>

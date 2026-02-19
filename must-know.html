@@ -37,6 +37,11 @@
       <a href="news.html">최신 공지/뉴스</a>
       <a href="verify.html">인증/제휴 문의</a>
     </nav>
+    <form class="header-search" action="community.html" method="get" role="search" aria-label="사이트 검색">
+      <label for="header-search-q" class="sr-only">뉴스·가이드·커뮤니티 검색</label>
+      <input type="search" id="header-search-q" name="q" placeholder="검색" autocomplete="off" aria-label="검색어">
+      <button type="submit" class="btn btn-outline btn-sm">검색</button>
+    </form>
     <div class="header-auth" id="headerAuth" aria-label="로그인 상태">
       <div id="auth-actions"></div>
     </div>
@@ -49,9 +54,9 @@
       <p>이 페이지는 온라인 가맹점을 위한 <strong>필수 법·제도·운영 요점</strong>만 모은 전용 안내입니다.</p>
     </div>
     <section class="section">
-      <div class="card stack">
+      <div class="card stack prose">
         <h3 class="section-title">필수 안내</h3>
-        <p class="section-desc">각 항목을 클릭하면 자세한 내용을 확인할 수 있습니다.</p>
+        <p class="section-desc">각 항목을 클릭하면 자세한 내용을 확인할 수 있습니다. <a href="calculator.html">수수료 계산기</a>, <a href="pg.html">PG 수수료 비교</a>, <a href="community.html">커뮤니티</a>에서 더 많은 정보를 활용하세요.</p>
         
         <div class="accordion">
           <!-- 전자상거래법 준수 사항 -->

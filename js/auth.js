@@ -52,7 +52,10 @@
    * 2) 모달 열기/닫기 (inject / remove)
    * ────────────────────────────────────────────────── */
   function removeAllModals() {
-    document.querySelectorAll('.modal-overlay').forEach(function (m) { m.remove(); });
+    ['loginModal', 'signupModal'].forEach(function (id) {
+      var el = document.getElementById(id);
+      if (el) el.remove();
+    });
   }
 
   function injectModal(html) {
@@ -65,7 +68,10 @@
     return el;
   }
 
+  var lastFocusBeforeModal = null;
+
   function openLoginModal() {
+    lastFocusBeforeModal = document.activeElement;
     var el = injectModal(loginModalHTML());
     var firstInput = el.querySelector('input');
     if (firstInput) setTimeout(function () { firstInput.focus(); }, 80);
@@ -73,6 +79,7 @@
   }
 
   function openSignupModal() {
+    lastFocusBeforeModal = document.activeElement;
     var el = injectModal(signupModalHTML());
     var firstInput = el.querySelector('input');
     if (firstInput) setTimeout(function () { firstInput.focus(); }, 80);
@@ -84,6 +91,9 @@
     if (el) el.remove();
     if (!document.querySelector('.modal-overlay')) {
       document.body.style.overflow = '';
+      if (lastFocusBeforeModal && typeof lastFocusBeforeModal.focus === 'function') {
+        try { lastFocusBeforeModal.focus(); } catch (e) {}
+      }
     }
   }
 
