@@ -447,6 +447,44 @@ a.ad-slot:hover { background: #cbd5e1; }
 }
 .page-calculator .hero { background: linear-gradient(135deg, #059669 0%, #047857 50%, #065f46 100%); }
 
+/* 수수료 계산기 · 뉴스 배너 크기 통일 (패딩·높이 동일) */
+.page-calculator .hero,
+.page-news .hero {
+  padding: 1rem 1.25rem;
+  border-radius: 20px;
+  box-sizing: border-box;
+  min-height: 10rem;
+}
+.page-news .hero {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  justify-content: center;
+  gap: 12px;
+  text-align: left;
+}
+.page-calculator .hero {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  justify-content: center;
+  gap: 0.5rem;
+}
+@media (min-width: 600px) {
+  .page-calculator .hero,
+  .page-news .hero {
+    padding: 2rem 2.25rem;
+    min-height: 12rem;
+  }
+}
+@media (min-width: 1024px) {
+  .page-calculator .hero,
+  .page-news .hero {
+    padding: 2.5rem 3rem;
+    min-height: 14rem;
+  }
+}
+
 /* ===== 섹션 · 카드 ===== */
 .section { margin-bottom: var(--gap-5); }
 .section-title {

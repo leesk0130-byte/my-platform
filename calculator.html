@@ -43,20 +43,11 @@
     .breadcrumb { font-size: 0.875rem; color: #64748b; margin-bottom: 0.75rem; }
     .breadcrumb a { color: #64748b; }
     .bc-sep { margin: 0 0.25rem; color: #94a3b8; }
-    /* ── 히어로: 좌측 정렬, 자연스러운 줄바꿈 ── */
+    /* ── 히어로: common.css에서 padding/크기 통일, 여기서는 색·타이포만 ── */
     .hero {
-      background: linear-gradient(135deg, #0d9488 0%, #0f766e 50%, #115e59 100%);
       color: #fff;
-      padding: 1rem 1.25rem;
-      border-radius: 20px;
       text-align: left;
       margin-bottom: 2rem;
-    }
-    @media (min-width: 600px) {
-      .hero { padding: 2rem 2.25rem; }
-    }
-    @media (min-width: 1024px) {
-      .hero { padding: 2.5rem 3rem; }
     }
     .hero h2 { font-size: 1.6rem; margin: 0 0 0.65rem; line-height: 1.3; }
     @media (min-width: 600px) { .hero h2 { font-size: 1.75rem; } }
@@ -190,7 +181,7 @@
 
   <main id="main" class="container page-calculator">
     <nav class="breadcrumb" aria-label="breadcrumb"><a href="index.html">홈</a> <span class="bc-sep">/</span> <strong>결제수수료 계산기</strong></nav>
-    <div class="hero">
+    <div class="hero" style="padding:1.5rem 2rem;min-height:140px;border-radius:20px;display:flex;flex-direction:column;justify-content:center;align-items:flex-start;gap:0.5rem;">
       <h2>결제수수료 계산기</h2>
       <p>총 거래액과 <strong>카드/현금 비율</strong> 또는 <strong>카드·현금 금액</strong>을 넣으면 PG 수수료를 바로 계산해 드려요.</p>
       <p>월 매출에서 카드·현금 비율과 수수료율만 입력하면 예상 수수료가 나옵니다. PG사 비교할 때 참고하세요.</p>
