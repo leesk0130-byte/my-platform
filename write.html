@@ -41,11 +41,59 @@
         <div class="community-rules-notice" role="alert" style="background:#fef3c7;border:1px solid #f59e0b;border-radius:12px;padding:1rem 1.25rem;margin-bottom:1.25rem;font-size:0.9375rem;">
           <strong>금지행위 안내</strong> — 상업적 광고·도배·개인정보(사업자번호, 계좌번호 등) 노출은 금지됩니다. 위반 시 글이 블라인드·삭제될 수 있으며, 반복 시 이용이 제한됩니다.
         </div>
+        <div class="form-group" style="margin-bottom:1rem;">
+          <span class="form-label" style="display:block;margin-bottom:0.5rem;">질문 템플릿 (클릭 시 제목·내용 자동 채움)</span>
+          <div class="template-buttons" style="display:flex;flex-wrap:wrap;gap:0.5rem;">
+            <button type="button" class="btn btn-outline btn-sm" data-template="settlement-delay">정산 지연</button>
+            <button type="button" class="btn btn-outline btn-sm" data-template="refund">환불</button>
+            <button type="button" class="btn btn-outline btn-sm" data-template="virtual-account">가상계좌</button>
+            <button type="button" class="btn btn-outline btn-sm" data-template="review">심사</button>
+          </div>
+        </div>
         <form id="writeForm" class="write-form" onsubmit="return false;">
           <div class="form-group">
             <label for="write-nickname">닉네임 (글에 표시될 이름)</label>
             <input type="text" id="write-nickname" placeholder="비워두면 익명으로 표시돼요" maxlength="20" aria-describedby="write-nickname-help">
             <span id="write-nickname-help" class="form-hint">입력하지 않으면 익명으로 표시됩니다.</span>
+          </div>
+          <div class="form-group">
+            <label for="write-industry">업종 <span style="color:#dc2626;">*</span></label>
+            <select id="write-industry" required>
+              <option value="">선택하세요</option>
+              <option value="의류/패션">의류/패션</option>
+              <option value="뷰티/화장품">뷰티/화장품</option>
+              <option value="식품">식품</option>
+              <option value="가전/디지털">가전/디지털</option>
+              <option value="생활/건강">생활/건강</option>
+              <option value="기타 소매">기타 소매</option>
+              <option value="서비스/교육">서비스/교육</option>
+              <option value="기타">기타</option>
+            </select>
+          </div>
+          <div class="form-group">
+            <label for="write-monthly-volume">월 거래액 구간 <span style="color:#dc2626;">*</span></label>
+            <select id="write-monthly-volume" required>
+              <option value="">선택하세요</option>
+              <option value="~500만원">~500만원</option>
+              <option value="500만~1천만원">500만~1천만원</option>
+              <option value="1천만~3천만원">1천만~3천만원</option>
+              <option value="3천만~1억원">3천만~1억원</option>
+              <option value="1억원~">1억원~</option>
+            </select>
+          </div>
+          <div class="form-group">
+            <label for="write-pg-used">사용 PG <span style="color:#dc2626;">*</span></label>
+            <select id="write-pg-used" required>
+              <option value="">선택하세요</option>
+              <option value="토스페이먼츠">토스페이먼츠</option>
+              <option value="이니시스">이니시스</option>
+              <option value="나이스페이먼츠">나이스페이먼츠</option>
+              <option value="KG이니시스">KG이니시스</option>
+              <option value="다우페이">다우페이</option>
+              <option value="KCP">KCP</option>
+              <option value="결제예정">결제예정</option>
+              <option value="기타">기타</option>
+            </select>
           </div>
           <div class="form-group">
             <label for="write-board">게시판</label>
@@ -125,6 +173,23 @@
         nicknameInput.placeholder = user.name + ' (로그인됨)';
         nicknameInput.value = user.name;
       }
+      var templates = {
+        'settlement-delay': { title: '[정산 지연] 정산이 늦어요. 확인할 것 알려주세요', body: '정산 예정일이 지났는데 입금이 안 됐어요.\n\n- 사용 PG:\n- 정산 예정일:\n- 해당 기간 매출 요약:\n\n어디부터 확인하면 좋을까요?' },
+        'refund': { title: '[환불] 취소/환불 처리 문의드려요', body: '고객 취소·환불 건 처리 방법이 궁금해요.\n\n- 사용 PG:\n- 전액 취소 / 부분 환불:\n- 문의 내용:\n\n절차나 수수료 정책 알려주시면 감사해요.' },
+        'virtual-account': { title: '[가상계좌] 입금 기한·미확인 문의', body: '가상계좌(무통장) 결제 관련해서요.\n\n- 사용 PG:\n- 입금했는데 미확인으로 나와요 / 입금 기한 연장 가능한지:\n\n경험 있으신 분 조언 부탁드려요.' },
+        'review': { title: '[심사] PG 가맹점 심사 기간·서류 문의', body: 'PG 가맹점 신청했는데 심사 관련해서요.\n\n- 신청한 PG:\n- 업종:\n- 심사 기간이 궁금해요 / 거절됐는데 재신청 가능한지:\n\n알려주시면 감사해요.' }
+      };
+      document.querySelectorAll('.write-template-btns button[data-template], .template-buttons button[data-template]').forEach(function(btn) {
+        btn.addEventListener('click', function() {
+          var t = templates[this.getAttribute('data-template')];
+          if (t) {
+            var titleEl = document.getElementById('write-title');
+            var bodyEl = document.getElementById('write-body');
+            if (titleEl) titleEl.value = t.title;
+            if (bodyEl) bodyEl.value = t.body;
+          }
+        });
+      });
       var form = document.getElementById('writeForm');
       var errEl = document.getElementById('write-error');
       form.addEventListener('submit', function(e) {
@@ -134,8 +199,16 @@
         var title = document.getElementById('write-title').value.trim();
         var body = document.getElementById('write-body').value.trim();
         var boardVal = document.getElementById('write-board').value;
+        var industry = (document.getElementById('write-industry') || {}).value || '';
+        var monthlyVolume = (document.getElementById('write-monthly-volume') || {}).value || '';
+        var pgUsed = (document.getElementById('write-pg-used') || {}).value || '';
         if (!title || !body) {
           errEl.textContent = '제목과 내용을 입력해 주세요.';
+          errEl.style.display = 'block';
+          return;
+        }
+        if (!industry || !monthlyVolume || !pgUsed) {
+          errEl.textContent = '업종, 월 거래액 구간, 사용 PG를 선택해 주세요.';
           errEl.style.display = 'block';
           return;
         }
@@ -143,7 +216,7 @@
         var submitBtn = form.querySelector('button[type="submit"]');
         if (submitBtn) { submitBtn.disabled = true; submitBtn.textContent = '등록 중...'; }
         var isNotice = document.getElementById('write-notice') && document.getElementById('write-notice').checked;
-        window.app.createPost({ title: title, body: body, author: nickname || '익명', board: boardVal, notice: isNotice }, function(err, post) {
+        window.app.createPost({ title: title, body: body, author: nickname || '익명', board: boardVal, notice: isNotice, industry: industry, monthlyVolume: monthlyVolume, pgUsed: pgUsed }, function(err, post) {
           if (submitBtn) { submitBtn.disabled = false; submitBtn.textContent = '등록하기'; }
           if (err) {
             errEl.textContent = err;

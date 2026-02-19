@@ -80,6 +80,9 @@
       hits: 0,
       verified: false,
       notice: !!(data.notice),
+      industry: data.industry || '',
+      monthlyVolume: data.monthlyVolume || '',
+      pgUsed: data.pgUsed || '',
       createdAt: new Date().toISOString()
     };
     list.unshift(post);
@@ -530,7 +533,10 @@
           title: data.title,
           body: data.body,
           author: data.author || '익명',
-          board: data.board || 'free'
+          board: data.board || 'free',
+          industry: data.industry || '',
+          monthlyVolume: data.monthlyVolume || '',
+          pgUsed: data.pgUsed || ''
         })
       }).then(function (res) { return res.json(); })
         .then(function (result) {
@@ -540,7 +546,7 @@
         })
         .catch(function () {
           var u = getUser();
-          var post = addLocalPost({ title: data.title, body: data.body, author: data.author, board: data.board, notice: data.notice, authorId: u ? u.uid : null });
+          var post = addLocalPost({ title: data.title, body: data.body, author: data.author, board: data.board, notice: data.notice, authorId: u ? u.uid : null, industry: data.industry, monthlyVolume: data.monthlyVolume, pgUsed: data.pgUsed });
           if (callback) callback(null, post);
         });
     },

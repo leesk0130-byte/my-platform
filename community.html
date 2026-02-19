@@ -40,7 +40,7 @@
     </nav>
     <form class="header-search" action="community.html" method="get" role="search" aria-label="사이트 검색">
       <label for="header-search-q" class="sr-only">뉴스·가이드·커뮤니티 검색</label>
-      <input type="search" id="header-search-q" name="q" placeholder="검색" autocomplete="off" aria-label="검색어">
+      <input type="search" id="header-search-q" name="q" placeholder="검색어 입력" autocomplete="off" aria-label="검색어">
       <button type="submit" class="btn btn-outline btn-sm">검색</button>
     </form>
     <div class="header-auth" id="headerAuth" aria-label="로그인 상태">
@@ -314,7 +314,7 @@
                 '</form>' +
               '</div>' +
             '</section>' +
-            '<section class="related-posts-section" id="related-posts-section" aria-label="관련 글" style="display:none;margin-top:1.5rem;">' +
+            '<section class="related-posts-section" id="related-posts-section" aria-label="관련 글" style="margin-top:1.5rem;">' +
               '<h2 class="section-title">관련 글</h2>' +
               '<ul class="feed-list" id="related-posts-list"></ul>' +
             '</section>' +
@@ -358,6 +358,21 @@
         drawComments();
         setTimeout(drawComments, 700);
         setTimeout(drawComments, 1800);
+
+        if (window.app.getRelatedPosts && currentPostId) {
+          window.app.getRelatedPosts(currentPostId, 5, function(err, related) {
+            var section = document.getElementById('related-posts-section');
+            var listEl = document.getElementById('related-posts-list');
+            if (section && listEl) {
+              if (related && related.length) {
+                window.app.renderPosts('related-posts-list', related, 'community.html?id=', true);
+                section.style.display = 'block';
+              } else {
+                section.style.display = 'none';
+              }
+            }
+          });
+        }
 
         var nicknameEl = document.getElementById('comment-nickname-value');
         var anonCheck  = document.getElementById('comment-anonymous');

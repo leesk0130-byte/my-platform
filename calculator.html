@@ -180,7 +180,7 @@
     </nav>
     <form class="header-search" action="community.html" method="get" role="search" aria-label="사이트 검색">
       <label for="header-search-q" class="sr-only">뉴스·가이드·커뮤니티 검색</label>
-      <input type="search" id="header-search-q" name="q" placeholder="검색" autocomplete="off" aria-label="검색어">
+      <input type="search" id="header-search-q" name="q" placeholder="검색어 입력" autocomplete="off" aria-label="검색어">
       <button type="submit" class="btn btn-outline btn-sm">검색</button>
     </form>
     <div class="header-auth" id="headerAuth" aria-label="로그인 상태">
@@ -309,7 +309,8 @@
         <div class="calc-actions">
           <button type="button" class="btn btn-primary" id="calc-do">수수료 계산하기</button>
           <button type="button" class="btn btn-outline" id="calc-save">저장</button>
-          <button type="button" class="btn btn-outline" id="calc-share">공유 URL 복사</button>
+          <button type="button" class="btn btn-outline" id="calc-share">링크 공유</button>
+          <button type="button" class="btn btn-outline" id="calc-image-save">이미지로 저장</button>
         </div>
 
         <!-- 결과 카드 -->
@@ -349,14 +350,16 @@
       </div>
     </section>
 
-    <section class="section">
+    <section class="section" id="calc-related-section">
       <div class="card" style="background:var(--color-surface,#fff);border:1px solid #e2e8f0;">
-        <h3 style="font-size:1rem;font-weight:700;margin-bottom:10px;">관련 정보</h3>
+        <h3 style="font-size:1rem;font-weight:700;margin-bottom:10px;">관련 가이드 · 커뮤니티</h3>
         <div style="display:flex;flex-wrap:wrap;gap:10px;">
           <a href="pg.html" class="btn btn-outline btn-sm">PG 수수료 비교표</a>
           <a href="must-know.html#pg-checklist" class="btn btn-outline btn-sm">PG 계약 체크리스트</a>
-          <a href="must-know.html#settlement" class="btn btn-outline btn-sm">정산 지연 대응 가이드</a>
-          <a href="community.html?board=fee" class="btn btn-outline btn-sm">수수료 커뮤니티</a>
+          <a href="must-know/settlement-delay.html" class="btn btn-outline btn-sm">정산 지연 가이드</a>
+          <a href="must-know/refund.html" class="btn btn-outline btn-sm">환불 가이드</a>
+          <a href="community.html?q=수수료" class="btn btn-outline btn-sm">수수료 커뮤니티</a>
+          <a href="calculator-saved.html" class="btn btn-outline btn-sm">저장한 계산 목록</a>
         </div>
       </div>
     </section>
@@ -683,10 +686,61 @@
       try {
         navigator.clipboard.writeText(url).then(function () {
           btn.textContent = '복사됨';
-          setTimeout(function () { btn.textContent = '공유 URL 복사'; }, 2000);
+          setTimeout(function () { btn.textContent = '링크 공유'; }, 2000);
         });
       } catch (e) { prompt('아래 URL을 복사하세요.', url); }
       if (window.trackEvent) window.trackEvent('share', { type: 'calc_url' });
+    });
+
+    document.getElementById('calc-image-save').addEventListener('click', function () {
+      var resultEl = document.getElementById('calc-result');
+      if (!resultEl || resultEl.style.display === 'none') {
+        alert('먼저 수수료를 계산해 주세요.');
+        return;
+      }
+      var summary = (document.getElementById('calc-result-summary') || {}).textContent || '';
+      var lines = [ '가맹점숲 수수료 계산 결과', summary ];
+      var singleList = document.getElementById('calc-result-single');
+      var compareList = document.getElementById('calc-result-compare');
+      if (singleList && singleList.style.display !== 'none') {
+        var dts = singleList.querySelectorAll('dt');
+        var dds = singleList.querySelectorAll('dd');
+        for (var i = 0; i < dts.length && i < dds.length; i++) {
+          lines.push((dts[i].textContent || '').trim() + ' ' + (dds[i].textContent || '').trim());
+        }
+      }
+      if (compareList && compareList.style.display !== 'none') {
+        var dts2 = compareList.querySelectorAll('dt');
+        var dds2 = compareList.querySelectorAll('dd');
+        for (var j = 0; j < dts2.length && j < dds2.length; j++) {
+          lines.push((dts2[j].textContent || '').trim() + ' ' + (dds2[j].textContent || '').trim());
+        }
+      }
+      var canvas = document.createElement('canvas');
+      var w = 480; var h = 80 + lines.length * 28;
+      canvas.width = w; canvas.height = h;
+      var ctx = canvas.getContext('2d');
+      ctx.fillStyle = '#0f172a';
+      ctx.fillRect(0, 0, w, h);
+      ctx.fillStyle = '#f8fafc';
+      ctx.font = 'bold 18px sans-serif';
+      ctx.fillText(lines[0] || '수수료 계산 결과', 24, 36);
+      ctx.font = '14px sans-serif';
+      for (var k = 1; k < lines.length; k++) {
+        ctx.fillText(lines[k], 24, 56 + k * 26);
+      }
+      try {
+        canvas.toBlob(function (blob) {
+          var a = document.createElement('a');
+          a.download = 'gmp-calc-result-' + Date.now() + '.png';
+          a.href = URL.createObjectURL(blob);
+          a.click();
+          URL.revokeObjectURL(a.href);
+        });
+      } catch (e) {
+        alert('이미지 저장을 지원하지 않는 브라우저입니다.');
+      }
+      if (window.trackEvent) window.trackEvent('share', { type: 'calc_image' });
     });
 
     /* ── URL 파라미터 복원 ── */

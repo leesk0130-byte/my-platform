@@ -36,6 +36,20 @@
     <changefreq>monthly</changefreq>
     <priority>0.8</priority>
   </url>
+  <url><loc>https://my-platform.pages.dev/must-know/settlement-delay.html</loc><lastmod>2026-02-11</lastmod><changefreq>monthly</changefreq><priority>0.7</priority></url>
+  <url><loc>https://my-platform.pages.dev/must-know/settlement-hold.html</loc><lastmod>2026-02-11</lastmod><changefreq>monthly</changefreq><priority>0.7</priority></url>
+  <url><loc>https://my-platform.pages.dev/must-know/refund.html</loc><lastmod>2026-02-11</lastmod><changefreq>monthly</changefreq><priority>0.7</priority></url>
+  <url><loc>https://my-platform.pages.dev/must-know/virtual-account.html</loc><lastmod>2026-02-11</lastmod><changefreq>monthly</changefreq><priority>0.7</priority></url>
+  <url><loc>https://my-platform.pages.dev/must-know/tax-invoice.html</loc><lastmod>2026-02-11</lastmod><changefreq>monthly</changefreq><priority>0.7</priority></url>
+  <url><loc>https://my-platform.pages.dev/must-know/review.html</loc><lastmod>2026-02-11</lastmod><changefreq>monthly</changefreq><priority>0.7</priority></url>
+  <url><loc>https://my-platform.pages.dev/must-know/chargeback.html</loc><lastmod>2026-02-11</lastmod><changefreq>monthly</changefreq><priority>0.7</priority></url>
+  <url><loc>https://my-platform.pages.dev/must-know/cash-receipt.html</loc><lastmod>2026-02-11</lastmod><changefreq>monthly</changefreq><priority>0.7</priority></url>
+  <url>
+    <loc>https://my-platform.pages.dev/calculator-saved.html</loc>
+    <lastmod>2026-02-11</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>0.6</priority>
+  </url>
   <url>
     <loc>https://my-platform.pages.dev/about.html</loc>
     <lastmod>2026-02-11</lastmod>
