@@ -57,49 +57,11 @@
       <div class="card">
         <h3 class="section-title">
           <span>최신 뉴스</span>
-          <button type="button" id="news-write-btn" class="btn btn-primary btn-sm" style="display:none;">+ 뉴스 작성</button>
+          <span id="news-write-slot"></span>
         </h3>
         <div id="page-root"></div>
       </div>
     </section>
-
-  <!-- 뉴스 작성 모달 (운영자 전용) -->
-  <div class="modal-overlay" id="newsWriteModal" aria-hidden="true">
-    <div class="modal" style="max-width:560px;">
-      <div class="modal-header">
-        <h3>뉴스 작성</h3>
-        <button type="button" class="modal-close" id="news-modal-close" aria-label="닫기">&times;</button>
-      </div>
-      <div class="modal-body">
-        <form id="newsWriteForm" onsubmit="return false;">
-          <div class="form-group">
-            <label for="news-title">제목 <span style="color:#dc2626;">*</span></label>
-            <input type="text" id="news-title" placeholder="뉴스 제목을 입력하세요" required style="width:100%;">
-          </div>
-          <div class="form-group">
-            <label for="news-category">카테고리</label>
-            <select id="news-category" style="width:100%;padding:10px;border:1px solid #e2e8f0;border-radius:8px;">
-              <option value="공지">공지</option>
-              <option value="PG수수료">PG수수료</option>
-              <option value="전자상거래">전자상거래</option>
-              <option value="정책/제도">정책/제도</option>
-              <option value="쇼핑몰뉴스">쇼핑몰뉴스</option>
-              <option value="일반">일반</option>
-            </select>
-          </div>
-          <div class="form-group">
-            <label for="news-content">본문 <span style="color:#dc2626;">*</span></label>
-            <textarea id="news-content" rows="10" placeholder="뉴스 본문을 입력하세요" required style="width:100%;padding:12px;border:1px solid #e2e8f0;border-radius:8px;font-size:0.9375rem;line-height:1.7;resize:vertical;"></textarea>
-          </div>
-          <div id="news-write-error" style="display:none;color:#dc2626;font-size:0.875rem;margin-bottom:8px;"></div>
-          <div class="modal-footer" style="gap:8px;">
-            <button type="button" class="btn btn-outline" id="news-modal-cancel">취소</button>
-            <button type="submit" class="btn btn-primary" id="news-submit-btn">등록하기</button>
-          </div>
-        </form>
-      </div>
-    </div>
-  </div>
   </main>
 
 
@@ -124,6 +86,7 @@
   <script>
   (function () {
     var OPERATOR_EMAIL = 'leesk0130@point3.team';
+    var slot = document.getElementById('news-write-slot');
 
     function isOperator() {
       var u = window.app && window.app.getUser && window.app.getUser();
@@ -131,16 +94,25 @@
       return (u.email || '').toLowerCase() === OPERATOR_EMAIL.toLowerCase();
     }
 
-    function showWriteBtn() {
-      var btn = document.getElementById('news-write-btn');
-      if (btn) btn.style.display = isOperator() ? '' : 'none';
+    function newsWriteModalHTML() {
+      return '<div class="modal-overlay" id="newsWriteModal" aria-hidden="true" role="dialog" aria-modal="true" aria-label="뉴스 작성">' +
+        '<div class="modal" style="max-width:560px;">' +
+          '<div class="modal-header"><h3>뉴스 작성</h3><button type="button" class="modal-close" id="news-modal-close" aria-label="닫기">&times;</button></div>' +
+          '<div class="modal-body">' +
+            '<form id="newsWriteForm" onsubmit="return false;">' +
+              '<div class="form-group"><label for="news-title">제목 <span style="color:#dc2626;">*</span></label><input type="text" id="news-title" placeholder="뉴스 제목을 입력하세요" required style="width:100%;"></div>' +
+              '<div class="form-group"><label for="news-category">카테고리</label><select id="news-category" style="width:100%;padding:10px;border:1px solid #e2e8f0;border-radius:8px;">' +
+                '<option value="공지">공지</option><option value="PG수수료">PG수수료</option><option value="전자상거래">전자상거래</option><option value="정책/제도">정책/제도</option><option value="쇼핑몰뉴스">쇼핑몰뉴스</option><option value="일반">일반</option></select></div>' +
+              '<div class="form-group"><label for="news-content">본문 <span style="color:#dc2626;">*</span></label><textarea id="news-content" rows="10" placeholder="뉴스 본문을 입력하세요" required style="width:100%;padding:12px;border:1px solid #e2e8f0;border-radius:8px;font-size:0.9375rem;line-height:1.7;resize:vertical;"></textarea></div>' +
+              '<div id="news-write-error" style="display:none;color:#dc2626;font-size:0.875rem;margin-bottom:8px;"></div>' +
+              '<div class="modal-footer" style="gap:8px;"><button type="button" class="btn btn-outline" id="news-modal-cancel">취소</button><button type="submit" class="btn btn-primary" id="news-submit-btn">등록하기</button></div>' +
+            '</form></div></div></div>';
     }
 
     function openModal() {
       var m = document.getElementById('newsWriteModal');
       if (m) { m.classList.add('is-open'); m.removeAttribute('aria-hidden'); document.body.style.overflow = 'hidden'; }
     }
-
     function closeModal() {
       var m = document.getElementById('newsWriteModal');
       if (m) { m.classList.remove('is-open'); m.setAttribute('aria-hidden', 'true'); document.body.style.overflow = ''; }
@@ -149,60 +121,65 @@
       var err = document.getElementById('news-write-error');
       if (err) { err.textContent = ''; err.style.display = 'none'; }
     }
-
-    document.getElementById('news-write-btn').addEventListener('click', openModal);
-    document.getElementById('news-modal-close').addEventListener('click', closeModal);
-    document.getElementById('news-modal-cancel').addEventListener('click', closeModal);
-    document.getElementById('newsWriteModal').addEventListener('click', function (e) {
-      if (e.target === this) closeModal();
-    });
-
-    document.getElementById('newsWriteForm').addEventListener('submit', function (e) {
-      e.preventDefault();
-      var title = (document.getElementById('news-title').value || '').trim();
-      var category = document.getElementById('news-category').value;
-      var content = (document.getElementById('news-content').value || '').trim();
-      var errEl = document.getElementById('news-write-error');
-      var submitBtn = document.getElementById('news-submit-btn');
-
-      if (!title || !content) {
-        errEl.textContent = '제목과 본문을 입력해주세요.';
-        errEl.style.display = 'block';
-        return;
+    function bindModalEvents() {
+      var btn = document.getElementById('news-write-btn');
+      if (btn && !btn._bound) { btn._bound = true; btn.addEventListener('click', openModal); }
+      var closeBtn = document.getElementById('news-modal-close');
+      if (closeBtn && !closeBtn._bound) { closeBtn._bound = true; closeBtn.addEventListener('click', closeModal); }
+      var cancelBtn = document.getElementById('news-modal-cancel');
+      if (cancelBtn && !cancelBtn._bound) { cancelBtn._bound = true; cancelBtn.addEventListener('click', closeModal); }
+      var modal = document.getElementById('newsWriteModal');
+      if (modal && !modal._bound) { modal._bound = true; modal.addEventListener('click', function (e) { if (e.target === modal) closeModal(); }); }
+      var form = document.getElementById('newsWriteForm');
+      if (form && !form._bound) {
+        form._bound = true;
+        form.addEventListener('submit', function (e) {
+          e.preventDefault();
+          var title = (document.getElementById('news-title').value || '').trim();
+          var category = (document.getElementById('news-category').value || '');
+          var content = (document.getElementById('news-content').value || '').trim();
+          var errEl = document.getElementById('news-write-error');
+          var submitBtn = document.getElementById('news-submit-btn');
+          if (!title || !content) { if (errEl) { errEl.textContent = '제목과 본문을 입력해주세요.'; errEl.style.display = 'block'; } return; }
+          var token = window.app && window.app.getToken && window.app.getToken();
+          if (!token) { if (errEl) { errEl.textContent = '로그인이 필요합니다.'; errEl.style.display = 'block'; } return; }
+          if (submitBtn) { submitBtn.disabled = true; submitBtn.textContent = '등록 중...'; }
+          fetch('/api/news', { method: 'POST', headers: { 'Content-Type': 'application/json', 'Authorization': 'Bearer ' + token }, body: JSON.stringify({ title: title, category: category, content: content }) })
+            .then(function (r) { return r.json().then(function (d) { return { ok: r.ok, data: d }; }); })
+            .then(function (res) {
+              if (!res.ok) throw new Error(res.data.error || '등록 실패');
+              closeModal();
+              if (window.newsRender && window.newsRender.reload) window.newsRender.reload(); else location.reload();
+            })
+            .catch(function (err) {
+              if (errEl) { errEl.textContent = err.message || '오류가 발생했습니다.'; errEl.style.display = 'block'; }
+              if (submitBtn) { submitBtn.disabled = false; submitBtn.textContent = '등록하기'; }
+            });
+        });
       }
-
-      var token = window.app && window.app.getToken && window.app.getToken();
-      if (!token) {
-        errEl.textContent = '로그인이 필요합니다.';
-        errEl.style.display = 'block';
-        return;
-      }
-
-      submitBtn.disabled = true;
-      submitBtn.textContent = '등록 중...';
-
-      fetch('/api/news', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json', 'Authorization': 'Bearer ' + token },
-        body: JSON.stringify({ title: title, category: category, content: content }),
-      })
-      .then(function (r) { return r.json().then(function (d) { return { ok: r.ok, data: d }; }); })
-      .then(function (res) {
-        if (!res.ok) throw new Error(res.data.error || '등록 실패');
-        closeModal();
-        if (window.newsRender && window.newsRender.reload) window.newsRender.reload();
-        else location.reload();
-      })
-      .catch(function (err) {
-        errEl.textContent = err.message || '오류가 발생했습니다.';
-        errEl.style.display = 'block';
-        submitBtn.disabled = false;
-        submitBtn.textContent = '등록하기';
-      });
-    });
-
-    showWriteBtn();
-    window.addEventListener('authStateChanged', showWriteBtn);
+    }
+    function removeOperatorUI() {
+      if (slot) slot.innerHTML = '';
+      var m = document.getElementById('newsWriteModal');
+      if (m) m.remove();
+    }
+    function renderOperatorUI() {
+      if (!slot) return;
+      slot.innerHTML = '<button type="button" id="news-write-btn" class="btn btn-primary btn-sm">+ 뉴스 작성</button>';
+      var wrap = document.createElement('div');
+      wrap.innerHTML = newsWriteModalHTML();
+      var modal = wrap.firstElementChild;
+      document.body.appendChild(modal);
+      bindModalEvents();
+    }
+    function updateByAuth() {
+      if (isOperator()) renderOperatorUI();
+      else removeOperatorUI();
+    }
+    updateByAuth();
+    window.addEventListener('authStateChanged', updateByAuth);
+    setTimeout(updateByAuth, 500);
+    setTimeout(updateByAuth, 2000);
   })();
   </script>
   <!-- 모바일 드로어 -->
@@ -221,11 +198,6 @@
       <a href="news.html"       class="drawer-link active">뉴스</a>
       <a href="verify.html"     class="drawer-link">인증/문의</a>
     </nav>
-    <div class="drawer-auth" id="drawerAuth">
-      <p class="drawer-auth-label">계정</p>
-      <button type="button" class="drawer-auth-btn" data-auth="login">로그인</button>
-      <button type="button" class="drawer-auth-btn drawer-auth-btn--primary" data-auth="signup">회원가입</button>
-    </div>
   </aside>
   <script src="js/drawer.js"></script>
 </body>

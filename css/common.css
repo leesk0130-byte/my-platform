@@ -2713,10 +2713,12 @@ img, video, iframe { max-width: 100%; height: auto; }
     gap: 0;
     overflow: visible;    /* 드롭다운 등 잘림 방지 */
   }
-  /* Hide desktop nav + auth + search on mobile (검색은 홈/커뮤니티에서) */
+  /* Hide desktop nav + search on mobile (로그인/회원가입은 헤더에만) */
   .header-nav { display: none !important; }
   .header-search { display: none !important; }
-  .header-auth { display: none !important; }
+  /* Show hamburger + header-auth (계정 블록은 푸터/드로어 제거로 헤더 1곳만) */
+  .header-auth { display: flex !important; margin-left: auto; }
+  .header-auth .btn { min-height: 44px; min-width: 44px; padding: 0.5rem 0.65rem; font-size: 0.8125rem; }
   /* Show hamburger */
   .nav-toggle {
     display: flex !important;
