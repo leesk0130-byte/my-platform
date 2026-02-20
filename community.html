@@ -40,7 +40,7 @@
     </nav>
     <form class="header-search" action="community.html" method="get" role="search" aria-label="사이트 검색">
       <label for="header-search-q" class="sr-only">뉴스·가이드·커뮤니티 검색</label>
-      <input type="search" id="header-search-q" name="q" placeholder="검색어 입력" autocomplete="off" aria-label="검색어">
+      <input type="search" id="header-search-q" name="q" placeholder="뉴스·가이드·커뮤니티 검색" autocomplete="off" aria-label="검색어">
       <button type="submit" class="btn btn-outline btn-sm">검색</button>
     </form>
     <div class="header-auth" id="headerAuth" aria-label="로그인 상태">
@@ -48,13 +48,16 @@
     </div>
   </header>
 
-  <main id="main" class="container page-community">
-    <nav class="breadcrumb" aria-label="breadcrumb"><a href="index.html">홈</a> <span class="bc-sep">/</span> <strong>커뮤니티</strong></nav>
-    <div class="community-intro" style="padding:1rem 0 0.5rem;">
-      <h2 style="font-size:clamp(1.1rem,3.5vw,1.5rem);margin-bottom:6px;">가맹점 커뮤니티</h2>
-      <p style="font-size:0.9375rem;line-height:1.65;color:var(--color-text-muted,#64748b);max-width:64ch;">온라인 쇼핑몰·가맹점 사장님들이 PG 수수료, 정산, 오류, 운영 노하우를 나누는 곳입니다. 수수료/정산, 자유게시판, Q&amp;A, 정보공유 카테고리로 운영됩니다.</p>
-      <p class="community-rules-notice" style="font-size:0.8125rem;color:#b45309;background:#fef3c7;border:1px solid #f59e0b;border-radius:8px;padding:0.6rem 0.9rem;margin-top:0.75rem;max-width:64ch;">⚠️ 금지: 상업적 광고·도배·개인정보 노출. 위반 시 블라인드·삭제·이용 제한될 수 있습니다.</p>
-    </div>
+  <main id="main" class="page">
+    <div class="container">
+      <div class="page-head">
+        <nav class="breadcrumb" aria-label="breadcrumb"><a href="index.html">홈</a> <span class="bc-sep">/</span> <strong>커뮤니티</strong></nav>
+      </div>
+      <section class="hero-green" aria-label="안내">
+        <h2>가맹점 커뮤니티</h2>
+        <p>온라인 쇼핑몰·가맹점 사장님들이 PG 수수료, 정산, 오류, 운영 노하우를 나누는 곳입니다. 수수료/정산, 자유게시판, Q&amp;A, 정보공유 카테고리로 운영됩니다.</p>
+      </section>
+      <p class="community-rules-notice" style="font-size:0.8125rem;color:#b45309;background:#fef3c7;border:1px solid #f59e0b;border-radius:8px;padding:0.6rem 0.9rem;margin:0 0 var(--gap-3);max-width:64ch;">⚠️ 금지: 상업적 광고·도배·개인정보 노출. 위반 시 블라인드·삭제·이용 제한될 수 있습니다.</p>
     <section class="section community-section">
       <!-- Famous Community 2-Column Layout -->
       <div class="community-layout">
@@ -130,6 +133,7 @@
         </div>
       </div>
     </section>
+    </div>
   </main>
 
 

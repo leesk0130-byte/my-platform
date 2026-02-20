@@ -39,7 +39,7 @@
     </nav>
     <form class="header-search" action="community.html" method="get" role="search" aria-label="사이트 검색">
       <label for="header-search-q" class="sr-only">뉴스·가이드·커뮤니티 검색</label>
-      <input type="search" id="header-search-q" name="q" placeholder="검색어 입력" autocomplete="off" aria-label="검색어">
+      <input type="search" id="header-search-q" name="q" placeholder="뉴스·가이드·커뮤니티 검색" autocomplete="off" aria-label="검색어">
       <button type="submit" class="btn btn-outline btn-sm">검색</button>
     </form>
     <div class="header-auth" id="headerAuth" aria-label="로그인 상태">
@@ -47,21 +47,25 @@
     </div>
   </header>
 
-  <main id="main" class="container page-news">
-    <nav class="breadcrumb" aria-label="breadcrumb"><a href="index.html">홈</a> <span class="bc-sep">/</span> <strong>뉴스</strong></nav>
-    <div class="hero hero-banner">
-      <h2>온라인 쇼핑몰 · 가맹점 뉴스</h2>
-      <p><strong>쇼핑몰·결제(PG)·전자상거래</strong> 관련 뉴스만 모은 코너예요. 수수료 정책, 법·제도, 가맹점 지원 소식을 확인하세요.</p>
-    </div>
-    <section class="section">
-      <div class="card">
-        <h3 class="section-title">
-          <span>최신 뉴스</span>
-          <span id="news-write-slot"></span>
-        </h3>
-        <div id="page-root"></div>
+  <main id="main" class="page">
+    <div class="container">
+      <div class="page-head">
+        <nav class="breadcrumb" aria-label="breadcrumb"><a href="index.html">홈</a> <span class="bc-sep">/</span> <strong>뉴스</strong></nav>
       </div>
-    </section>
+      <section class="hero-green" aria-label="안내">
+        <h2>온라인 쇼핑몰 · 가맹점 뉴스</h2>
+        <p><strong>쇼핑몰·결제(PG)·전자상거래</strong> 관련 뉴스만 모은 코너예요. 수수료 정책, 법·제도, 가맹점 지원 소식을 확인하세요.</p>
+      </section>
+      <section class="section">
+        <div class="card">
+          <h3 class="section-title">
+            <span>최신 뉴스</span>
+            <span id="news-write-slot"></span>
+          </h3>
+          <div id="page-root"></div>
+        </div>
+      </section>
+    </div>
   </main>
 
 
