@@ -466,6 +466,39 @@ a.ad-slot:hover { background: #cbd5e1; }
 .page-calculator .hero.hero-banner {
   /* 동일 스타일 유지 (추가 오버라이드 없음) */
 }
+
+/* 계산기·뉴스: 브레드크럼~초록 박스 여백 완전 동일 (페이지 전환 시 똑같이) */
+.page-calculator.container,
+.page-news.container {
+  padding-top: 1.25rem;
+  padding-bottom: 2rem;
+}
+.page-calculator .breadcrumb,
+.page-news .breadcrumb {
+  margin-top: 0;
+  margin-bottom: 1rem;
+}
+.page-calculator .hero.hero-banner,
+.page-news .hero.hero-banner {
+  margin-top: 0;
+  margin-bottom: 2rem;
+}
+@media (min-width: 768px) {
+  .page-calculator.container,
+  .page-news.container {
+    padding-top: 1.5rem;
+    padding-bottom: 2.5rem;
+  }
+  .page-calculator .breadcrumb,
+  .page-news .breadcrumb {
+    margin-bottom: 1rem;
+  }
+  .page-calculator .hero.hero-banner,
+  .page-news .hero.hero-banner {
+    margin-bottom: 2rem;
+  }
+}
+
 .hero.hero-banner h2 {
   font-size: clamp(1.2rem, 4vw, 1.75rem);
   margin: 0 0 0.5rem;
