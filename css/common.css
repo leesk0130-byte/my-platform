@@ -447,22 +447,61 @@ a.ad-slot:hover { background: #cbd5e1; }
 }
 .page-calculator .hero { background: linear-gradient(135deg, #059669 0%, #047857 50%, #065f46 100%); }
 
-/* 수수료 계산기 · 뉴스 배너 크기 통일 (고정 높이, 중앙 정렬, 패딩 통일) */
+/* 수수료 계산기 · 뉴스 배너 크기·위치 완전 동일 (페이지 전환 시 똑같이 보이도록) */
 .hero.hero-banner {
   min-height: 240px;
   display: flex;
   flex-direction: column;
   justify-content: center;
+  align-items: flex-start;
   padding: 40px 60px;
+  margin-bottom: var(--space-8);
   border-radius: 20px;
   box-sizing: border-box;
-}
-.page-news .hero.hero-banner {
-  align-items: flex-start;
   text-align: left;
 }
+.page-news .hero.hero-banner,
 .page-calculator .hero.hero-banner {
-  align-items: flex-start;
+  /* 동일 스타일 유지 (추가 오버라이드 없음) */
+}
+.hero.hero-banner h2 {
+  font-size: clamp(1.2rem, 4vw, 1.75rem);
+  margin: 0 0 0.5rem;
+  line-height: 1.3;
+  text-align: left;
+  font-weight: 800;
+}
+.hero.hero-banner p {
+  font-size: 0.9375rem;
+  line-height: 1.65;
+  margin: 0 0 0.5rem;
+  text-align: left;
+  max-width: 60ch;
+  opacity: 0.95;
+}
+.hero.hero-banner p:last-child {
+  margin-bottom: 0;
+}
+/* 모바일에서도 계산기/뉴스 초록 박스 크기·위치 동일 (일반 .hero 모바일 스타일 적용 안 함) */
+@media (max-width: 768px) {
+  .hero.hero-banner {
+    min-height: 200px !important;
+    padding: 24px 20px !important;
+    margin-bottom: var(--space-8) !important;
+    margin-left: 0 !important;
+    margin-right: 0 !important;
+    border-radius: 20px !important;
+  }
+}
+@media (max-width: 767px) {
+  .hero.hero-banner {
+    min-height: 200px !important;
+    padding: 24px 20px !important;
+    margin-bottom: var(--space-8) !important;
+    margin-left: 0 !important;
+    margin-right: 0 !important;
+    border-radius: 20px !important;
+  }
 }
 
 /* ===== 섹션 · 카드 ===== */
