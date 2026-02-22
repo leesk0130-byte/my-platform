@@ -243,6 +243,27 @@
     setPostLike(postId, next ? 1 : -cur);
     if (callback) callback(null, getPostLikeCount(postId));
   }
+  function uploadImageToStorage(file, callback) {
+    if (!window.firebase || !window.firebase.storage) {
+      if (callback) callback('이미지 업로드 기능을 사용하려면 Firebase Storage가 필요합니다.');
+      return;
+    }
+    try {
+      var storage = firebase.storage();
+      var ref = storage.ref('community/' + Date.now() + '_' + Math.random().toString(36).slice(2) + (file.name ? '_' + file.name.replace(/[^a-zA-Z0-9.-]/g, '') : ''));
+      ref.put(file).then(function () {
+        ref.getDownloadURL().then(function (url) {
+          if (callback) callback(null, url);
+        }).catch(function (err) {
+          if (callback) callback(err && err.message ? err.message : 'URL을 가져오지 못했어요.');
+        });
+      }).catch(function (err) {
+        if (callback) callback(err && err.message ? err.message : '업로드에 실패했어요.');
+      });
+    } catch (e) {
+      if (callback) callback(e && e.message ? e.message : '업로드 중 오류가 났어요.');
+    }
+  }
   function isAuthorVerified(author) { return VERIFIED_AUTHORS[author] === true; }
   function verifiedBadgeHtml(verified, author) {
     if (!verified) return '';
@@ -573,6 +594,7 @@
     },
     isAuthorVerified: isAuthorVerified,
     verifiedBadgeHtml: verifiedBadgeHtml,
+    uploadImageToStorage: uploadImageToStorage,
 
     createPost: function (data, callback) {
       var url = BASE('api/community/posts');

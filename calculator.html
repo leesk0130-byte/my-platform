@@ -101,6 +101,8 @@
     .calc-result-summary { font-size: 0.8125rem; color: #0f766e; background: #ccfbf1; border-radius: 8px; padding: 0.6rem 0.9rem; margin-bottom: 1rem; line-height: 1.6; }
     /* ── 수수료율 강조 ── */
     .calc-result-rate { font-size: 0.875rem; color: #64748b; margin-top: 0.75rem; padding-top: 0.75rem; border-top: 1px dashed #99f6e4; }
+    .calc-cta-community .btn { display: inline-block; }
+    .calc-result-ad { background: #f8fafc; border-radius: 12px; overflow: hidden; }
     /* ── 계산 버튼 비활성 ── */
     #calc-do:disabled { opacity: 0.45; cursor: not-allowed; }
     footer { background: #0f172a; color: #94a3b8; padding: 2rem 1.5rem; margin-top: 2.5rem; font-size: 0.875rem; }
@@ -340,6 +342,14 @@
             <dt class="calc-result-total">절감액 (A→B 전환 시)</dt>
             <dd class="calc-result-total" id="result-save-amount">0원</dd>
           </dl>
+          <div id="calc-cta-community" class="calc-cta-community" style="display:none; margin-top:1rem; padding-top:1rem; border-top:1px solid #99f6e4;">
+            <a id="calc-cta-link" href="#" class="btn btn-primary">이 PG사로 바꿀까? 커뮤니티에 질문하기</a>
+          </div>
+        </div>
+        <!-- 계산 결과 하단 광고 (애드센스 디스플레이) -->
+        <div id="calc-result-ad" class="ad-slot calc-result-ad" style="min-height:90px; margin-top:1rem;">
+          <!-- Google AdSense: data-ad-client, data-ad-slot은 발급 후 교체 -->
+          <ins class="adsbygoogle" style="display:block" data-ad-client="ca-pub-XXXXXXXXXX" data-ad-slot="XXXXXXXXXX" data-ad-format="auto" data-full-width-responsive="true"></ins>
         </div>
       </div>
     </section>
@@ -372,6 +382,7 @@
     </div>
   </footer>
 
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
   <script src="https://www.gstatic.com/firebasejs/10.7.0/firebase-app-compat.js"></script>
   <script src="https://www.gstatic.com/firebasejs/10.7.0/firebase-auth-compat.js"></script>
   <script src="js/config.js"></script>
@@ -583,10 +594,19 @@
         summaryEl.textContent = '총 ' + toKoreanAmount(totalAmount) + ' | 카드 ' + cardRatioPct + '% / 현금 ' + cashRatioPct + '% | PG A(카드 ' + crA + '% / 현금 ' + nrA + '%) vs PG B(카드 ' + crB + '% / 현금 ' + nrB + '%)';
         var feeA = Math.round(cardAmount * crA / 100 + cashAmount * nrA / 100);
         var feeB = Math.round(cardAmount * crB / 100 + cashAmount * nrB / 100);
+        var saveAmount = feeA - feeB;
         setResult('result-comp-total', totalAmount);
         setResult('result-fee-a', feeA);
         setResult('result-fee-b', feeB);
-        setResult('result-save-amount', feeA - feeB);
+        setResult('result-save-amount', saveAmount);
+        var ctaBox = document.getElementById('calc-cta-community');
+        var ctaLink = document.getElementById('calc-cta-link');
+        if (ctaBox && ctaLink && saveAmount >= 100000) {
+          ctaLink.href = 'write.html?board=fee&title=' + encodeURIComponent('[수수료 고민] PG사 바꾸면 월 ' + toKoreanAmount(saveAmount) + ' 절약되는데 어떤가요?');
+          ctaBox.style.display = 'block';
+        } else if (ctaBox) {
+          ctaBox.style.display = 'none';
+        }
       } else {
         var cardRate = toNum(document.getElementById('card-rate').value);
         var cashRate = toNum(document.getElementById('cash-rate').value);
@@ -605,6 +625,8 @@
         var ratePct = totalAmount > 0 ? (totalFee / totalAmount * 100).toFixed(2) : '0';
         var ratePctEl = document.getElementById('result-rate-pct');
         if (ratePctEl) ratePctEl.textContent = '전체 수수료율 ' + ratePct + '% (총 거래액 대비)';
+        var ctaBox = document.getElementById('calc-cta-community');
+        if (ctaBox) ctaBox.style.display = 'none';
       }
 
       document.getElementById('calc-result').scrollIntoView({ behavior: 'smooth', block: 'nearest' });
@@ -693,49 +715,43 @@
         alert('먼저 수수료를 계산해 주세요.');
         return;
       }
-      var summary = (document.getElementById('calc-result-summary') || {}).textContent || '';
-      var lines = [ '가맹점숲 수수료 계산 결과', summary ];
-      var singleList = document.getElementById('calc-result-single');
-      var compareList = document.getElementById('calc-result-compare');
-      if (singleList && singleList.style.display !== 'none') {
-        var dts = singleList.querySelectorAll('dt');
-        var dds = singleList.querySelectorAll('dd');
-        for (var i = 0; i < dts.length && i < dds.length; i++) {
-          lines.push((dts[i].textContent || '').trim() + ' ' + (dds[i].textContent || '').trim());
-        }
+      var ctaBox = document.getElementById('calc-cta-community');
+      var ctaOrigDisplay = ctaBox ? ctaBox.style.display : '';
+      if (ctaBox) ctaBox.style.display = 'none';
+      if (typeof html2canvas === 'undefined') {
+        alert('이미지 저장 기능을 불러오는 중입니다. 잠시 후 다시 시도해 주세요.');
+        if (ctaBox) ctaBox.style.display = ctaOrigDisplay;
+        return;
       }
-      if (compareList && compareList.style.display !== 'none') {
-        var dts2 = compareList.querySelectorAll('dt');
-        var dds2 = compareList.querySelectorAll('dd');
-        for (var j = 0; j < dts2.length && j < dds2.length; j++) {
-          lines.push((dts2[j].textContent || '').trim() + ' ' + (dds2[j].textContent || '').trim());
-        }
-      }
-      var canvas = document.createElement('canvas');
-      var w = 480; var h = 80 + lines.length * 28;
-      canvas.width = w; canvas.height = h;
-      var ctx = canvas.getContext('2d');
-      ctx.fillStyle = '#0f172a';
-      ctx.fillRect(0, 0, w, h);
-      ctx.fillStyle = '#f8fafc';
-      ctx.font = 'bold 18px sans-serif';
-      ctx.fillText(lines[0] || '수수료 계산 결과', 24, 36);
-      ctx.font = '14px sans-serif';
-      for (var k = 1; k < lines.length; k++) {
-        ctx.fillText(lines[k], 24, 56 + k * 26);
-      }
-      try {
-        canvas.toBlob(function (blob) {
+      html2canvas(resultEl, { scale: 2, useCORS: true, logging: false }).then(function (canvas) {
+        if (ctaBox) ctaBox.style.display = ctaOrigDisplay;
+        var w = canvas.width;
+        var h = canvas.height;
+        var pad = 28;
+        var newH = h + pad;
+        var out = document.createElement('canvas');
+        out.width = w;
+        out.height = newH;
+        var ctx = out.getContext('2d');
+        ctx.fillStyle = '#f0fdfa';
+        ctx.fillRect(0, 0, w, newH);
+        ctx.drawImage(canvas, 0, 0);
+        ctx.fillStyle = '#64748b';
+        ctx.font = '14px sans-serif';
+        ctx.textAlign = 'center';
+        ctx.fillText('bizimshop.co.kr', w / 2, h + 18);
+        out.toBlob(function (blob) {
           var a = document.createElement('a');
           a.download = 'gmp-calc-result-' + Date.now() + '.png';
           a.href = URL.createObjectURL(blob);
           a.click();
           URL.revokeObjectURL(a.href);
         });
-      } catch (e) {
-        alert('이미지 저장을 지원하지 않는 브라우저입니다.');
-      }
-      if (window.trackEvent) window.trackEvent('share', { type: 'calc_image' });
+        if (window.trackEvent) window.trackEvent('share', { type: 'calc_image' });
+      }).catch(function (err) {
+        if (ctaBox) ctaBox.style.display = ctaOrigDisplay;
+        alert('이미지를 만들지 못했어요. 다시 시도해 주세요.');
+      });
     });
 
     /* ── URL 파라미터 복원 ── */

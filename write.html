@@ -115,6 +115,11 @@
           <div class="form-group">
             <label for="write-body">내용</label>
             <textarea id="write-body" placeholder="내용을 입력하세요" required></textarea>
+            <div class="write-image-attach" style="margin-top:0.5rem;">
+              <input type="file" id="write-image-input" accept="image/*" style="display:none;" aria-label="이미지 선택">
+              <button type="button" class="btn btn-outline btn-sm" id="write-image-btn">이미지 첨부</button>
+              <span id="write-image-status" class="form-hint" style="margin-left:0.5rem;"></span>
+            </div>
           </div>
           <div id="write-error" class="msg-error" style="display:none;"></div>
           <div class="form-actions">
@@ -140,6 +145,7 @@
 
   <script src="https://www.gstatic.com/firebasejs/10.7.0/firebase-app-compat.js"></script>
   <script src="https://www.gstatic.com/firebasejs/10.7.0/firebase-auth-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/10.7.0/firebase-storage-compat.js"></script>
   <script src="js/config.js"></script>
   <script src="js/app.js"></script>
   <script src="js/auth.js"></script>
@@ -161,12 +167,63 @@
     })();
     // 글쓰기 페이지 전용 스크립트
     (function() {
+      var DRAFT_KEY = 'merchant_plus_write_draft';
       var params = new URLSearchParams(location.search);
       var board = params.get('board');
+      var titleParam = params.get('title');
       if (board) {
         var sel = document.getElementById('write-board');
         if (sel) sel.value = board;
       }
+      if (titleParam) {
+        var titleEl = document.getElementById('write-title');
+        if (titleEl) titleEl.value = decodeURIComponent(titleParam);
+      }
+      function saveDraft() {
+        var o = {
+          title: (document.getElementById('write-title') || {}).value || '',
+          body: (document.getElementById('write-body') || {}).value || '',
+          board: (document.getElementById('write-board') || {}).value || 'free',
+          nickname: (document.getElementById('write-nickname') || {}).value || '',
+          industry: (document.getElementById('write-industry') || {}).value || '',
+          monthlyVolume: (document.getElementById('write-monthly-volume') || {}).value || '',
+          pgUsed: (document.getElementById('write-pg-used') || {}).value || '',
+          ts: Date.now()
+        };
+        if (!o.title && !o.body) return;
+        try { localStorage.setItem(DRAFT_KEY, JSON.stringify(o)); } catch (e) {}
+      }
+      function loadDraft() {
+        try {
+          var s = localStorage.getItem(DRAFT_KEY);
+          if (!s) return null;
+          return JSON.parse(s);
+        } catch (e) { return null; }
+      }
+      function clearDraft() {
+        try { localStorage.removeItem(DRAFT_KEY); } catch (e) {}
+      }
+      var draft = loadDraft();
+      if (draft && (draft.title || draft.body)) {
+        if (!titleParam && confirm('이어서 작성하시겠습니까? 임시 저장된 글이 있습니다.')) {
+          var t = document.getElementById('write-title');
+          var b = document.getElementById('write-body');
+          var brd = document.getElementById('write-board');
+          var nick = document.getElementById('write-nickname');
+          var ind = document.getElementById('write-industry');
+          var vol = document.getElementById('write-monthly-volume');
+          var pg = document.getElementById('write-pg-used');
+          if (t) t.value = draft.title || '';
+          if (b) b.value = draft.body || '';
+          if (brd) brd.value = draft.board || 'free';
+          if (nick) nick.value = draft.nickname || '';
+          if (ind) ind.value = draft.industry || '';
+          if (vol) vol.value = draft.monthlyVolume || '';
+          if (pg) pg.value = draft.pgUsed || '';
+        }
+      }
+      setInterval(saveDraft, 10000);
+
       var user = window.app && window.app.getUser && window.app.getUser();
       var nicknameInput = document.getElementById('write-nickname');
       if (user && user.name && nicknameInput && !nicknameInput.value.trim()) {
@@ -223,9 +280,39 @@
             errEl.style.display = 'block';
             return;
           }
-          if (post && post.id) location.href = 'community.html?id=' + encodeURIComponent(post.id);
+          if (post && post.id) {
+          clearDraft();
+          location.href = 'community.html?id=' + encodeURIComponent(post.id);
+        }
         });
       });
+
+      var imageBtn = document.getElementById('write-image-btn');
+      var imageInput = document.getElementById('write-image-input');
+      var imageStatus = document.getElementById('write-image-status');
+      var bodyEl = document.getElementById('write-body');
+      if (imageBtn && imageInput && bodyEl) {
+        imageBtn.addEventListener('click', function() { imageInput.click(); });
+        imageInput.addEventListener('change', function() {
+          var file = this.files && this.files[0];
+          if (!file || !file.type.match(/^image\//)) {
+            if (imageStatus) imageStatus.textContent = '이미지 파일만 선택해 주세요.';
+            return;
+          }
+          if (imageStatus) imageStatus.textContent = '업로드 중...';
+          imageInput.value = '';
+          if (!window.app || !window.app.uploadImageToStorage) {
+            if (imageStatus) imageStatus.textContent = '이미지 업로드 기능을 사용할 수 없어요.';
+            return;
+          }
+          window.app.uploadImageToStorage(file, function(err, url) {
+            if (imageStatus) imageStatus.textContent = err || '첨부 완료';
+            if (err) return;
+            var cur = bodyEl.value || '';
+            bodyEl.value = cur + (cur ? '\n\n' : '') + '<img src="' + url + '" alt="">';
+          });
+        });
+      }
     })();
     function toggleNav() {
       var nav = document.getElementById('headerNav');
