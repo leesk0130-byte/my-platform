@@ -12,6 +12,10 @@
   Content-Type: text/plain; charset=utf-8
   Cache-Control: public, max-age=86400
 
+/ads.txt
+  Content-Type: text/plain; charset=utf-8
+  Cache-Control: public, max-age=86400
+
 /BingSiteAuth.xml
   Content-Type: application/xml; charset=utf-8
 

@@ -1,3 +1,1 @@
-# Ads.txt - AdSense 계정에서 발급한 퍼블리셔 ID(pub-로 시작)로 교체하세요.
-# AdSense → 계정 → 사이트 → 사이트 정보에서 확인 가능
 google.com, pub-3006893636342653, DIRECT, f08c47fec0942fa0
