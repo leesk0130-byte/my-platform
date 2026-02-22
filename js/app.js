@@ -29,6 +29,39 @@
     return b ? b + '/' + p : '/' + p;
   };
 
+  var db = null;
+  try {
+    if (window.FIREBASE_CONFIG && window.firebase && typeof window.firebase.firestore === 'function') {
+      if (!firebase.apps.length) firebase.initializeApp(window.FIREBASE_CONFIG);
+      db = firebase.firestore();
+    }
+  } catch (e) { db = null; }
+
+  function firestoreDocToPost(docSnap) {
+    if (!docSnap || !docSnap.exists) return null;
+    var d = docSnap.data ? docSnap.data() : docSnap;
+    var createdAt = d.createdAt;
+    if (createdAt && typeof createdAt.toDate === 'function') createdAt = createdAt.toDate().toISOString();
+    else if (createdAt && typeof createdAt !== 'string') createdAt = (createdAt && createdAt.seconds) ? new Date(createdAt.seconds * 1000).toISOString() : (d.createdAt || '');
+    return {
+      id: docSnap.id,
+      title: d.title || '',
+      body: d.body || '',
+      author: d.author || '익명',
+      authorId: d.authorId != null ? d.authorId : null,
+      board: d.board || 'free',
+      hits: typeof d.hits === 'number' ? d.hits : 0,
+      verified: !!d.verified,
+      notice: !!d.notice,
+      industry: d.industry || '',
+      monthlyVolume: d.monthlyVolume || '',
+      pgUsed: d.pgUsed || '',
+      createdAt: createdAt || new Date().toISOString(),
+      commentCount: typeof d.commentCount === 'number' ? d.commentCount : 0,
+      likeCount: typeof d.likeCount === 'number' ? d.likeCount : 0
+    };
+  }
+
   // 뉴스는 API(GET /api/news)에서만 조회. 하드코딩/목업 없음.
 
   // 커뮤니티 글 전부 비움 — 직접 올릴 예정
@@ -98,25 +131,67 @@
   }
 
   function deletePost(postId, callback) {
-    var post = getLocalPostById(postId);
-    if (!post) { if (callback) callback('글을 찾을 수 없어요.'); return; }
-    if (!canEditPost(post)) { if (callback) callback('수정 권한이 없습니다.'); return; }
-    var list = getLocalPosts().filter(function (p) { return p.id !== postId; });
-    saveLocalPosts(list);
-    if (callback) callback(null);
+    function doLocalDelete() {
+      var list = getLocalPosts().filter(function (p) { return p.id !== postId; });
+      saveLocalPosts(list);
+      if (callback) callback(null);
+    }
+    function tryDelete(post) {
+      if (!post) { if (callback) callback('글을 찾을 수 없어요.'); return; }
+      if (!canEditPost(post)) { if (callback) callback('수정 권한이 없습니다.'); return; }
+      if (db && String(postId).indexOf('local_') !== 0) {
+        db.collection('posts').doc(postId).delete().then(function () { if (callback) callback(null); }).catch(function () { doLocalDelete(); });
+      } else {
+        doLocalDelete();
+      }
+    }
+    if (db && String(postId).indexOf('local_') !== 0) {
+      db.collection('posts').doc(postId).get().then(function (doc) {
+        tryDelete(doc.exists ? firestoreDocToPost(doc) : getLocalPostById(postId));
+      }).catch(function () {
+        tryDelete(getLocalPostById(postId));
+      });
+    } else {
+      tryDelete(getLocalPostById(postId));
+    }
   }
 
   function updatePost(postId, data, callback) {
-    var list = getLocalPosts();
-    var idx = list.findIndex(function (p) { return p.id === postId; });
-    if (idx === -1) { if (callback) callback('글을 찾을 수 없어요.'); return; }
-    var post = list[idx];
-    if (!canEditPost(post)) { if (callback) callback('수정 권한이 없습니다.'); return; }
-    if (data.title != null) list[idx].title = data.title;
-    if (data.body != null) list[idx].body = data.body;
-    if (data.board != null) list[idx].board = data.board;
-    saveLocalPosts(list);
-    if (callback) callback(null, list[idx]);
+    function doLocalUpdate() {
+      var list = getLocalPosts();
+      var idx = list.findIndex(function (p) { return p.id === postId; });
+      if (idx === -1) { if (callback) callback('글을 찾을 수 없어요.'); return; }
+      if (data.title != null) list[idx].title = data.title;
+      if (data.body != null) list[idx].body = data.body;
+      if (data.board != null) list[idx].board = data.board;
+      saveLocalPosts(list);
+      if (callback) callback(null, list[idx]);
+    }
+    function tryUpdate(post) {
+      if (!post) { if (callback) callback('글을 찾을 수 없어요.'); return; }
+      if (!canEditPost(post)) { if (callback) callback('수정 권한이 없습니다.'); return; }
+      if (db && String(postId).indexOf('local_') !== 0) {
+        var upd = {};
+        if (data.title != null) upd.title = data.title;
+        if (data.body != null) upd.body = data.body;
+        if (data.board != null) upd.board = data.board;
+        if (Object.keys(upd).length === 0) { if (callback) callback(null, post); return; }
+        db.collection('posts').doc(postId).update(upd).then(function () {
+          if (callback) callback(null, Object.assign({}, post, upd));
+        }).catch(function () { doLocalUpdate(); });
+      } else {
+        doLocalUpdate();
+      }
+    }
+    if (db && String(postId).indexOf('local_') !== 0) {
+      db.collection('posts').doc(postId).get().then(function (doc) {
+        tryUpdate(doc.exists ? firestoreDocToPost(doc) : getLocalPostById(postId));
+      }).catch(function () {
+        tryUpdate(getLocalPostById(postId));
+      });
+    } else {
+      tryUpdate(getLocalPostById(postId));
+    }
   }
 
   function togglePostNotice(postId, callback) {
@@ -153,16 +228,48 @@
   }
   function getComments(postId, callback) {
     var url = BASE('api/community/posts/' + (postId || '') + '/comments');
+    function fallbackFirestore() {
+      if (db) {
+        db.collection('posts').doc(postId).collection('comments').orderBy('createdAt', 'asc').get()
+          .then(function (snap) {
+            var list = [];
+            snap.forEach(function (doc) {
+              var d = doc.data();
+              var createdAt = d.createdAt;
+              if (createdAt && typeof createdAt.toDate === 'function') createdAt = createdAt.toDate().toISOString();
+              else if (createdAt && typeof createdAt !== 'string' && createdAt && createdAt.seconds) createdAt = new Date(createdAt.seconds * 1000).toISOString();
+              list.push({
+                id: doc.id,
+                author: d.author || '익명',
+                body: d.body || '',
+                parentId: d.parentId || null,
+                verified: !!d.verified,
+                createdAt: createdAt || ''
+              });
+            });
+            list.sort(function (a, b) { return commentSortKey(a) - commentSortKey(b); });
+            callback(null, list);
+          })
+          .catch(function () {
+            var local = getLocalComments(postId);
+            var hidden = getHiddenCommentIds(postId);
+            var mock = getMockComments(postId).filter(function (c) { return hidden.indexOf(c.id) === -1; });
+            var combined = local.concat(mock);
+            combined.sort(function (a, b) { return commentSortKey(a) - commentSortKey(b); });
+            callback(null, combined);
+          });
+        return;
+      }
+      var local = getLocalComments(postId);
+      var hidden = getHiddenCommentIds(postId);
+      var mock = getMockComments(postId).filter(function (c) { return hidden.indexOf(c.id) === -1; });
+      var combined = local.concat(mock);
+      combined.sort(function (a, b) { return commentSortKey(a) - commentSortKey(b); });
+      callback(null, combined);
+    }
     fetch(url).then(function (res) { return res.ok ? res.json() : Promise.reject(); })
       .then(function (data) { callback(null, data.items || data || []); })
-      .catch(function () {
-        var local = getLocalComments(postId);
-        var hidden = getHiddenCommentIds(postId);
-        var mock = getMockComments(postId).filter(function (c) { return hidden.indexOf(c.id) === -1; });
-        var combined = local.concat(mock);
-        combined.sort(function (a, b) { return commentSortKey(a) - commentSortKey(b); });
-        callback(null, combined);
-      });
+      .catch(fallbackFirestore);
   }
   function addLocalComment(postId, data) {
     var list = getLocalComments(postId);
@@ -235,6 +342,29 @@
     var token = getToken();
     var headers = { 'Content-Type': 'application/json' };
     if (token) headers['Authorization'] = 'Bearer ' + token;
+    function fallbackFirestore() {
+      if (db) {
+        var payload = {
+          author: data.author || '익명',
+          body: data.body || '',
+          parentId: data.parentId || null,
+          createdAt: new Date().toISOString(),
+          verified: false
+        };
+        db.collection('posts').doc(postId).collection('comments').add(payload).then(function (ref) {
+          var comment = { id: ref.id, author: payload.author, body: payload.body, parentId: payload.parentId, createdAt: payload.createdAt, verified: false };
+          var inc = firebase.firestore && firebase.firestore.FieldValue && firebase.firestore.FieldValue.increment;
+          if (inc) {
+            db.collection('posts').doc(postId).update({ commentCount: inc(1) }).catch(function () {});
+          }
+          if (callback) callback(null, comment);
+        }).catch(function () {
+          fallbackLocal();
+        });
+        return;
+      }
+      fallbackLocal();
+    }
     function fallbackLocal() {
       try {
         var comment = addLocalComment(postId, data);
@@ -253,22 +383,64 @@
     }).then(function (result) {
       if (result && result.id && callback) callback(null, result);
       else if (callback) callback(result && (result.error || result.message) ? (result.error || result.message) : '등록 실패');
-    }).catch(function () {
-      fallbackLocal();
-    });
+    }).catch(fallbackFirestore);
   }
   function togglePostLike(postId, callback) {
     var sid = String(postId);
     var liked = getLikedPosts();
+    var u = getUser();
+    var anonId = localStorage.getItem('merchant_plus_anon_id');
+    if (!anonId) {
+      anonId = 'anon_' + Date.now() + '_' + Math.random().toString(36).slice(2);
+      try { localStorage.setItem('merchant_plus_anon_id', anonId); } catch (e) {}
+    }
+    var userId = (u && u.uid) ? u.uid : anonId;
+    function syncLocalAndCallback(newCount, alreadyLiked) {
+      setPostLike(postId, newCount);
+      if (alreadyLiked) setLikedPosts(liked.filter(function (id) { return id !== sid; }));
+      else setLikedPosts(liked.concat(sid));
+      if (callback) callback(null, newCount);
+    }
+    if (db && sid.indexOf('local_') !== 0) {
+      var likeRef = db.collection('posts').doc(postId).collection('likes').doc(userId);
+      var postRef = db.collection('posts').doc(postId);
+      var inc = firebase.firestore && firebase.firestore.FieldValue && firebase.firestore.FieldValue.increment;
+      likeRef.get().then(function (likeSnap) {
+        var alreadyLiked = likeSnap.exists;
+        postRef.get().then(function (postSnap) {
+          var curCount = postSnap.exists && postSnap.data() ? (postSnap.data().likeCount || 0) : 0;
+          if (alreadyLiked) {
+            likeRef.delete().then(function () {
+              if (inc) postRef.update({ likeCount: inc(-1) }).then(function () { syncLocalAndCallback(Math.max(0, curCount - 1), true); }).catch(function () { syncLocalAndCallback(Math.max(0, curCount - 1), true); });
+              else syncLocalAndCallback(Math.max(0, curCount - 1), true);
+            }).catch(function () { syncLocalAndCallback(getPostLikeCount(postId), true); });
+          } else {
+            likeRef.set({ createdAt: new Date().toISOString() }).then(function () {
+              if (inc) postRef.update({ likeCount: inc(1) }).then(function () { syncLocalAndCallback(curCount + 1, false); }).catch(function () { syncLocalAndCallback(curCount + 1, false); });
+              else syncLocalAndCallback(curCount + 1, false);
+            }).catch(function () { syncLocalAndCallback(getPostLikeCount(postId), false); });
+          }
+        }).catch(function () {
+          var already = liked.indexOf(sid) !== -1;
+          if (already) { setPostLike(postId, -1); setLikedPosts(liked.filter(function (id) { return id !== sid; })); }
+          else { setPostLike(postId, 1); setLikedPosts(liked.concat(sid)); }
+          if (callback) callback(null, getPostLikeCount(postId));
+        });
+      }).catch(function () {
+        var already = liked.indexOf(sid) !== -1;
+        if (already) { setPostLike(postId, -1); setLikedPosts(liked.filter(function (id) { return id !== sid; })); }
+        else { setPostLike(postId, 1); setLikedPosts(liked.concat(sid)); }
+        if (callback) callback(null, getPostLikeCount(postId));
+      });
+      return;
+    }
     var alreadyLiked = liked.indexOf(sid) !== -1;
     if (alreadyLiked) {
       setPostLike(postId, -1);
-      liked = liked.filter(function (id) { return id !== sid; });
-      setLikedPosts(liked);
+      setLikedPosts(liked.filter(function (id) { return id !== sid; }));
     } else {
       setPostLike(postId, 1);
-      liked = liked.concat(sid);
-      setLikedPosts(liked);
+      setLikedPosts(liked.concat(sid));
     }
     if (callback) callback(null, getPostLikeCount(postId));
   }
@@ -369,6 +541,10 @@
     if (last != null && (now - last) < VIEW_COOLDOWN) return false;
     lastMap[postId] = now;
     try { localStorage.setItem(LAST_VIEWED_KEY, JSON.stringify(lastMap)); } catch (e) {}
+    if (db && String(postId).indexOf('local_') !== 0) {
+      var inc = firebase.firestore && firebase.firestore.FieldValue && firebase.firestore.FieldValue.increment;
+      if (inc) db.collection('posts').doc(postId).update({ hits: inc(1) }).catch(function () {});
+    }
     var views = getPostViews();
     views[postId] = (views[postId] || 0) + 1;
     try { localStorage.setItem(POST_VIEWS_KEY, JSON.stringify(views)); } catch (e) {}
@@ -424,7 +600,56 @@
     },
 
     fetchPosts: function (board, limit, offset, callback, sort) {
-      // sort: 'latest' | 'hits' | 'comments' | 'likes'
+      var order = sort || 'latest';
+      var lim = limit || 20;
+      var off = offset || 0;
+      function finish(list) {
+        var filtered = (board && board !== 'all') ? list.filter(function (p) { return (p.board || 'free') === board; }) : list.slice();
+        filtered.sort(function (a, b) {
+          if (b.notice && !a.notice) return 1;
+          if (a.notice && !b.notice) return -1;
+          if (order === 'hits') return (b.hits || 0) - (a.hits || 0);
+          if (order === 'comments') return (b.commentCount || 0) - (a.commentCount || 0);
+          if (order === 'likes') return (b.likeCount || 0) - (a.likeCount || 0);
+          var ta = (a.createdAt && new Date(a.createdAt).getTime()) || 0;
+          var tb = (b.createdAt && new Date(b.createdAt).getTime()) || 0;
+          return tb - ta;
+        });
+        if (callback) callback(null, filtered.slice(off, off + lim), filtered.length);
+      }
+      if (db) {
+        db.collection('posts').orderBy('createdAt', 'desc').get()
+          .then(function (snap) {
+            var list = [];
+            snap.forEach(function (doc) {
+              var p = firestoreDocToPost(doc);
+              if (p) list.push(p);
+            });
+            finish(list);
+          })
+          .catch(function () {
+            var local = getLocalPosts();
+            var list = local.map(function (p) {
+              var localComments = getLocalComments(p.id);
+              var additionalViews = typeof getPostViewCount === 'function' ? getPostViewCount(p.id) : 0;
+              return {
+                id: p.id,
+                title: p.title,
+                author: p.author,
+                board: p.board || 'free',
+                hits: (p.hits != null ? p.hits : 0) + additionalViews,
+                verified: p.verified,
+                notice: !!p.notice,
+                commentCount: localComments.length,
+                likeCount: getPostLikeCount(p.id),
+                body: p.body,
+                createdAt: p.createdAt
+              };
+            });
+            finish(list);
+          });
+        return;
+      }
       var local = getLocalPosts();
       var list = local.map(function (p) {
         var localComments = getLocalComments(p.id);
@@ -443,84 +668,80 @@
           createdAt: p.createdAt
         };
       });
-      var filtered = (board && board !== 'all') ? list.filter(function (p) { return p.board === board; }) : list;
-      filtered.sort(function (a, b) {
-        if (b.notice && !a.notice) return 1;
-        if (a.notice && !b.notice) return -1;
-        var order = sort || 'latest';
-        if (order === 'hits') return (b.hits || 0) - (a.hits || 0);
-        if (order === 'comments') return (b.commentCount || 0) - (a.commentCount || 0);
-        if (order === 'likes') return (b.likeCount || 0) - (a.likeCount || 0);
-        var ta = (a.createdAt && new Date(a.createdAt).getTime()) || 0;
-        var tb = (b.createdAt && new Date(b.createdAt).getTime()) || 0;
-        return tb - ta;
-      });
-      if (callback) callback(null, filtered.slice(offset || 0, (offset || 0) + (limit || 20)), filtered.length);
+      finish(list);
+    },
+    getPostById: function (postId, callback) {
+      if (!postId || !callback) return;
+      if (db) {
+        db.collection('posts').doc(postId).get()
+          .then(function (doc) {
+            if (doc.exists) {
+              callback(null, firestoreDocToPost(doc));
+            } else {
+              var local = getLocalPostById(postId);
+              callback(null, local);
+            }
+          })
+          .catch(function () {
+            callback(null, getLocalPostById(postId));
+          });
+        return;
+      }
+      callback(null, getLocalPostById(postId));
     },
     getPostLikeCount: getPostLikeCount,
     hasUserLikedPost: hasUserLikedPost,
+    getUserLikedState: function (postId, callback) {
+      if (!postId || !callback) return;
+      var u = getUser();
+      var anonId = localStorage.getItem('merchant_plus_anon_id');
+      var userId = (u && u.uid) ? u.uid : (anonId || '');
+      if (db && String(postId).indexOf('local_') !== 0 && userId) {
+        db.collection('posts').doc(postId).collection('likes').doc(userId).get()
+          .then(function (doc) {
+            var liked = doc.exists;
+            if (liked) {
+              var arr = getLikedPosts();
+              if (arr.indexOf(String(postId)) === -1) setLikedPosts(arr.concat(String(postId)));
+              setPostLike(postId, 1);
+            }
+            callback(liked);
+          })
+          .catch(function () { callback(hasUserLikedPost(postId)); });
+      } else {
+        callback(hasUserLikedPost(postId));
+      }
+    },
     setPostLike: setPostLike,
     togglePostLike: togglePostLike,
 
     getPostsByIds: function (ids, callback) {
       if (!ids || !ids.length) { if (callback) callback(null, []); return; }
-      var local = getLocalPosts();
-      var       withComments = local.map(function (p) {
-        var localComments = getLocalComments(p.id);
-        var additionalViews = typeof getPostViewCount === 'function' ? getPostViewCount(p.id) : 0;
-        return {
-          id: p.id,
-          title: p.title,
-          author: p.author,
-          board: p.board || 'free',
-          hits: (p.hits != null ? p.hits : 0) + additionalViews,
-          verified: p.verified,
-          notice: !!p.notice,
-          commentCount: localComments.length,
-          likeCount: getPostLikeCount(p.id),
-          body: p.body,
-          createdAt: p.createdAt
-        };
-      });
-      var idSet = {};
-      ids.forEach(function (id) { idSet[id] = true; });
-      var ordered = ids.map(function (id) {
-        return withComments.filter(function (p) { return p.id === id; })[0];
-      }).filter(Boolean);
-      if (callback) callback(null, ordered);
+      var self = this;
+      this.fetchPosts('all', 500, 0, function (err, list) {
+        if (err || !list) { if (callback) callback(null, []); return; }
+        var idSet = {};
+        ids.forEach(function (id) { idSet[id] = true; });
+        var byId = {};
+        list.forEach(function (p) { if (idSet[p.id]) byId[p.id] = p; });
+        var ordered = ids.map(function (id) { return byId[id]; }).filter(Boolean);
+        if (callback) callback(null, ordered);
+      }, 'latest');
     },
 
     getRelatedPosts: function (postId, limit, callback) {
-      var post = getLocalPostById(postId);
-      if (!post) { if (callback) callback(null, []); return; }
-      var board = post.board || 'free';
-      var local = getLocalPosts();
-      var       withComments = local.map(function (p) {
-        var localComments = getLocalComments(p.id);
-        var additionalViews = typeof getPostViewCount === 'function' ? getPostViewCount(p.id) : 0;
-        return {
-          id: p.id,
-          title: p.title,
-          author: p.author,
-          board: p.board || 'free',
-          hits: (p.hits != null ? p.hits : 0) + additionalViews,
-          verified: p.verified,
-          notice: !!p.notice,
-          commentCount: localComments.length,
-          likeCount: getPostLikeCount(p.id),
-          body: p.body,
-          createdAt: p.createdAt
-        };
+      var self = this;
+      this.getPostById(postId, function (err, post) {
+        if (!post) { if (callback) callback(null, []); return; }
+        var board = post.board || 'free';
+        self.fetchPosts(board, 100, 0, function (err, list) {
+          if (err || !list) { if (callback) callback(null, []); return; }
+          var related = list
+            .filter(function (p) { return p.id !== postId; })
+            .slice(0, limit || 5);
+          if (callback) callback(null, related);
+        }, 'latest');
       });
-      var related = withComments
-        .filter(function (p) { return p.id !== postId && (p.board || 'free') === board; })
-        .sort(function (a, b) {
-          var ta = (a.createdAt && new Date(a.createdAt).getTime()) || 0;
-          var tb = (b.createdAt && new Date(b.createdAt).getTime()) || 0;
-          return tb - ta;
-        })
-        .slice(0, limit || 5);
-      if (callback) callback(null, related);
     },
 
     getLocalPosts: getLocalPosts,
@@ -633,9 +854,36 @@
       var token = getToken();
       var headers = { 'Content-Type': 'application/json' };
       if (token) headers['Authorization'] = 'Bearer ' + token;
+      var u = getUser();
+      function fallbackFirestore() {
+        if (db) {
+          var payload = {
+            title: data.title || '',
+            body: data.body || '',
+            author: data.author || '익명',
+            authorId: u ? u.uid : null,
+            board: data.board || 'free',
+            createdAt: new Date().toISOString(),
+            notice: !!(data.notice),
+            industry: data.industry || '',
+            monthlyVolume: data.monthlyVolume || '',
+            pgUsed: data.pgUsed || '',
+            hits: 0,
+            likeCount: 0,
+            commentCount: 0,
+            verified: false
+          };
+          db.collection('posts').add(payload).then(function (ref) {
+            if (callback) callback(null, { id: ref.id, title: payload.title, body: payload.body, author: payload.author, authorId: payload.authorId, board: payload.board, createdAt: payload.createdAt, notice: payload.notice, industry: payload.industry, monthlyVolume: payload.monthlyVolume, pgUsed: payload.pgUsed, hits: 0, verified: false });
+          }).catch(function () {
+            fallbackLocal();
+          });
+          return;
+        }
+        fallbackLocal();
+      }
       function fallbackLocal() {
         try {
-          var u = getUser();
           var post = addLocalPost({ title: data.title, body: data.body, author: data.author, board: data.board, notice: data.notice, authorId: u ? u.uid : null, industry: data.industry, monthlyVolume: data.monthlyVolume, pgUsed: data.pgUsed });
           if (callback) callback(null, post);
         } catch (e) {
@@ -662,7 +910,7 @@
           if (callback) callback(null, result);
         } else if (callback) callback(result && (result.error || result.message) ? (result.error || result.message) : '등록 실패');
       }).catch(function () {
-        fallbackLocal();
+        fallbackFirestore();
       });
     },
 

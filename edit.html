@@ -83,6 +83,7 @@
 
   <script src="https://www.gstatic.com/firebasejs/10.7.0/firebase-app-compat.js"></script>
   <script src="https://www.gstatic.com/firebasejs/10.7.0/firebase-auth-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/10.7.0/firebase-firestore-compat.js"></script>
   <script src="js/config.js"></script>
   <script src="js/app.js"></script>
   <script src="js/auth.js"></script>
@@ -110,23 +111,24 @@
       var cancelLink = document.getElementById('edit-cancel');
       if (cancelLink) cancelLink.href = 'community.html?id=' + encodeURIComponent(postId || '');
 
-      if (!postId || !window.app) {
+      if (!postId || !window.app || !window.app.getPostById) {
         if (notFoundEl) notFoundEl.style.display = 'block';
         return;
       }
-      var post = window.app.getLocalPostById(postId);
-      if (!post) {
-        if (notFoundEl) notFoundEl.style.display = 'block';
-        return;
-      }
-      if (!window.app.canEditPost || !window.app.canEditPost(post)) {
-        if (noPermEl) noPermEl.style.display = 'block';
-        return;
-      }
-      if (formWrap) formWrap.style.display = 'block';
-      document.getElementById('edit-title').value = post.title || '';
-      document.getElementById('edit-body').value = post.body || '';
-      document.getElementById('edit-board').value = post.board || 'free';
+      window.app.getPostById(postId, function(err, post) {
+        if (!post) {
+          if (notFoundEl) notFoundEl.style.display = 'block';
+          return;
+        }
+        if (!window.app.canEditPost || !window.app.canEditPost(post)) {
+          if (noPermEl) noPermEl.style.display = 'block';
+          return;
+        }
+        if (formWrap) formWrap.style.display = 'block';
+        document.getElementById('edit-title').value = post.title || '';
+        document.getElementById('edit-body').value = post.body || '';
+        document.getElementById('edit-board').value = post.board || 'free';
+      });
 
       document.getElementById('editForm').addEventListener('submit', function(e) {
         e.preventDefault();
