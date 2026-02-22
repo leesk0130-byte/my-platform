@@ -20,7 +20,7 @@
 
 - API 서버를 두면 **CORS(Cross-Origin Resource Sharing)** 를 설정해야 합니다.
 - **허용 도메인 화이트리스트**에 다음만 넣어 두세요.
-  - `https://my-platform.pages.dev`
+  - `https://bizimshop.co.kr`
   - 커스텀 도메인 사용 시: `https://your-domain.com`
 - `Access-Control-Allow-Origin`에 `*`를 쓰지 말고, 위 도메인만 명시하세요.
 

@@ -32,7 +32,7 @@
 1. **https://search.google.com/search-console** 접속  
 2. Google 계정으로 로그인  
 3. **속성 추가** → **URL 접두어** 선택  
-4. 사이트 주소 입력: **https://my-platform.pages.dev**  
+4. 사이트 주소 입력: **https://bizimshop.co.kr**  
 5. 소유권 확인: **HTML 태그** 또는 **HTML 파일** 방식 중 하나 선택해서 안내대로 하면 돼요.  
    - **HTML 태그**라면: `<meta name="google-site-verification" content="여기_나오는_값" />` 를 **index.html**의 `<head>` 안에 넣어 주세요. (한 줄만 추가하면 됨)  
 6. 확인이 끝나면 **Search Console에 사이트가 등록**된 거예요.
@@ -41,7 +41,7 @@
 
 1. Search Console에서 해당 속성(사이트) 선택  
 2. 왼쪽 메뉴 **색인 생성** → **Sitemaps**  
-3. **새 사이트맵 추가**에 **sitemap.xml** 입력 (또는 `https://my-platform.pages.dev/sitemap.xml`)  
+3. **새 사이트맵 추가**에 **sitemap.xml** 입력 (또는 `https://bizimshop.co.kr/sitemap.xml`)  
 4. **제출** 클릭  
 
 → 구글이 **sitemap.xml**에 적어 둔 주소들을 주기적으로 방문해서 검색 결과에 반영해요.
@@ -49,8 +49,8 @@
 **사이트맵이 "가져올 수 없음"으로 나올 때**
 
 - **구글에 사이트맵 알리기 (핑):** 브라우저에서 아래 주소를 **그대로** 열어 보세요. 구글이 사이트맵을 가져오라고 요청하는 주소예요.  
-  `https://www.google.com/ping?sitemap=https://my-platform.pages.dev/sitemap.xml`  
-- **URL 검사:** Search Console 왼쪽 상단 **URL 검사**에 `https://my-platform.pages.dev/sitemap.xml` 붙여 넣고 **Enter** → 구글이 보는 결과와 오류 메시지를 확인할 수 있어요.  
+  `https://www.google.com/ping?sitemap=https://bizimshop.co.kr/sitemap.xml`  
+- **URL 검사:** Search Console 왼쪽 상단 **URL 검사**에 `https://bizimshop.co.kr/sitemap.xml` 붙여 넣고 **Enter** → 구글이 보는 결과와 오류 메시지를 확인할 수 있어요.  
 - 사이트맵이 계속 실패해도 **메인·뉴스·커뮤니티 등 링크**를 따라 구글이 페이지를 찾아갈 수 있어요. 사이트맵은 “빨리/많이” 알려 주는 용도라, **색인 자체는 시간이 지나면 될 수 있어요.**
 
 ### 3-3. 나머지는 시간이 걸림
@@ -78,7 +78,7 @@
 
 - **코드 쪽**: 제목, 메타 설명, 키워드, canonical, Open Graph, **robots.txt**, **sitemap.xml** 적용해 두었어요.  
 - **당신이 할 일**:  
-  1) **Google Search Console**에 **https://my-platform.pages.dev** 등록하고 소유권 확인  
+  1) **Google Search Console**에 **https://bizimshop.co.kr** 등록하고 소유권 확인  
   2) **Sitemaps** 메뉴에서 **sitemap.xml** 제출  
   3) 며칠~몇 주 기다리면 구글 검색에 조금씩 노출됨  
 
