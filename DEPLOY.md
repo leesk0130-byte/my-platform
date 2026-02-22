@@ -8,9 +8,10 @@
 ## 전체 순서 한 줄 요약
 
 1. **GitHub** = 내 코드를 인터넷에 올려두는 창고 만드는 것  
-2. **Cloudflare** = 그 창고를 보고 **진짜 사이트 주소**(예: https://xxx.pages.dev)로 열어 주는 것  
+2. **Cloudflare** = 그 창고를 보고 사이트를 호스팅한 뒤, **커스텀 도메인 https://bizimshop.co.kr** 로 열어 주는 것  
 3. **Firebase** = 로그인·회원가입·글 저장을 **진짜로** 쓰려면 나중에 설정하는 것  
 
+**공개 사이트 주소**: **https://bizimshop.co.kr** (검색·공유는 이 주소만 사용합니다.)  
 **“일단 사이트만 주소로 열리게”** 하려면 → **1번 + 2번**만 하면 됩니다.
 
 ---
@@ -90,7 +91,7 @@ Enter 누름.
 
 # 2단계: Cloudflare (사이트 주소로 열리게 하기)
 
-**목적**: GitHub에 올린 코드를 **실제 사이트 주소**(예: https://my-platform-xxxx.pages.dev)로 누구나 볼 수 있게 합니다.
+**목적**: GitHub에 올린 코드를 Cloudflare Pages로 호스팅하고, **공개 주소 https://bizimshop.co.kr** 로 누구나 볼 수 있게 합니다. (Cloudflare가 부여하는 \*.pages.dev 주소는 커스텀 도메인 연결 전까지만 쓰고, 검색·공유는 bizimshop.co.kr 만 사용합니다.)
 
 ## 2-1. Cloudflare 가입
 
@@ -129,7 +130,7 @@ Enter 누름.
 
 1~2분 기다리면 **Deploy 성공**이라고 나옵니다.  
 **Visit site** 또는 **사이트 주소**를 클릭하면 **가맹점숲 사이트가 인터넷 주소로** 열립니다.  
-주소는 예: **https://my-platform-xxxx.pages.dev** 같은 형태입니다.  
+Cloudflare가 부여하는 기본 주소는 **https://my-platform-xxxx.pages.dev** 형태입니다. **커스텀 도메인**으로 **https://bizimshop.co.kr** 을 연결하면, 공개·검색용으로는 **bizimshop.co.kr** 만 사용합니다.  
 이 주소를 **메모해 두면** 나중에 누구에게나 “여기 들어가 보세요” 하고 줄 수 있습니다.
 
 **여기까지 하면 “서버 개설 + 사이트 공개”는 끝입니다.**
@@ -189,7 +190,7 @@ Enter 누름.
 | 2 | Cursor 터미널에서 `git init` ~ `git push` 까지 실행 | Cursor 하단 TERMINAL |
 | 3 | Cloudflare 가입 → Workers & Pages → Connect to Git → my-platform 선택 | dash.cloudflare.com |
 | 4 | Build command 비우고, Build output directory에 `/` 입력 → Save and Deploy | 같은 화면 |
-| 5 | 완료 후 나온 **사이트 주소** 메모 (예: https://my-platform-xxxx.pages.dev) | Visit site 클릭 |
+| 5 | 완료 후 **Custom domains**에서 **bizimshop.co.kr** 연결. 공개 주소는 **https://bizimshop.co.kr** | Workers & Pages → my-platform → Custom domains |
 
 **1~5까지 하면 “서버 개설 + 주소로 사이트 열기”는 끝입니다.**  
 궁금한 단계가 있으면 “2단계 Cloudflare에서 저장소가 안 보여요”처럼 **몇 단계에서 무엇이 안 되는지** 말해 주시면, 그 부분만 더 정확히 적어 드리겠습니다.

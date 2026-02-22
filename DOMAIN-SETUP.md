@@ -1,6 +1,8 @@
 # bizimshop.co.kr 도메인 연결 (가비아 + Cloudflare Pages)
 
-사이트 코드에는 이미 **bizimshop.co.kr** 이 반영되어 있습니다. 아래 두 곳만 설정하면 됩니다.
+**공개·검색용 주소는 https://bizimshop.co.kr 만 사용합니다.** 이전 \*.pages.dev 주소는 검색에서 제한될 수 있어 사용하지 않습니다. 사이트 코드·canonical·sitemap·og:url 은 모두 bizimshop.co.kr 로 맞춰 두었습니다.
+
+아래는 DNS·Cloudflare 설정 안내입니다.
 
 ---
 
