@@ -68,7 +68,32 @@
 
 ---
 
-## 4. 연결 후 확인
+## 4. "도메인 추가(Add site)"로 진행한 경우 — 지금 화면에서
+
+1. **Enter an existing domain** 칸에 **bizimshop.co.kr** 입력 (example.com 지우고).
+2. **Quick scan for DNS records** 그대로 선택.
+3. **Block AI training bots** / robots.txt 토글은 그대로 두고 **Continue** (또는 다음) 클릭.
+4. 다음 화면에서 Cloudflare가 가비아 DNS를 스캔해서 레코드를 보여주면 **그대로 두고** 다시 **Continue**.
+5. 요금제 선택 화면이 나오면 **Free** 선택 후 **Continue**.
+6. **네임서버 안내 화면**이 나옵니다. 여기서 **두 개의 주소**가 나옵니다. 예:
+   - `xxx.ns.cloudflare.com`
+   - `yyy.ns.cloudflare.com`
+7. **가비아로 이동**  
+   - MY가비아 → 도메인 관리 → **bizimshop.co.kr** → **네임서버 변경** (또는 DNS 서버 설정).
+   - 기존 네임서버를 **지우고**, Cloudflare에서 복사한 **두 개**를 넣고 저장.
+8. Cloudflare 화면으로 돌아와서 **Done, check nameservers** (또는 네임서버 확인) 클릭.  
+   - 전파까지 최대 24시간 걸릴 수 있음 (보통 수 분~몇 시간).
+9. **연결이 완료된 뒤**, Cloudflare DNS에 **CNAME**이 있어야 사이트가 뜹니다.  
+   - Cloudflare 대시보드 → **bizimshop.co.kr** → **DNS** → **Records**.  
+   - **@** 또는 **bizimshop.co.kr** 에 대한 **CNAME**이 **my-platform.pages.dev** 를 가리키는지 확인.  
+   - 없으면 **Add record** → 타입 **CNAME**, 이름 **@**, Target **my-platform.pages.dev** (끝에 점 있으면 **my-platform.pages.dev.**) 저장.
+10. **Pages에 커스텀 도메인 등록**  
+    - **Workers & Pages** → **my-platform** → **Custom domains** → **Set up a custom domain** → **bizimshop.co.kr** 입력 후 추가.  
+    - 이렇게 해야 bizimshop.co.kr 로 접속 시 실제로 Pages 사이트가 열립니다.
+
+---
+
+## 5. 연결 후 확인
 
 - https://bizimshop.co.kr 접속
 - https://bizimshop.co.kr/ads.txt (AdSense용)
@@ -76,7 +101,7 @@
 
 ---
 
-## 5. Firebase/기타 서비스
+## 6. Firebase/기타 서비스
 
 - **Firebase Authentication** 사용 중이면: **승인된 도메인**에 `bizimshop.co.kr` 추가 (DEPLOY.md 참고)
 - **Google Search Console**: 속성으로 `https://bizimshop.co.kr` 추가 후 소유권 확인
