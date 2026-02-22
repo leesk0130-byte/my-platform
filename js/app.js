@@ -597,6 +597,10 @@
       if (db) {
         db.collection('posts').orderBy('createdAt', 'desc').get()
           .then(function (snap) {
+            if (snap.empty) {
+              if (callback) callback(null, [], 0);
+              return;
+            }
             var list = [];
             try {
               snap.forEach(function (doc) {
