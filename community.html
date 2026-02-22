@@ -593,7 +593,7 @@
         setListUI(true);
         var sortOrder = (sortSelect && sortSelect.value) || sortBy;
         window.app.fetchPosts(board, 500, 0, function(err, items) {
-          if (err) { setListUI(true); renderError(err); return; }
+          if (err) { console.error('[community] fetchPosts 오류', err); setListUI(true); renderError(err); return; }
           allFilteredItems = applyFilterAndSort(items || []);
           if (!append) currentShown = Math.min(PAGE_SIZE, allFilteredItems.length);
           else currentShown = Math.min(currentShown + PAGE_SIZE, allFilteredItems.length);

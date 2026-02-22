@@ -269,6 +269,7 @@
             <div class="form-group">
               <label for="card-rate">카드 수수료율 (%)</label>
               <input type="number" id="card-rate" inputmode="decimal" placeholder="예: 3.2" min="0" max="100" step="0.01" value="3.2">
+              <p class="form-hint" style="margin-top:0.35rem;">2026년 영세(연매출 3억 이하) 우대 수수료 <strong>0.4%</strong> 적용 시 <button type="button" class="calc-preset-btn" id="calc-preset-young" style="margin-left:0.25rem;">0.4% 적용</button></p>
             </div>
             <div class="form-group">
               <label for="cash-rate">현금·실시간이체 수수료율 (%)</label>
@@ -557,6 +558,16 @@
         validate();
       });
     });
+    /* 2026 영세 우대 0.4% 프리셋 (app.FEE_2026.CARD_YOUNG과 동일) */
+    var youngPreset = document.getElementById('calc-preset-young');
+    if (youngPreset) {
+      youngPreset.addEventListener('click', function () {
+        var rate = (window.app && window.app.FEE_2026 && typeof window.app.FEE_2026.CARD_YOUNG === 'number')
+          ? window.app.FEE_2026.CARD_YOUNG : 0.4;
+        document.getElementById('card-rate').value = rate;
+        validate();
+      });
+    }
 
     /* ── 계산 실행 ── */
     calcBtn.addEventListener('click', function () {

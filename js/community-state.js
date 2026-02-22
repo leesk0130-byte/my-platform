@@ -457,6 +457,7 @@
     
     window.app.fetchPosts(board, 500, 0, function(err, items) {
       if (err) {
+        console.error('[community-state] fetchPosts 오류', err);
         renderPage('error', err);
         return;
       }
@@ -482,10 +483,11 @@
     
     window.app.fetchPosts('all', 500, 0, function(err, items) {
       if (err) {
+        console.error('[community-state] fetchPosts(상세) 오류', err);
         renderPage('error', err);
         return;
       }
-      
+
       var post = (items || []).find(function(p) { return p.id === id; });
       
       if (post) {

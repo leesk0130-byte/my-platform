@@ -621,13 +621,23 @@
         db.collection('posts').orderBy('createdAt', 'desc').get()
           .then(function (snap) {
             var list = [];
-            snap.forEach(function (doc) {
-              var p = firestoreDocToPost(doc);
-              if (p) list.push(p);
-            });
+            try {
+              snap.forEach(function (doc) {
+                try {
+                  var p = firestoreDocToPost(doc);
+                  if (p) list.push(p);
+                } catch (docErr) {
+                  console.warn('[app.js fetchPosts] doc 변환 실패, 건너뜀', doc.id, docErr);
+                }
+              });
+            } catch (e) {
+              console.error('[app.js fetchPosts] forEach 중 오류', e);
+            }
             finish(list);
           })
-          .catch(function () {
+          .catch(function (e) {
+            var msg = (e && (e.message || e.code)) ? String(e.message || e.code) : '목록을 불러오지 못했어요.';
+            console.error('[app.js fetchPosts] Firestore get 실패', e);
             var local = getLocalPosts();
             var list = local.map(function (p) {
               var localComments = getLocalComments(p.id);
@@ -646,7 +656,11 @@
                 createdAt: p.createdAt
               };
             });
-            finish(list);
+            if (list.length > 0) {
+              finish(list);
+            } else if (callback) {
+              callback(msg, [], 0);
+            }
           });
         return;
       }
@@ -682,11 +696,17 @@
         var ref = db.collection('posts').doc(postId);
         ref.get().then(function (doc) {
           if (doc.exists) {
-            done(null, firestoreDocToPost(doc));
+            try {
+              done(null, firestoreDocToPost(doc));
+            } catch (e) {
+              console.warn('[app.js getPostById] doc 변환 실패', postId, e);
+              done(null, getLocalPostById(postId));
+            }
           } else {
             done(null, getLocalPostById(postId));
           }
-        }).catch(function () {
+        }).catch(function (e) {
+          console.error('[app.js getPostById] Firestore get 실패', postId, e);
           done(null, getLocalPostById(postId));
         });
         setTimeout(function () {
