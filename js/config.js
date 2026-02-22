@@ -15,6 +15,9 @@ window.FIREBASE_CONFIG = {
   appId: "1:756858954176:web:8cecdbdde15888888002825",
   measurementId: "G-ZZ3EQ1Z6G5"
 };
+if (typeof console !== 'undefined' && console.log) {
+  console.log('[config.js] 로드됨. 파이어베이스가 설정값 읽는지 확인: FIREBASE_CONFIG.projectId=', window.FIREBASE_CONFIG && window.FIREBASE_CONFIG.projectId);
+}
 
 function apiUrl(path) {
   var base = (window.API_BASE_URL || '').replace(/\/$/, '');

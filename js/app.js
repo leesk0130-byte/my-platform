@@ -32,10 +32,12 @@
   var db = null;
   try {
     var config = window.FIREBASE_CONFIG;
+    console.log('[app.js] config 확인: config.js에서 FIREBASE_CONFIG 읽음, projectId=', config && config.projectId);
     var hasFirebase = !!(window.firebase && typeof window.firebase.firestore === 'function');
     if (config && hasFirebase) {
       if (!firebase.apps.length) firebase.initializeApp(config);
       db = firebase.firestore();
+      console.log('[app.js] Firestore 연결됨. db.collection("posts") 사용 가능.');
     }
     if (!db) {
       console.warn('[app.js] Firestore 미연결. config.js 확인: FIREBASE_CONFIG=', !!config, ', projectId=', config && config.projectId, ', firebase.firestore=', hasFirebase);
@@ -603,8 +605,10 @@
         if (callback) callback(null, filtered.slice(off, off + lim), filtered.length);
       }
       if (db) {
+        console.log('[app.js fetchPosts] Firestore db.collection("posts") 쿼리 실행');
         db.collection('posts').orderBy('createdAt', 'desc').get()
           .then(function (snap) {
+            console.log('[app.js fetchPosts] Firestore 응답 문서 수=', snap.size, '(데이터가 실제로 들어있는지 확인)');
             if (snap.empty) {
               if (callback) callback(null, [], 0);
               return;
@@ -648,7 +652,7 @@
             if (list.length > 0) {
               finish(list);
             } else if (callback) {
-              callback(msg, [], 0);
+              callback(null, [], 0);
             }
           });
         return;
@@ -939,7 +943,9 @@
         verified: false,
         createdAt: firebase.firestore.FieldValue.serverTimestamp()
       };
+      console.log('[app.js createPost] Firestore db.collection("posts").add 호출');
       db.collection('posts').add(payload).then(function (ref) {
+        console.log('[app.js createPost] 저장 완료. id=', ref.id, ', db.collection("posts")에 데이터 들어감');
         if (callback) callback(null, { id: ref.id });
       }).catch(function (err) {
         console.error('[app.js createPost] Firestore add 실패', err);
