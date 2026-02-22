@@ -103,6 +103,7 @@
               <option value="qna">질문답변</option>
               <option value="info">정보공유</option>
             </select>
+            <p id="write-fee-hint" class="form-hint" style="display:none; margin-top:0.35rem;">2025년 PG 수수료 비교(영세 0.4% 환급 등)는 <a href="pg.html">PG 수수료 페이지</a>에서 확인할 수 있어요.</p>
           </div>
           <div class="form-group" id="write-notice-wrap">
             <input type="checkbox" id="write-notice" value="1"> <label for="write-notice">공지로 등록</label>
@@ -176,6 +177,14 @@
         var sel = document.getElementById('write-board');
         if (sel) sel.value = board;
       }
+      function toggleFeeHint() {
+        var sel = document.getElementById('write-board');
+        var hint = document.getElementById('write-fee-hint');
+        if (hint && sel) hint.style.display = sel.value === 'fee' ? 'block' : 'none';
+      }
+      toggleFeeHint();
+      var boardSel = document.getElementById('write-board');
+      if (boardSel) boardSel.addEventListener('change', toggleFeeHint);
       if (titleParam) {
         var titleEl = document.getElementById('write-title');
         if (titleEl) titleEl.value = decodeURIComponent(titleParam);

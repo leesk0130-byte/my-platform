@@ -850,37 +850,31 @@
     uploadImageToStorage: uploadImageToStorage,
 
     createPost: function (data, callback) {
-      var url = BASE('api/community/posts');
-      var token = getToken();
-      var headers = { 'Content-Type': 'application/json' };
-      if (token) headers['Authorization'] = 'Bearer ' + token;
       var u = getUser();
-      function fallbackFirestore() {
-        if (db) {
-          var payload = {
-            title: data.title || '',
-            body: data.body || '',
-            author: data.author || '익명',
-            authorId: u ? u.uid : null,
-            board: data.board || 'free',
-            createdAt: new Date().toISOString(),
-            notice: !!(data.notice),
-            industry: data.industry || '',
-            monthlyVolume: data.monthlyVolume || '',
-            pgUsed: data.pgUsed || '',
-            hits: 0,
-            likeCount: 0,
-            commentCount: 0,
-            verified: false
-          };
-          db.collection('posts').add(payload).then(function (ref) {
-            if (callback) callback(null, { id: ref.id, title: payload.title, body: payload.body, author: payload.author, authorId: payload.authorId, board: payload.board, createdAt: payload.createdAt, notice: payload.notice, industry: payload.industry, monthlyVolume: payload.monthlyVolume, pgUsed: payload.pgUsed, hits: 0, verified: false });
-          }).catch(function () {
-            fallbackLocal();
-          });
-          return;
-        }
-        fallbackLocal();
+      function saveToFirestore() {
+        if (!db) return false;
+        var payload = {
+          title: data.title || '',
+          body: data.body || '',
+          author: data.author || '익명',
+          authorId: u ? u.uid : null,
+          board: data.board || 'free',
+          createdAt: new Date().toISOString(),
+          notice: !!(data.notice),
+          industry: data.industry || '',
+          monthlyVolume: data.monthlyVolume || '',
+          pgUsed: data.pgUsed || '',
+          hits: 0,
+          likeCount: 0,
+          commentCount: 0,
+          verified: false
+        };
+        db.collection('posts').add(payload).then(function (ref) {
+          if (callback) callback(null, { id: ref.id, title: payload.title, body: payload.body, author: payload.author, authorId: payload.authorId, board: payload.board, createdAt: payload.createdAt, notice: payload.notice, industry: payload.industry, monthlyVolume: payload.monthlyVolume, pgUsed: payload.pgUsed, hits: 0, verified: false });
+        }).catch(function (err) {
+          if (callback) callback(err && err.message ? err.message : 'Firestore 저장에 실패했어요.');
+        });
+        return true;
       }
       function fallbackLocal() {
         try {
@@ -890,28 +884,39 @@
           if (callback) callback(e && e.message ? e.message : '글 등록에 실패했어요.');
         }
       }
-      fetch(url, {
-        method: 'POST',
-        headers: headers,
-        body: JSON.stringify({
-          title: data.title,
-          body: data.body,
-          author: data.author || '익명',
-          board: data.board || 'free',
-          industry: data.industry || '',
-          monthlyVolume: data.monthlyVolume || '',
-          pgUsed: data.pgUsed || ''
-        })
-      }).then(function (res) {
-        if (!res.ok) throw new Error('API failed');
-        return res.json();
-      }).then(function (result) {
-        if (result && result.id) {
-          if (callback) callback(null, result);
-        } else if (callback) callback(result && (result.error || result.message) ? (result.error || result.message) : '등록 실패');
-      }).catch(function () {
-        fallbackFirestore();
-      });
+      function tryApi() {
+        var url = BASE('api/community/posts');
+        var token = getToken();
+        var headers = { 'Content-Type': 'application/json' };
+        if (token) headers['Authorization'] = 'Bearer ' + token;
+        fetch(url, {
+          method: 'POST',
+          headers: headers,
+          body: JSON.stringify({
+            title: data.title,
+            body: data.body,
+            author: data.author || '익명',
+            board: data.board || 'free',
+            industry: data.industry || '',
+            monthlyVolume: data.monthlyVolume || '',
+            pgUsed: data.pgUsed || ''
+          })
+        }).then(function (res) {
+          if (!res.ok) throw new Error('API failed');
+          return res.json();
+        }).then(function (result) {
+          if (result && result.id) {
+            if (callback) callback(null, result);
+          } else if (callback) callback(result && (result.error || result.message) ? (result.error || result.message) : '등록 실패');
+        }).catch(function () {
+          fallbackLocal();
+        });
+      }
+      if (db) {
+        saveToFirestore();
+      } else {
+        tryApi();
+      }
     },
 
     canEditPost: canEditPost,
