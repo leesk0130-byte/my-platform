@@ -506,14 +506,14 @@
       }
       window.addEventListener('authStateChanged', refreshCommentListWithDeleteFlag);
 
-      /* ── 상세 보기 ── */
+      /* ── 상세 보기 (URL id로 Firestore 문서 직접 조회) ── */
       if (postId) {
         if (!window.app || typeof window.app.getPostById !== 'function') {
           renderError('글을 불러올 수 없어요. 페이지를 새로고침해 주세요.');
           return;
         }
-        renderLoading('글을 불러오는 중이에요...');
         setListUI(false);
+        renderLoading('글을 불러오는 중이에요...');
         var detailDone = false;
         var timeoutId = setTimeout(function() {
           if (detailDone) return;
@@ -524,21 +524,16 @@
           if (detailDone) return;
           detailDone = true;
           clearTimeout(timeoutId);
+          if (err) {
+            renderError(err);
+            return;
+          }
           if (!post) {
-            var MOCK = [
-              { id: '1', title: 'PG사 토스 vs 이니시스 vs 나이스 수수료 비교 후기 있어요', author: '가맹점주', date: '2시간 전', body: '각 PG사 수수료 비교해 보신 분들 후기 공유해 주세요.\n\n저는 토스 쓰고 있는데 연회비 11만원에 카드 3.4%라 부담되네요. 이니시스는 연회비 면제라 바꿀까 고민 중이에요.', verified: false },
-              { id: '2', title: '쇼핑몰 오픈 3개월 차, 정산 일정 D+5면 괜찮을까요?', author: '초보사장', date: '5시간 전', body: '정산이 D+5인 PG사 고려 중인데, 자금 회전에 무리가 없을지 궁금합니다.', verified: false },
-              { id: '3', title: '전자세금계산서 자동 발행 연동 PG 추천 부탁드려요', author: '회원', date: '어제', body: '전자세금계산서 자동 발행 잘 되는 PG 추천해 주세요.', verified: false },
-              { id: '5', title: '영세사업자 수수료 우대 받은 분 계신가요?', author: '가맹점주', date: '3일 전', body: '영세사업자로 수수료 우대 받고 계신 분 후기 부탁드려요.', verified: false }
-            ];
-            post = MOCK.filter(function(p) { return p.id === postId; })[0];
-          }
-          if (post) {
-            if (window.app && window.app.incrementPostViews) window.app.incrementPostViews(postId);
-            renderDetail(post);
-          } else {
             renderNotFound();
+            return;
           }
+          if (window.app && window.app.incrementPostViews) window.app.incrementPostViews(postId);
+          renderDetail(post);
         });
         return;
       }

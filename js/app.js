@@ -662,7 +662,12 @@
       finish(list);
     },
     getPostById: function (postId, callback) {
-      if (!postId || !callback) return;
+      if (!callback) return;
+      postId = (postId || '').toString().trim();
+      if (!postId) {
+        callback(null, null);
+        return;
+      }
       var called = false;
       function done(err, post) {
         if (called) return;
@@ -671,27 +676,30 @@
       }
       if (db) {
         var ref = db.collection('posts').doc(postId);
-        ref.get().then(function (doc) {
-          if (doc.exists) {
-            try {
-              done(null, firestoreDocToPost(doc));
-            } catch (e) {
-              console.warn('[app.js getPostById] doc ?? ??', postId, e);
-              done(null, getLocalPostById(postId));
+        ref.get()
+          .then(function (doc) {
+            if (doc.exists) {
+              try {
+                done(null, firestoreDocToPost(doc));
+              } catch (e) {
+                console.warn('[app.js getPostById] doc 변환 실패', postId, e);
+                done(null, getLocalPostById(postId));
+              }
+            } else {
+              done(null, getLocalPostById(postId) || null);
             }
-          } else {
-            done(null, getLocalPostById(postId));
-          }
-        }).catch(function (e) {
-          console.error('[app.js getPostById] Firestore get ??', postId, e);
-          done(null, getLocalPostById(postId));
-        });
+          })
+          .catch(function (e) {
+            console.error('[app.js getPostById] Firestore get 실패', postId, e);
+            var msg = (e && (e.message || e.code)) ? String(e.message || e.code) : '글을 불러오지 못했어요.';
+            done(msg, null);
+          });
         setTimeout(function () {
           if (!called) done(null, null);
-        }, 12000);
+        }, 10000);
         return;
       }
-      done(null, getLocalPostById(postId));
+      done('데이터베이스에 연결할 수 없어요.', getLocalPostById(postId) || null);
     },
     deleteAllCommunityPosts: function (callback) {
       if (!callback) return;
