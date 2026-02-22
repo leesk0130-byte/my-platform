@@ -16,6 +16,7 @@
   <meta property="og:url" content="https://bizimshop.co.kr/">
   <meta property="og:locale" content="ko_KR">
   <meta property="og:image" content="https://bizimshop.co.kr/og-image.svg">
+  <!-- 일부 SNS/채팅은 PNG·JPG를 선호합니다. og-image.svg를 1200x630 PNG로 내보낸 뒤 og-image.png로 저장하고, 위 content를 og-image.png로 바꿔도 됩니다. -->
   <meta name="twitter:card" content="summary_large_image">
   <meta name="twitter:title" content="가맹점숲 | 쇼핑몰 뉴스, PG 수수료 비교, 결제 수수료 계산기">
   <meta name="twitter:description" content="온라인 쇼핑몰·가맹점을 위한 정보 플랫폼. 쇼핑몰 뉴스, PG 수수료 비교, 결제 수수료 계산기.">
@@ -27,6 +28,8 @@
   <script type="application/ld+json">
   {"@context":"https://schema.org","@type":"Organization","name":"가맹점숲","url":"https://bizimshop.co.kr/","description":"온라인 쇼핑몰·가맹점을 위한 PG 수수료, 쇼핑몰 뉴스, 결제 수수료 계산기, 커뮤니티 정보 플랫폼.","logo":"https://bizimshop.co.kr/og-image.svg"}
   </script>
+  <link rel="icon" type="image/svg+xml" href="og-image.svg">
+  <link rel="apple-touch-icon" href="og-image.svg">
   <link rel="stylesheet" href="css/common.css">
   <script src="js/analytics-stub.js"></script>
   <script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-3006893636342653" crossorigin="anonymous"></script>
@@ -34,7 +37,7 @@
 <body>
   <a href="#main" class="skip-link">본문으로 건너뛰기</a>
   <header>
-    <h1><a href="index.html" title="홈으로">가맹점숲</a></h1>
+    <div class="site-logo"><a href="index.html" title="홈으로">가맹점숲</a></div>
     <button type="button" class="nav-toggle" aria-label="메뉴 열기" aria-expanded="false" data-toggle-nav><span></span><span></span><span></span></button>
     <nav class="header-nav" id="headerNav" aria-label="메인 메뉴">
       <a href="community.html" title="커뮤니티">커뮤니티</a>
@@ -56,7 +59,7 @@
   <main id="main" class="container">
     <!-- A. Hero Section - 허브: 검색 1개 + 바로가기 -->
     <div class="hero">
-      <p class="hero-tagline">온라인 가맹점 정보 &amp; 커뮤니티</p>
+      <h1 class="hero-tagline">온라인 가맹점 정보 &amp; 커뮤니티</h1>
       <p>PG 수수료·정산·오류·가이드 검색부터 수수료 비교까지, 가맹점주를 위한 도구와 정보를 한곳에서.</p>
       <form class="hero-search" action="community.html" method="get" role="search" aria-label="커뮤니티 검색" data-track-search>
         <label for="hero-search-input" class="sr-only">PG 수수료/정산/오류/가이드 검색</label>
@@ -80,6 +83,12 @@
       </p>
     </div>
 
+    <!-- ▼▼▼ Hero 섹션 바로 아래 디스플레이 광고 단위 (애드센스 승인 후 여기에 ins/스크립트 삽입) ▼▼▼ -->
+    <div class="ad-slot ad-slot-hero" aria-label="광고">
+      <!-- 예: <ins class="adsbygoogle" data-ad-client="ca-pub-3006893636342653" data-ad-slot="XXXXXX" ...></ins> -->
+    </div>
+    <!-- ▲▲▲ Hero 하단 광고 단위 끝 ▲▲▲ -->
+
     <!-- B. 미리보기 섹션 -->
     <div class="main-layout">
       <div class="main-content">
@@ -90,7 +99,12 @@
               최신 뉴스
               <a href="news.html" class="btn btn-ghost btn-sm">더보기</a>
             </h2>
-            <ul class="news-list" id="news-list"></ul>
+            <noscript><p class="section-desc" style="padding:1rem 0;">최신 가맹점 소식을 불러오는 중입니다. JavaScript를 활성화해 주세요.</p></noscript>
+            <ul class="news-list" id="news-list" aria-busy="true" aria-live="polite">
+              <li class="skeleton-item" aria-hidden="true"><span class="skeleton-line"></span><span class="skeleton-line short"></span></li>
+              <li class="skeleton-item" aria-hidden="true"><span class="skeleton-line"></span><span class="skeleton-line short"></span></li>
+              <li class="skeleton-item" aria-hidden="true"><span class="skeleton-line"></span><span class="skeleton-line short"></span></li>
+            </ul>
           </div>
         </section>
 
@@ -101,7 +115,12 @@
               인기글 Top5
               <a href="community.html?sort=hits" class="btn btn-ghost btn-sm">전체보기</a>
             </h2>
-            <ul class="feed-list" id="community-popular-list"></ul>
+            <noscript><p class="section-desc" style="padding:1rem 0;">커뮤니티 인기글을 불러오는 중입니다. JavaScript를 활성화해 주세요.</p></noscript>
+            <ul class="feed-list" id="community-popular-list" aria-busy="true" aria-live="polite">
+              <li class="skeleton-item" aria-hidden="true"><span class="skeleton-line"></span><span class="skeleton-line short"></span></li>
+              <li class="skeleton-item" aria-hidden="true"><span class="skeleton-line"></span><span class="skeleton-line short"></span></li>
+              <li class="skeleton-item" aria-hidden="true"><span class="skeleton-line"></span><span class="skeleton-line short"></span></li>
+            </ul>
           </div>
         </section>
 
@@ -112,7 +131,12 @@
               최신글 Top5
               <a href="community.html" class="btn btn-ghost btn-sm">전체보기</a>
             </h2>
-            <ul class="feed-list" id="community-list"></ul>
+            <noscript><p class="section-desc" style="padding:1rem 0;">커뮤니티 최신글을 불러오는 중입니다. JavaScript를 활성화해 주세요.</p></noscript>
+            <ul class="feed-list" id="community-list" aria-busy="true" aria-live="polite">
+              <li class="skeleton-item" aria-hidden="true"><span class="skeleton-line"></span><span class="skeleton-line short"></span></li>
+              <li class="skeleton-item" aria-hidden="true"><span class="skeleton-line"></span><span class="skeleton-line short"></span></li>
+              <li class="skeleton-item" aria-hidden="true"><span class="skeleton-line"></span><span class="skeleton-line short"></span></li>
+            </ul>
           </div>
         </section>
       </div>
@@ -135,6 +159,12 @@
           <h3 class="section-title"><a href="bookmarks.html">내가 저장한 글</a></h3>
           <p class="section-desc" style="margin-top:0.25rem;">커뮤니티에서 북마크한 글을 모아봅니다.</p>
         </div>
+
+        <!-- ▼▼▼ 사이드바 하단 디스플레이 광고 단위 (애드센스 승인 후 여기에 ins/스크립트 삽입) ▼▼▼ -->
+        <div class="ad-slot ad-slot-sidebar" aria-label="광고">
+          <!-- 예: <ins class="adsbygoogle" data-ad-client="ca-pub-3006893636342653" data-ad-slot="XXXXXX" ...></ins> -->
+        </div>
+        <!-- ▲▲▲ 사이드바 하단 광고 단위 끝 ▲▲▲ -->
       </aside>
     </div>
   </main>

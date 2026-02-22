@@ -153,9 +153,12 @@ header {
   z-index: 100;
   box-shadow: var(--shadow-md);
 }
-header h1 { font-size: var(--text-xl); font-weight: 700; letter-spacing: -0.03em; }
-header h1 a { color: #fff; }
-header h1 a:hover { text-decoration: none; opacity: 0.9; }
+header h1,
+header .site-logo { font-size: var(--text-xl); font-weight: 700; letter-spacing: -0.03em; }
+header h1 a,
+header .site-logo a { color: #fff; }
+header h1 a:hover,
+header .site-logo a:hover { text-decoration: none; opacity: 0.9; }
 /* 햄버거 메뉴 (모바일) */
 .nav-toggle {
   display: none;
@@ -192,7 +195,7 @@ header h1 a:hover { text-decoration: none; opacity: 0.9; }
   .header-auth { margin-left: auto; gap: var(--space-1); }
   .header-auth .btn { padding: var(--space-2) var(--space-3); font-size: var(--text-xs); min-width: 0; }
   header { padding: var(--space-3) var(--space-4); }
-  header h1 { font-size: var(--text-lg); }
+  header h1, header .site-logo { font-size: var(--text-lg); }
 }
 
 .header-nav { display: flex; align-items: center; gap: var(--space-8); flex-wrap: wrap; }
@@ -1004,6 +1007,14 @@ footer {
 .skeleton-card .skeleton-line { margin-bottom: var(--space-3); }
 .skeleton-card .skeleton-line:first-child { height: 1.25em; width: 80%; }
 .skeleton-card .skeleton-line:nth-child(2) { height: 0.875em; width: 40%; }
+.skeleton-item { list-style: none; padding: var(--space-3) 0; border-bottom: 1px solid var(--color-border-soft); }
+.skeleton-item .skeleton-line { display: block; background: linear-gradient(90deg, var(--color-border-soft) 25%, var(--color-border) 50%, var(--color-border-soft) 75%); background-size: 200% 100%; animation: skeleton 1.2s ease-in-out infinite; border-radius: var(--radius-sm); }
+.skeleton-item .skeleton-line.short { width: 50%; margin-top: var(--space-2); }
+
+/* 광고 슬롯 (애드센스 삽입용 빈 공간) */
+.ad-slot { min-height: 50px; margin: var(--space-4) 0; }
+.ad-slot-hero { margin-top: var(--space-6); margin-bottom: var(--space-6); }
+.ad-slot-sidebar { margin-top: var(--space-4); }
 
 /* Toast */
 .toast-container {
@@ -2048,7 +2059,7 @@ body {
     gap: 0;
     flex-wrap: nowrap;
   }
-  header h1 { font-size: 1.1rem; flex: 1; }
+  header h1, header .site-logo { font-size: 1.1rem; flex: 1; }
   .header-auth { display: none; }          /* 모바일에서 auth 숨김 */
   .header-nav a {
     padding: 14px var(--px-mobile);        /* 터치 44px 확보 */
@@ -2393,7 +2404,7 @@ img, video, iframe { max-width: 100%; height: auto; }
     flex-wrap: nowrap;
     gap: 0;
   }
-  header h1 { font-size: 1.1rem; flex: 1; }
+  header h1, header .site-logo { font-size: 1.1rem; flex: 1; }
   .nav-toggle {
     width: var(--tap); height: var(--tap);
     min-width: var(--tap); min-height: var(--tap);
