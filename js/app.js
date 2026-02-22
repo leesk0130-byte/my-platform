@@ -75,7 +75,6 @@
       body: data.body || '',
       author: data.author || '익명',
       authorId: data.authorId != null ? data.authorId : (u ? u.uid : null),
-      date: formatRelativeDate(new Date()),
       board: data.board || 'free',
       hits: 0,
       verified: false,
@@ -116,7 +115,6 @@
     if (data.title != null) list[idx].title = data.title;
     if (data.body != null) list[idx].body = data.body;
     if (data.board != null) list[idx].board = data.board;
-    list[idx].date = formatRelativeDate(new Date());
     saveLocalPosts(list);
     if (callback) callback(null, list[idx]);
   }
@@ -139,11 +137,17 @@
   function getMockComments(postId) {
     var now = Date.now();
     return (MOCK_COMMENTS[postId] || []).map(function (c, i) {
-      return { id: c.id, author: c.author, date: c.date, body: c.body, verified: c.verified, createdAt: now - 3600000 * (i + 2) };
+      var createdAt = new Date(now - 3600000 * (i + 2)).toISOString();
+      return { id: c.id, author: c.author, body: c.body, verified: c.verified, createdAt: createdAt };
     });
   }
   function commentSortKey(c) {
-    if (c.createdAt != null) return Number(c.createdAt);
+    if (c.createdAt != null) {
+      var t = Number(c.createdAt);
+      if (!isNaN(t)) return t;
+      var d = new Date(c.createdAt);
+      if (!isNaN(d.getTime())) return d.getTime();
+    }
     var m = (c.id || '').toString().match(/comment_(\d+)/);
     return m ? parseInt(m[1], 10) : 0;
   }
@@ -163,23 +167,31 @@
   function addLocalComment(postId, data) {
     var list = getLocalComments(postId);
     var id = 'comment_' + Date.now();
-    var now = Date.now();
     var comment = {
       id: id,
       parentId: data.parentId || null,
       author: data.author || '익명',
-      date: formatRelativeDate(new Date()),
       body: data.body || '',
       verified: false,
-      createdAt: now
+      createdAt: new Date().toISOString()
     };
     list.push(comment);
     try { localStorage.setItem(getCommentsStorageKey(postId), JSON.stringify(list)); } catch (e) {}
     return comment;
   }
   var LIKES_STORAGE_KEY = 'merchant_plus_likes';
+  var LIKED_POSTS_KEY = 'merchant_plus_liked_posts';
   function getLikesMap() {
     try { return JSON.parse(localStorage.getItem(LIKES_STORAGE_KEY) || '{}'); } catch (e) { return {}; }
+  }
+  function getLikedPosts() {
+    try { return JSON.parse(localStorage.getItem(LIKED_POSTS_KEY) || '[]'); } catch (e) { return []; }
+  }
+  function setLikedPosts(arr) {
+    try { localStorage.setItem(LIKED_POSTS_KEY, JSON.stringify(arr)); } catch (e) {}
+  }
+  function hasUserLikedPost(postId) {
+    return getLikedPosts().indexOf(String(postId)) !== -1;
   }
   function getPostLikeCount(postId) {
     var m = getLikesMap();
@@ -223,24 +235,41 @@
     var token = getToken();
     var headers = { 'Content-Type': 'application/json' };
     if (token) headers['Authorization'] = 'Bearer ' + token;
+    function fallbackLocal() {
+      try {
+        var comment = addLocalComment(postId, data);
+        if (callback) callback(null, comment);
+      } catch (e) {
+        if (callback) callback(e && e.message ? e.message : '댓글 등록에 실패했어요.');
+      }
+    }
     fetch(url, {
       method: 'POST',
       headers: headers,
       body: JSON.stringify({ author: data.author || '익명', body: data.body || '', parentId: data.parentId || null })
-    }).then(function (res) { return res.json(); })
-      .then(function (result) {
-        if (result.id && callback) callback(null, result);
-        else if (callback) callback(result.error || result.message || '등록 실패');
-      })
-      .catch(function () {
-        var comment = addLocalComment(postId, data);
-        if (callback) callback(null, comment);
-      });
+    }).then(function (res) {
+      if (!res.ok) throw new Error('API failed');
+      return res.json();
+    }).then(function (result) {
+      if (result && result.id && callback) callback(null, result);
+      else if (callback) callback(result && (result.error || result.message) ? (result.error || result.message) : '등록 실패');
+    }).catch(function () {
+      fallbackLocal();
+    });
   }
   function togglePostLike(postId, callback) {
-    var cur = getPostLikeCount(postId);
-    var next = cur ? 0 : 1;
-    setPostLike(postId, next ? 1 : -cur);
+    var sid = String(postId);
+    var liked = getLikedPosts();
+    var alreadyLiked = liked.indexOf(sid) !== -1;
+    if (alreadyLiked) {
+      setPostLike(postId, -1);
+      liked = liked.filter(function (id) { return id !== sid; });
+      setLikedPosts(liked);
+    } else {
+      setPostLike(postId, 1);
+      liked = liked.concat(sid);
+      setLikedPosts(liked);
+    }
     if (callback) callback(null, getPostLikeCount(postId));
   }
   function uploadImageToStorage(file, callback) {
@@ -334,12 +363,15 @@
 
   function incrementPostViews(postId) {
     if (!postId) return false;
-    
-    // 쿨다운 없이 매번 조회수 증가
+    var now = Date.now();
+    var lastMap = getLastViewed();
+    var last = lastMap[postId];
+    if (last != null && (now - last) < VIEW_COOLDOWN) return false;
+    lastMap[postId] = now;
+    try { localStorage.setItem(LAST_VIEWED_KEY, JSON.stringify(lastMap)); } catch (e) {}
     var views = getPostViews();
     views[postId] = (views[postId] || 0) + 1;
-    localStorage.setItem(POST_VIEWS_KEY, JSON.stringify(views));
-    
+    try { localStorage.setItem(POST_VIEWS_KEY, JSON.stringify(views)); } catch (e) {}
     return true;
   }
 
@@ -401,7 +433,6 @@
           id: p.id,
           title: p.title,
           author: p.author,
-          date: p.date,
           board: p.board || 'free',
           hits: (p.hits != null ? p.hits : 0) + additionalViews,
           verified: p.verified,
@@ -427,20 +458,20 @@
       if (callback) callback(null, filtered.slice(offset || 0, (offset || 0) + (limit || 20)), filtered.length);
     },
     getPostLikeCount: getPostLikeCount,
+    hasUserLikedPost: hasUserLikedPost,
     setPostLike: setPostLike,
     togglePostLike: togglePostLike,
 
     getPostsByIds: function (ids, callback) {
       if (!ids || !ids.length) { if (callback) callback(null, []); return; }
       var local = getLocalPosts();
-      var withComments = local.map(function (p) {
+      var       withComments = local.map(function (p) {
         var localComments = getLocalComments(p.id);
         var additionalViews = typeof getPostViewCount === 'function' ? getPostViewCount(p.id) : 0;
         return {
           id: p.id,
           title: p.title,
           author: p.author,
-          date: p.date,
           board: p.board || 'free',
           hits: (p.hits != null ? p.hits : 0) + additionalViews,
           verified: p.verified,
@@ -464,14 +495,13 @@
       if (!post) { if (callback) callback(null, []); return; }
       var board = post.board || 'free';
       var local = getLocalPosts();
-      var withComments = local.map(function (p) {
+      var       withComments = local.map(function (p) {
         var localComments = getLocalComments(p.id);
         var additionalViews = typeof getPostViewCount === 'function' ? getPostViewCount(p.id) : 0;
         return {
           id: p.id,
           title: p.title,
           author: p.author,
-          date: p.date,
           board: p.board || 'free',
           hits: (p.hits != null ? p.hits : 0) + additionalViews,
           verified: p.verified,
@@ -528,7 +558,8 @@
         var noticeBadge = p.notice ? '<span class="notice-badge">공지</span>' : '';
         var verified = (p.verified === true || isAuthorVerified(p.author)) ? verifiedBadgeHtml(true, p.author) : '';
         var likeStr = (p.likeCount != null && p.likeCount > 0) ? ' · 👍 ' + p.likeCount : '';
-        var meta = (p.author ? p.author + ' · ' : '') + (p.date || '') + (p.hits != null ? ' · 조회 ' + p.hits : '') + likeStr + verified;
+        var dateStr = (p.createdAt ? formatRelativeDate(new Date(p.createdAt)) : '') || (p.date || '');
+        var meta = (p.author ? p.author + ' · ' : '') + dateStr + (p.hits != null ? ' · 조회 ' + p.hits : '') + likeStr + verified;
         var commentCount = p.commentCount || 0;
         var commentBadge = commentCount > 0 ? '<span class="comment-count-badge">' + commentCount + '</span>' : '';
         var noticeBtn = isOp ? '<button type="button" class="notice-toggle-btn btn btn-outline btn-sm" data-post-id="' + (p.id || '').replace(/"/g, '&quot;') + '">' + (p.notice ? '공지 해제' : '공지') + '</button>' : '';
@@ -580,7 +611,8 @@
       });
       function renderOne(c, isReply) {
         var verified = (c.verified === true || isAuthorVerified(c.author)) ? verifiedBadgeHtml(true, c.author) : '';
-        var metaText = '<span class="comment-meta-info">' + (c.author || '익명') + verified + ' · ' + (c.date || '') + '</span>';
+        var commentDateStr = (c.createdAt ? formatRelativeDate(new Date(c.createdAt)) : '') || (c.date || '');
+        var metaText = '<span class="comment-meta-info">' + (c.author || '익명') + verified + ' · ' + commentDateStr + '</span>';
         var delBtn = canDelete ? '<button type="button" class="comment-delete-btn" data-post-id="' + (postId || '').replace(/"/g, '&quot;') + '" data-comment-id="' + (c.id || '').replace(/"/g, '&quot;') + '" aria-label="댓글 삭제">삭제</button>' : '';
         var replyBtn = onReply ? '<button type="button" class="comment-reply-btn" data-comment-id="' + (c.id || '').replace(/"/g, '&quot;') + '" aria-label="답글">답글</button>' : '';
         var bodyHtml = (c.body || '').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/\n/g, '<br>');
@@ -601,6 +633,15 @@
       var token = getToken();
       var headers = { 'Content-Type': 'application/json' };
       if (token) headers['Authorization'] = 'Bearer ' + token;
+      function fallbackLocal() {
+        try {
+          var u = getUser();
+          var post = addLocalPost({ title: data.title, body: data.body, author: data.author, board: data.board, notice: data.notice, authorId: u ? u.uid : null, industry: data.industry, monthlyVolume: data.monthlyVolume, pgUsed: data.pgUsed });
+          if (callback) callback(null, post);
+        } catch (e) {
+          if (callback) callback(e && e.message ? e.message : '글 등록에 실패했어요.');
+        }
+      }
       fetch(url, {
         method: 'POST',
         headers: headers,
@@ -613,17 +654,16 @@
           monthlyVolume: data.monthlyVolume || '',
           pgUsed: data.pgUsed || ''
         })
-      }).then(function (res) { return res.json(); })
-        .then(function (result) {
-          if (result.id) {
-            if (callback) callback(null, result);
-          } else if (callback) callback(result.error || result.message || '등록 실패');
-        })
-        .catch(function () {
-          var u = getUser();
-          var post = addLocalPost({ title: data.title, body: data.body, author: data.author, board: data.board, notice: data.notice, authorId: u ? u.uid : null, industry: data.industry, monthlyVolume: data.monthlyVolume, pgUsed: data.pgUsed });
-          if (callback) callback(null, post);
-        });
+      }).then(function (res) {
+        if (!res.ok) throw new Error('API failed');
+        return res.json();
+      }).then(function (result) {
+        if (result && result.id) {
+          if (callback) callback(null, result);
+        } else if (callback) callback(result && (result.error || result.message) ? (result.error || result.message) : '등록 실패');
+      }).catch(function () {
+        fallbackLocal();
+      });
     },
 
     canEditPost: canEditPost,

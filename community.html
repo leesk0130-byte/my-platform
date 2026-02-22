@@ -367,11 +367,20 @@
 
         var likeCountEl = document.getElementById('post-like-count');
         var likeBtn = document.getElementById('post-like-btn');
-        if (likeCountEl) likeCountEl.textContent = window.app.getPostLikeCount ? window.app.getPostLikeCount(currentPostId) : 0;
+        function updateLikeButtonState() {
+          var count = window.app.getPostLikeCount ? window.app.getPostLikeCount(currentPostId) : 0;
+          var liked = window.app.hasUserLikedPost && window.app.hasUserLikedPost(currentPostId);
+          if (likeCountEl) likeCountEl.textContent = count;
+          if (likeBtn) {
+            likeBtn.setAttribute('aria-pressed', liked ? 'true' : 'false');
+            likeBtn.classList.toggle('post-like-btn--liked', !!liked);
+          }
+        }
+        updateLikeButtonState();
         if (likeBtn) likeBtn.addEventListener('click', function() {
           if (!window.app.togglePostLike) return;
           window.app.togglePostLike(currentPostId, function(_, count) {
-            if (likeCountEl) likeCountEl.textContent = count;
+            updateLikeButtonState();
           });
         });
 
