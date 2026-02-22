@@ -693,6 +693,9 @@ a.ad-slot:hover { background: #cbd5e1; }
   box-shadow: var(--shadow-sm);
 }
 .comment-item:last-child { margin-bottom: 0; }
+.comment-item-reply { margin-left: var(--space-8); border-left: 3px solid var(--color-border); padding-left: var(--space-3); }
+.comment-reply-btn { margin-right: var(--space-2); padding: 2px 8px; font-size: var(--text-xs); color: var(--color-primary); background: transparent; border: 1px solid var(--color-primary); border-radius: var(--radius-sm); cursor: pointer; }
+.comment-reply-btn:hover { background: var(--color-primary-light); }
 .comment-meta {
   display: flex;
   flex-wrap: wrap;
@@ -1292,6 +1295,12 @@ button:focus-visible, input:focus-visible, select:focus-visible, textarea:focus-
 .feed-item:last-child {
   border-bottom: none;
 }
+
+.feed-item-row { display: flex; flex-wrap: wrap; align-items: center; gap: var(--space-2); }
+.feed-item-row .feed-title-wrapper { flex: 1; min-width: 0; }
+.feed-item-row .feed-item-thumb { flex-shrink: 0; margin-left: auto; }
+.feed-item-thumb img { width: 56px; height: 56px; object-fit: cover; border-radius: var(--radius-sm); display: block; }
+.board-infinite-sentinel { min-height: 1px; height: 1px; margin: 0; padding: 0; pointer-events: none; }
 
 /* 기존 feed-title을 wrapper로 변경 */
 .feed-title-wrapper {

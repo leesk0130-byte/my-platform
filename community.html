@@ -66,6 +66,7 @@
           <div class="card">
             <div class="board-tabs">
               <a href="community.html" class="active">전체</a>
+              <a href="community.html?tab=best">🔥 실시간 베스트</a>
               <a href="community.html?board=free">자유게시판</a>
               <a href="community.html?board=fee">수수료/정산</a>
               <a href="community.html?board=qna">질문답변</a>
@@ -83,6 +84,7 @@
                   <option value="latest">최신순</option>
                   <option value="hits">조회순</option>
                   <option value="comments">댓글순</option>
+                  <option value="likes">추천순</option>
                 </select>
               </div>
             </div>
@@ -184,16 +186,21 @@
             return '<li class="feed-item"><a href="community.html?id=' + (p.id || '') + '" class="feed-title-link">' + (p.title || '') + '</a></li>';
           }).join('');
         }
-        var moreBtn = hasMore ? '<div class="board-more-wrap"><button type="button" class="btn btn-outline" id="posts-more-btn">더보기</button></div>' : '';
-        setRoot('<ul class="feed-list" id="community-list" aria-label="게시글 목록">' + listHtml + '</ul>' + moreBtn);
-        var mb = document.getElementById('posts-more-btn');
-        if (mb) mb.onclick = function() {
-          currentShown = Math.min(currentShown + PAGE_SIZE, allFilteredItems.length);
-          renderPage();
-        };
-        /* renderPosts를 사용한 경우 실제 렌더 */
+        var sentinelHtml = hasMore ? '<div id="posts-infinite-sentinel" class="board-infinite-sentinel" aria-hidden="true"></div>' : '';
+        setRoot('<ul class="feed-list" id="community-list" aria-label="게시글 목록">' + listHtml + '</ul>' + sentinelHtml);
         if (window.app && window.app.renderPosts) {
           window.app.renderPosts('community-list', items, 'community.html?id=', true);
+        }
+        var sentinel = document.getElementById('posts-infinite-sentinel');
+        if (sentinel && typeof IntersectionObserver !== 'undefined') {
+          var io = new IntersectionObserver(function(entries) {
+            entries.forEach(function(entry) {
+              if (!entry.isIntersecting) return;
+              currentShown = Math.min(currentShown + PAGE_SIZE, allFilteredItems.length);
+              renderPage();
+            });
+          }, { rootMargin: '200px', threshold: 0 });
+          io.observe(sentinel);
         }
       }
 
@@ -289,19 +296,23 @@
               '<div class="post-body-wrap" aria-label="본문 내용">' +
                 '<p class="post-body-label">본문</p>' +
                 '<div id="post-detail-body" class="post-body">' + bodyText + '</div>' +
+              '<div class="post-detail-like-row" style="margin-top:1rem;padding-top:0.75rem;border-top:1px solid var(--color-border-soft,#f1f5f9);">' +
+                '<button type="button" class="btn btn-ghost btn-sm post-like-btn" id="post-like-btn" data-post-id="' + (post.id || '').replace(/"/g, '&quot;') + '" aria-label="추천">👍 <span id="post-like-count">0</span></button>' +
+              '</div>' +
               '</div>' +
             '</article>' +
             '<section class="comment-section" id="comment-section" aria-label="댓글">' +
               '<h2 class="comment-section-title">댓글 <span class="comment-count" id="comment-count">0</span></h2>' +
               '<ul class="comment-list" id="comment-list"></ul>' +
               '<div class="comment-form-wrap">' +
-                '<p class="comment-form-label">댓글 작성</p>' +
+                '<p class="comment-form-label">댓글 작성 <span id="comment-reply-to-label" class="comment-reply-to-label" style="display:none;"></span></p>' +
+                '<input type="hidden" id="comment-parent-id" value="">' +
                 '<form id="comment-form" class="comment-form">' +
                   '<div class="form-group comment-nickname-row"><span class="comment-nickname-label">닉네임</span><span class="comment-nickname-value" id="comment-nickname-value">\u2014</span></div>' +
                   '<div class="form-group form-group-checkbox"><label for="comment-anonymous"><input type="checkbox" id="comment-anonymous"> 익명으로 작성</label></div>' +
                   '<div class="form-group"><label for="comment-body" class="sr-only">댓글 내용</label><textarea id="comment-body" placeholder="댓글을 입력하세요" required rows="3"></textarea></div>' +
                   '<div id="comment-error" class="msg-error" style="display:none;"></div>' +
-                  '<div class="form-actions"><button type="submit" class="btn btn-primary">댓글 등록</button></div>' +
+                  '<div class="form-actions"><button type="submit" class="btn btn-primary">댓글 등록</button> <button type="button" class="btn btn-ghost btn-sm" id="comment-cancel-reply" style="display:none;">취소</button></div>' +
                 '</form>' +
               '</div>' +
             '</section>' +
@@ -338,12 +349,60 @@
         currentDetailPostId = post.id;
         var currentPostId = post.id;
 
+        function updateMetaForPost(p) {
+          var title = (p.title || '글 보기') + ' | 가맹점숲';
+          document.title = title;
+          var rawBody = (p.body || '').replace(/<[^>]+>/g, ' ').replace(/\s+/g, ' ').trim();
+          var desc = rawBody.slice(0, 150) + (rawBody.length > 150 ? '…' : '');
+          var metaDesc = document.querySelector('meta[name="description"]');
+          if (metaDesc) metaDesc.setAttribute('content', desc);
+          var ogTitle = document.querySelector('meta[property="og:title"]');
+          if (ogTitle) ogTitle.setAttribute('content', title);
+          var ogDesc = document.querySelector('meta[property="og:description"]');
+          if (ogDesc) ogDesc.setAttribute('content', desc);
+          var ogUrl = document.querySelector('meta[property="og:url"]');
+          if (ogUrl) ogUrl.setAttribute('content', window.location.href);
+        }
+        updateMetaForPost(post);
+
+        var likeCountEl = document.getElementById('post-like-count');
+        var likeBtn = document.getElementById('post-like-btn');
+        if (likeCountEl) likeCountEl.textContent = window.app.getPostLikeCount ? window.app.getPostLikeCount(currentPostId) : 0;
+        if (likeBtn) likeBtn.addEventListener('click', function() {
+          if (!window.app.togglePostLike) return;
+          window.app.togglePostLike(currentPostId, function(_, count) {
+            if (likeCountEl) likeCountEl.textContent = count;
+          });
+        });
+
         function drawComments() {
           if (!document.getElementById('comment-list')) return;
+          var parentInput = document.getElementById('comment-parent-id');
+          var replyToLabel = document.getElementById('comment-reply-to-label');
+          var cancelReplyBtn = document.getElementById('comment-cancel-reply');
+          function clearReply() {
+            if (parentInput) parentInput.value = '';
+            if (replyToLabel) { replyToLabel.style.display = 'none'; replyToLabel.textContent = ''; }
+            if (cancelReplyBtn) cancelReplyBtn.style.display = 'none';
+          }
           window.app.getComments(currentPostId, function(_, comments) {
-            window.app.renderComments('comment-list', comments, { postId: currentPostId, canDelete: window.app.isOperator && window.app.isOperator() });
+            window.app.renderComments('comment-list', comments, {
+              postId: currentPostId,
+              canDelete: window.app.isOperator && window.app.isOperator(),
+              onReply: true
+            });
             var ce = document.getElementById('comment-count');
             if (ce) ce.textContent = comments ? comments.length : 0;
+            document.querySelectorAll('.comment-reply-btn').forEach(function(btn) {
+              btn.onclick = function() {
+                var cid = btn.getAttribute('data-comment-id');
+                if (parentInput) parentInput.value = cid || '';
+                if (replyToLabel) { replyToLabel.style.display = 'inline'; replyToLabel.textContent = '(답글)'; }
+                if (cancelReplyBtn) cancelReplyBtn.style.display = 'inline';
+                document.getElementById('comment-body').focus();
+              };
+            });
+            if (cancelReplyBtn) cancelReplyBtn.onclick = clearReply;
           });
         }
         drawComments();
@@ -390,10 +449,17 @@
               var u2 = window.app.getUser && window.app.getUser();
               if (u2 && u2.name) author = u2.name;
             }
-            window.app.addComment(currentPostId, { author: author, body: body }, function(err2) {
+            var parentIdEl = document.getElementById('comment-parent-id');
+            var parentId = (parentIdEl && parentIdEl.value) || null;
+            window.app.addComment(currentPostId, { author: author, body: body, parentId: parentId }, function(err2) {
               if (err2) { if (errEl) { errEl.textContent = err2; errEl.style.display = 'block'; } return; }
               var ta = document.getElementById('comment-body');
               if (ta) ta.value = '';
+              if (parentIdEl) parentIdEl.value = '';
+              var replyToLabel = document.getElementById('comment-reply-to-label');
+              var cancelReplyBtn = document.getElementById('comment-cancel-reply');
+              if (replyToLabel) { replyToLabel.style.display = 'none'; replyToLabel.textContent = ''; }
+              if (cancelReplyBtn) cancelReplyBtn.style.display = 'none';
               drawComments();
             });
           };
@@ -444,14 +510,16 @@
       }
 
       /* ── 목록 보기 ── */
-      var board = params.get('board') || 'all';
+      var tabBest = params.get('tab') === 'best';
+      var board = tabBest ? 'all' : (params.get('board') || 'all');
       var searchQ = params.get('q') || '';
-      var sortBy = params.get('sort') || 'latest';
+      var sortBy = tabBest ? 'likes' : (params.get('sort') || 'latest');
       document.querySelectorAll('.board-tabs a').forEach(function(a) {
         a.classList.remove('active');
         var href = a.getAttribute('href') || '';
-        if (board === 'all' && href === 'community.html') a.classList.add('active');
-        else if (href.indexOf('board=' + board) !== -1) a.classList.add('active');
+        if (tabBest && href.indexOf('tab=best') !== -1) a.classList.add('active');
+        else if (!tabBest && board === 'all' && href === 'community.html') a.classList.add('active');
+        else if (!tabBest && href.indexOf('board=' + board) !== -1) a.classList.add('active');
       });
       var searchInput = document.getElementById('board-search-input');
       var searchBtn   = document.getElementById('board-search-btn');
@@ -470,6 +538,8 @@
         var list = q ? items.filter(function(p) { return (p.title||'').toLowerCase().indexOf(q)!==-1||(p.body||'').toLowerCase().indexOf(q)!==-1; }) : items.slice();
         var s = (sortSelect && sortSelect.value) || 'latest';
         if (s === 'hits') list.sort(function(a,b){ return (b.hits||0)-(a.hits||0); });
+        else if (s === 'comments') list.sort(function(a,b){ return (b.commentCount||0)-(a.commentCount||0); });
+        else if (s === 'likes') list.sort(function(a,b){ return (b.likeCount||0)-(a.likeCount||0); });
         return list;
       }
 
@@ -487,13 +557,14 @@
       function loadList(append) {
         if (!append) renderLoading();
         setListUI(true);
+        var sortOrder = (sortSelect && sortSelect.value) || sortBy;
         window.app.fetchPosts(board, 500, 0, function(err, items) {
           if (err) { setListUI(true); renderError(err); return; }
           allFilteredItems = applyFilterAndSort(items || []);
           if (!append) currentShown = Math.min(PAGE_SIZE, allFilteredItems.length);
           else currentShown = Math.min(currentShown + PAGE_SIZE, allFilteredItems.length);
           renderPage();
-        });
+        }, sortOrder);
       }
 
       if (searchBtn && searchInput) {

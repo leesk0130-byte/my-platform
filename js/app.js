@@ -166,6 +166,7 @@
     var now = Date.now();
     var comment = {
       id: id,
+      parentId: data.parentId || null,
       author: data.author || '익명',
       date: formatRelativeDate(new Date()),
       body: data.body || '',
@@ -176,6 +177,21 @@
     try { localStorage.setItem(getCommentsStorageKey(postId), JSON.stringify(list)); } catch (e) {}
     return comment;
   }
+  var LIKES_STORAGE_KEY = 'merchant_plus_likes';
+  function getLikesMap() {
+    try { return JSON.parse(localStorage.getItem(LIKES_STORAGE_KEY) || '{}'); } catch (e) { return {}; }
+  }
+  function getPostLikeCount(postId) {
+    var m = getLikesMap();
+    return typeof m[postId] === 'number' ? m[postId] : 0;
+  }
+  function setPostLike(postId, delta) {
+    var m = getLikesMap();
+    m[postId] = Math.max(0, (m[postId] || 0) + delta);
+    try { localStorage.setItem(LIKES_STORAGE_KEY, JSON.stringify(m)); } catch (e) {}
+    return m[postId];
+  }
+
   var HIDDEN_COMMENTS_PREFIX = 'merchant_plus_hidden_comments_';
   function getHiddenCommentIds(postId) {
     try {
@@ -210,7 +226,7 @@
     fetch(url, {
       method: 'POST',
       headers: headers,
-      body: JSON.stringify({ author: data.author || '익명', body: data.body || '' })
+      body: JSON.stringify({ author: data.author || '익명', body: data.body || '', parentId: data.parentId || null })
     }).then(function (res) { return res.json(); })
       .then(function (result) {
         if (result.id && callback) callback(null, result);
@@ -220,6 +236,12 @@
         var comment = addLocalComment(postId, data);
         if (callback) callback(null, comment);
       });
+  }
+  function togglePostLike(postId, callback) {
+    var cur = getPostLikeCount(postId);
+    var next = cur ? 0 : 1;
+    setPostLike(postId, next ? 1 : -cur);
+    if (callback) callback(null, getPostLikeCount(postId));
   }
   function isAuthorVerified(author) { return VERIFIED_AUTHORS[author] === true; }
   function verifiedBadgeHtml(verified, author) {
@@ -349,8 +371,7 @@
     },
 
     fetchPosts: function (board, limit, offset, callback, sort) {
-      // API·목업 사용 안 함. 로컬 저장 글만 표시(비어 있음, 글쓰기로 올리면 그만 보임)
-      // sort: 'latest' | 'hits' | 'comments' (기본 최신순)
+      // sort: 'latest' | 'hits' | 'comments' | 'likes'
       var local = getLocalPosts();
       var list = local.map(function (p) {
         var localComments = getLocalComments(p.id);
@@ -365,6 +386,7 @@
           verified: p.verified,
           notice: !!p.notice,
           commentCount: localComments.length,
+          likeCount: getPostLikeCount(p.id),
           body: p.body,
           createdAt: p.createdAt
         };
@@ -376,12 +398,16 @@
         var order = sort || 'latest';
         if (order === 'hits') return (b.hits || 0) - (a.hits || 0);
         if (order === 'comments') return (b.commentCount || 0) - (a.commentCount || 0);
+        if (order === 'likes') return (b.likeCount || 0) - (a.likeCount || 0);
         var ta = (a.createdAt && new Date(a.createdAt).getTime()) || 0;
         var tb = (b.createdAt && new Date(b.createdAt).getTime()) || 0;
         return tb - ta;
       });
       if (callback) callback(null, filtered.slice(offset || 0, (offset || 0) + (limit || 20)), filtered.length);
     },
+    getPostLikeCount: getPostLikeCount,
+    setPostLike: setPostLike,
+    togglePostLike: togglePostLike,
 
     getPostsByIds: function (ids, callback) {
       if (!ids || !ids.length) { if (callback) callback(null, []); return; }
@@ -399,6 +425,7 @@
           verified: p.verified,
           notice: !!p.notice,
           commentCount: localComments.length,
+          likeCount: getPostLikeCount(p.id),
           body: p.body,
           createdAt: p.createdAt
         };
@@ -429,6 +456,7 @@
           verified: p.verified,
           notice: !!p.notice,
           commentCount: localComments.length,
+          likeCount: getPostLikeCount(p.id),
           body: p.body,
           createdAt: p.createdAt
         };
@@ -467,21 +495,30 @@
       var base = detailUrl || 'community.html?id=';
       var boardLabels = { free: '자유', fee: '수수료/정산', qna: '질문답변', info: '정보공유' };
       var isOp = isOperator();
+      function firstImageUrl(body) {
+        if (!body) return null;
+        var m = body.match(/<img[^>]+src=["']([^"']+)["']/i) || body.match(/(https?:\/\/[^\s<>"']+\.(?:jpe?g|png|gif|webp))/i);
+        return m ? m[1] : null;
+      }
       el.innerHTML = (list || []).map(function (p) {
         var href = base + (p.id || '');
         var board = p.board || 'free';
         var badge = showBoardBadge ? '<span class="feed-board-badge">' + (boardLabels[board] || board) + '</span>' : '';
         var noticeBadge = p.notice ? '<span class="notice-badge">공지</span>' : '';
         var verified = (p.verified === true || isAuthorVerified(p.author)) ? verifiedBadgeHtml(true, p.author) : '';
-        var meta = (p.author ? p.author + ' · ' : '') + (p.date || '') + (p.hits != null ? ' · 조회 ' + p.hits : '') + verified;
+        var likeStr = (p.likeCount != null && p.likeCount > 0) ? ' · 👍 ' + p.likeCount : '';
+        var meta = (p.author ? p.author + ' · ' : '') + (p.date || '') + (p.hits != null ? ' · 조회 ' + p.hits : '') + likeStr + verified;
         var commentCount = p.commentCount || 0;
         var commentBadge = commentCount > 0 ? '<span class="comment-count-badge">' + commentCount + '</span>' : '';
         var noticeBtn = isOp ? '<button type="button" class="notice-toggle-btn btn btn-outline btn-sm" data-post-id="' + (p.id || '').replace(/"/g, '&quot;') + '">' + (p.notice ? '공지 해제' : '공지') + '</button>' : '';
+        var thumbUrl = firstImageUrl(p.body);
+        var thumbHtml = thumbUrl ? '<span class="feed-item-thumb"><img src="' + thumbUrl.replace(/"/g, '&quot;') + '" alt="" width="56" height="56" loading="lazy"></span>' : '';
         return '<li class="feed-item feed-item-row">' +
           '<a href="' + href + '" class="feed-title-wrapper">' +
             '<span class="feed-title-content feed-title-row">' + noticeBadge + badge + '<span class="feed-title-text">' + (p.title || '') + '</span></span>' +
             commentBadge +
           '</a>' +
+          (thumbHtml ? thumbHtml : '') +
           '<span class="feed-meta">' + meta + '</span>' +
           (noticeBtn ? '<span class="feed-operator-actions">' + noticeBtn + '</span>' : '') +
         '</li>';
@@ -507,16 +544,32 @@
       opts = opts || {};
       var postId = opts.postId;
       var canDelete = opts.canDelete === true && postId;
+      var onReply = opts.onReply || null;
       if (!list || list.length === 0) {
         el.innerHTML = '<li class="comment-empty">아직 댓글이 없어요. 첫 댓글을 남겨 보세요.</li>';
         return;
       }
-      el.innerHTML = list.map(function (c) {
+      var topLevel = list.filter(function (c) { return !c.parentId; });
+      var byParent = {};
+      list.forEach(function (c) {
+        if (c.parentId) {
+          if (!byParent[c.parentId]) byParent[c.parentId] = [];
+          byParent[c.parentId].push(c);
+        }
+      });
+      function renderOne(c, isReply) {
         var verified = (c.verified === true || isAuthorVerified(c.author)) ? verifiedBadgeHtml(true, c.author) : '';
         var metaText = '<span class="comment-meta-info">' + (c.author || '익명') + verified + ' · ' + (c.date || '') + '</span>';
         var delBtn = canDelete ? '<button type="button" class="comment-delete-btn" data-post-id="' + (postId || '').replace(/"/g, '&quot;') + '" data-comment-id="' + (c.id || '').replace(/"/g, '&quot;') + '" aria-label="댓글 삭제">삭제</button>' : '';
-        return '<li class="comment-item"><div class="comment-meta">' + metaText + delBtn + '</div><div class="comment-body">' + (c.body || '').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/\n/g, '<br>') + '</div></li>';
-      }).join('');
+        var replyBtn = onReply ? '<button type="button" class="comment-reply-btn" data-comment-id="' + (c.id || '').replace(/"/g, '&quot;') + '" aria-label="답글">답글</button>' : '';
+        var bodyHtml = (c.body || '').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/\n/g, '<br>');
+        var replyClass = isReply ? ' comment-item-reply' : '';
+        var html = '<li class="comment-item' + replyClass + '" data-comment-id="' + (c.id || '').replace(/"/g, '&quot;') + '"><div class="comment-meta">' + metaText + ' ' + replyBtn + delBtn + '</div><div class="comment-body">' + bodyHtml + '</div></li>';
+        var replies = (byParent[c.id] || []).sort(function (a, b) { return commentSortKey(a) - commentSortKey(b); });
+        replies.forEach(function (r) { html += renderOne(r, true); });
+        return html;
+      }
+      el.innerHTML = topLevel.sort(function (a, b) { return commentSortKey(a) - commentSortKey(b); }).map(function (c) { return renderOne(c, false); }).join('');
     },
     isAuthorVerified: isAuthorVerified,
     verifiedBadgeHtml: verifiedBadgeHtml,
