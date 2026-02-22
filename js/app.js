@@ -833,6 +833,41 @@
       }).join('');
     },
 
+    renderPostsHTML: function (list, detailUrl, showBoardBadge) {
+      var base = detailUrl || 'community.html?id=';
+      var boardLabels = { free: '??', fee: '???/??', qna: '????', info: '????' };
+      var isOp = isOperator();
+      function firstImageUrl(body) {
+        if (!body) return null;
+        var m = body.match(/<img[^>]+src=["']([^"']+)["']/i) || body.match(/(https?:\/\/[^\s<>"']+\.(?:jpe?g|png|gif|webp))/i);
+        return m ? m[1] : null;
+      }
+      return (list || []).map(function (p) {
+        var href = base + (p.id || '');
+        var board = p.board || 'free';
+        var badge = showBoardBadge ? '<span class="feed-board-badge">' + (boardLabels[board] || board) + '</span>' : '';
+        var noticeBadge = p.notice ? '<span class="notice-badge">??</span>' : '';
+        var verified = (p.verified === true || isAuthorVerified(p.author)) ? verifiedBadgeHtml(true, p.author) : '';
+        var likeStr = (p.likeCount != null && p.likeCount > 0) ? ' ? ?? ' + p.likeCount : '';
+        var dateStr = (p.createdAt ? formatRelativeDate(new Date(p.createdAt)) : '') || (p.date || '');
+        var meta = (p.author ? p.author + ' ? ' : '') + dateStr + (p.hits != null ? ' ? ?? ' + p.hits : '') + likeStr + verified;
+        var commentCount = p.commentCount || 0;
+        var commentBadge = commentCount > 0 ? '<span class="comment-count-badge">' + commentCount + '</span>' : '';
+        var noticeBtn = isOp ? '<button type="button" class="notice-toggle-btn btn btn-outline btn-sm" data-post-id="' + (p.id || '').replace(/"/g, '&quot;') + '">' + (p.notice ? '?? ??' : '??') + '</button>' : '';
+        var thumbUrl = firstImageUrl(p.body);
+        var thumbHtml = thumbUrl ? '<span class="feed-item-thumb"><img src="' + thumbUrl.replace(/"/g, '&quot;') + '" alt="" width="56" height="56" loading="lazy"></span>' : '';
+        return '<li class="feed-item feed-item-row">' +
+          '<a href="' + href + '" class="feed-title-wrapper">' +
+            '<span class="feed-title-content feed-title-row">' + noticeBadge + badge + '<span class="feed-title-text">' + (p.title || '') + '</span></span>' +
+            commentBadge +
+          '</a>' +
+          (thumbHtml ? thumbHtml : '') +
+          '<span class="feed-meta">' + meta + '</span>' +
+          (noticeBtn ? '<span class="feed-operator-actions">' + noticeBtn + '</span>' : '') +
+        '</li>';
+      }).join('');
+    },
+
     renderPosts: function (containerId, list, detailUrl, showBoardBadge) {
       var el = document.getElementById(containerId);
       if (!el) return;
@@ -943,9 +978,8 @@
         verified: false,
         createdAt: firebase.firestore.FieldValue.serverTimestamp()
       };
-      console.log('[app.js createPost] Firestore db.collection("posts").add 호출');
       db.collection('posts').add(payload).then(function (ref) {
-        console.log('[app.js createPost] 저장 완료. id=', ref.id, ', db.collection("posts")에 데이터 들어감');
+        console.log('Firestore 저장 성공');
         if (callback) callback(null, { id: ref.id });
       }).catch(function (err) {
         console.error('[app.js createPost] Firestore add 실패', err);
