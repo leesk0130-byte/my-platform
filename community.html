@@ -91,6 +91,7 @@
             <div class="board-actions" style="justify-content:flex-end;">
               <a href="bookmarks.html" class="btn btn-ghost btn-sm">저장한 글</a>
               <a href="write.html" class="btn btn-primary board-actions-write-mobile">글쓰기</a>
+              <button type="button" class="btn btn-ghost btn-sm" id="admin-delete-all-posts" style="display:none; color:#dc2626;">모든 글 삭제</button>
             </div>
             <div id="board-notice" class="board-notice" aria-label="공지" style="display:none;"></div>
             <div id="page-root" aria-live="polite"></div>
@@ -166,8 +167,8 @@
       var pageRoot = document.getElementById('page-root');
       function setRoot(html) { if (pageRoot) pageRoot.innerHTML = html; }
 
-      function renderLoading() {
-        setRoot('<div class="loading-state"><div class="loading-spinner"></div><p>글 목록을 불러오는 중이에요...</p></div>');
+      function renderLoading(msg) {
+        setRoot('<div class="loading-state"><div class="loading-spinner"></div><p>' + (msg || '글 목록을 불러오는 중이에요...') + '</p></div>');
       }
       function renderEmpty() {
         setRoot('<div class="empty-state"><p class="empty-state-icon" aria-hidden="true">\uD83D\uDCDD</p><p class="empty-state-title">아직 작성된 글이 없어요!</p><p class="empty-state-desc">첫 글을 작성해 보세요.</p><a href="write.html" class="btn btn-primary">첫 글 쓰기</a></div>');
@@ -507,9 +508,22 @@
 
       /* ── 상세 보기 ── */
       if (postId) {
-        renderLoading();
+        if (!window.app || typeof window.app.getPostById !== 'function') {
+          renderError('글을 불러올 수 없어요. 페이지를 새로고침해 주세요.');
+          return;
+        }
+        renderLoading('글을 불러오는 중이에요...');
         setListUI(false);
+        var detailDone = false;
+        var timeoutId = setTimeout(function() {
+          if (detailDone) return;
+          detailDone = true;
+          renderError('글을 불러오지 못했어요. 네트워크를 확인한 뒤 다시 시도해 주세요.');
+        }, 10000);
         window.app.getPostById(postId, function(err, post) {
+          if (detailDone) return;
+          detailDone = true;
+          clearTimeout(timeoutId);
           if (!post) {
             var MOCK = [
               { id: '1', title: 'PG사 토스 vs 이니시스 vs 나이스 수수료 비교 후기 있어요', author: '가맹점주', date: '2시간 전', body: '각 PG사 수수료 비교해 보신 분들 후기 공유해 주세요.\n\n저는 토스 쓰고 있는데 연회비 11만원에 카드 3.4%라 부담되네요. 이니시스는 연회비 면제라 바꿀까 고민 중이에요.', verified: false },
@@ -618,6 +632,21 @@
         });
       }
       loadPopularPosts();
+
+      var adminDelBtn = document.getElementById('admin-delete-all-posts');
+      if (adminDelBtn && window.app && window.app.isOperator && window.app.isOperator()) {
+        adminDelBtn.style.display = 'inline-block';
+        adminDelBtn.onclick = function() {
+          if (!confirm('커뮤니티 글을 모두 삭제할까요? (Firestore + 로컬 저장 모두 삭제됩니다)')) return;
+          adminDelBtn.disabled = true;
+          window.app.deleteAllCommunityPosts(function(err) {
+            adminDelBtn.disabled = false;
+            if (err) { alert(err); return; }
+            if (window.app.showToast) window.app.showToast('모든 글이 삭제되었어요.');
+            location.reload();
+          });
+        };
+      }
     })();
 
     function loadPopularPosts() {

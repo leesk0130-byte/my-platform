@@ -672,22 +672,73 @@
     },
     getPostById: function (postId, callback) {
       if (!postId || !callback) return;
+      var called = false;
+      function done(err, post) {
+        if (called) return;
+        called = true;
+        callback(err, post);
+      }
       if (db) {
-        db.collection('posts').doc(postId).get()
-          .then(function (doc) {
-            if (doc.exists) {
-              callback(null, firestoreDocToPost(doc));
-            } else {
-              var local = getLocalPostById(postId);
-              callback(null, local);
-            }
-          })
-          .catch(function () {
-            callback(null, getLocalPostById(postId));
-          });
+        var ref = db.collection('posts').doc(postId);
+        ref.get().then(function (doc) {
+          if (doc.exists) {
+            done(null, firestoreDocToPost(doc));
+          } else {
+            done(null, getLocalPostById(postId));
+          }
+        }).catch(function () {
+          done(null, getLocalPostById(postId));
+        });
+        setTimeout(function () {
+          if (!called) done(null, null);
+        }, 12000);
         return;
       }
-      callback(null, getLocalPostById(postId));
+      done(null, getLocalPostById(postId));
+    },
+    deleteAllCommunityPosts: function (callback) {
+      if (!callback) return;
+      if (!isOperator()) {
+        callback('운영자만 실행할 수 있어요.');
+        return;
+      }
+      function clearLocal() {
+        try {
+          saveLocalPosts([]);
+          var keys = [];
+          for (var i = 0; i < localStorage.length; i++) {
+            var k = localStorage.key(i);
+            if (k && (k.indexOf(COMMENTS_STORAGE_PREFIX) === 0 || k === LIKES_STORAGE_KEY || k === LIKED_POSTS_KEY || k === POST_VIEWS_KEY || k === LAST_VIEWED_KEY)) keys.push(k);
+          }
+          keys.forEach(function (k) { localStorage.removeItem(k); });
+        } catch (e) {}
+      }
+      if (!db) {
+        clearLocal();
+        callback(null);
+        return;
+      }
+      db.collection('posts').get().then(function (snap) {
+        var refs = [];
+        snap.forEach(function (doc) { refs.push(doc.ref); });
+        var BATCH_SIZE = 500;
+        var chain = Promise.resolve();
+        for (var i = 0; i < refs.length; i += BATCH_SIZE) {
+          (function (batch) {
+            chain = chain.then(function () { return batch.commit(); });
+          })((function () {
+            var b = db.batch();
+            refs.slice(i, i + BATCH_SIZE).forEach(function (ref) { b.delete(ref); });
+            return b;
+          })());
+        }
+        return chain;
+      }).then(function () {
+        clearLocal();
+        callback(null);
+      }).catch(function (err) {
+        callback(err && err.message ? err.message : '삭제 중 오류가 났어요.');
+      });
     },
     getPostLikeCount: getPostLikeCount,
     hasUserLikedPost: hasUserLikedPost,
