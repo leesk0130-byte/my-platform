@@ -178,9 +178,7 @@
         setRoot('<div class="empty-state" style="margin:1.5rem 2rem;"><p class="empty-state-icon" aria-hidden="true">\uD83D\uDD0D</p><p class="empty-state-title">글이 없거나 삭제되었습니다</p><p class="empty-state-desc">요청하신 글을 찾을 수 없어요. 삭제되었거나 잘못된 주소일 수 있어요.</p><a href="community.html" class="btn btn-primary">목록으로 돌아가기</a></div>');
       }
       function renderError(msg) {
-        setRoot('<div class="empty-state"><p class="empty-state-title">일시적인 오류가 났어요</p><p class="empty-state-desc">' + (msg || '잠시 후 다시 시도해 주세요.') + '</p><button type="button" class="btn btn-primary" id="view-error-retry">다시 시도</button></div>');
-        var btn = document.getElementById('view-error-retry');
-        if (btn) btn.onclick = function() { loadList(false); };
+        setRoot('<div class="empty-state"><p class="empty-state-title">글을 불러올 수 없어요</p><p class="empty-state-desc">' + (msg || '잠시 후 다시 시도해 주세요.') + '</p><a href="community.html" class="btn btn-primary">목록으로 돌아가기</a></div>');
       }
       function renderList(items, hasMore) {
         var listHtml = window.app && window.app.renderPostsHTML ? window.app.renderPostsHTML(items, 'community.html?id=', true) : '';
@@ -510,7 +508,7 @@
       /* ── 상세 보기 (URL id로 Firestore 문서 직접 조회) ── */
       if (postId) {
         if (!window.app || typeof window.app.getPostById !== 'function') {
-          renderError('글을 불러올 수 없어요. 페이지를 새로고침해 주세요.');
+          renderNotFound();
           return;
         }
         setListUI(false);
@@ -519,14 +517,14 @@
         var timeoutId = setTimeout(function() {
           if (detailDone) return;
           detailDone = true;
-          renderError('글을 불러오지 못했어요. 네트워크를 확인한 뒤 다시 시도해 주세요.');
+          renderNotFound();
         }, 10000);
         window.app.getPostById(postId, function(err, post) {
           if (detailDone) return;
           detailDone = true;
           clearTimeout(timeoutId);
           if (err) {
-            renderError(err);
+            renderNotFound();
             return;
           }
           if (!post) {
@@ -592,11 +590,7 @@
           if (err) {
             console.error('[community] fetchPosts 오류', err);
             setListUI(true);
-            if (!(items && items.length)) {
-              renderEmpty();
-            } else {
-              renderError(err);
-            }
+            renderEmpty();
             return;
           }
           allFilteredItems = applyFilterAndSort(items || []);
