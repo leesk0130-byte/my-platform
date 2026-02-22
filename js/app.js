@@ -92,57 +92,6 @@
   var VERIFIED_AUTHORS = { '???': true };
   var OPERATOR_EMAIL = 'leesk0130@point3.team';
 
-  var STORAGE_KEY = 'merchant_plus_posts';
-  var DATA_VERSION = 'community_reset_1';
-  if (typeof localStorage !== 'undefined' && localStorage.getItem('merchant_plus_data_version') !== DATA_VERSION) {
-    try {
-      localStorage.removeItem(STORAGE_KEY);
-      for (var i = localStorage.length - 1; i >= 0; i--) {
-        var k = localStorage.key(i);
-        if (k && k.indexOf(COMMENTS_STORAGE_PREFIX) === 0) localStorage.removeItem(k);
-      }
-      localStorage.setItem('merchant_plus_data_version', DATA_VERSION);
-    } catch (e) {}
-  }
-
-  function getLocalPosts() {
-    try {
-      return JSON.parse(localStorage.getItem(STORAGE_KEY) || '[]');
-    } catch (e) {
-      return [];
-    }
-  }
-
-  function saveLocalPosts(list) {
-    try {
-      localStorage.setItem(STORAGE_KEY, JSON.stringify(list));
-    } catch (e) {}
-  }
-
-  function addLocalPost(data) {
-    var list = getLocalPosts();
-    var id = 'local_' + Date.now();
-    var u = getUser();
-    var post = {
-      id: id,
-      title: data.title || '',
-      body: data.body || '',
-      author: data.author || '??',
-      authorId: data.authorId != null ? data.authorId : (u ? u.uid : null),
-      board: data.board || 'free',
-      hits: 0,
-      verified: false,
-      notice: !!(data.notice),
-      industry: data.industry || '',
-      monthlyVolume: data.monthlyVolume || '',
-      pgUsed: data.pgUsed || '',
-      createdAt: new Date().toISOString()
-    };
-    list.unshift(post);
-    saveLocalPosts(list);
-    return post;
-  }
-
   function canEditPost(post) {
     if (!post) return false;
     var u = getUser();
@@ -152,8 +101,8 @@
   }
 
   function deletePost(postId, callback) {
-    if (!db || String(postId).indexOf('local_') === 0) {
-      if (callback) callback('데이터베이스에 연결되어 있지 않거나 로컬 글은 삭제할 수 없어요.');
+    if (!db) {
+      if (callback) callback('데이터베이스에 연결되어 있지 않아요.');
       return;
     }
     db.collection('posts').doc(postId).get().then(function (doc) {
@@ -169,8 +118,8 @@
   }
 
   function updatePost(postId, data, callback) {
-    if (!db || String(postId).indexOf('local_') === 0) {
-      if (callback) callback('데이터베이스에 연결되어 있지 않거나 로컬 글은 수정할 수 없어요.');
+    if (!db) {
+      if (callback) callback('데이터베이스에 연결되어 있지 않아요.');
       return;
     }
     db.collection('posts').doc(postId).get().then(function (doc) {
@@ -193,7 +142,7 @@
   }
 
   function togglePostNotice(postId, callback) {
-    if (!db || String(postId).indexOf('local_') === 0) {
+    if (!db) {
       if (callback) callback('데이터베이스에 연결되어 있지 않아요.');
       return;
     }
@@ -354,8 +303,7 @@
     });
   }
   function togglePostLike(postId, callback) {
-    var sid = String(postId);
-    if (!db || sid.indexOf('local_') === 0) {
+    if (!db) {
       if (callback) callback(null, 0);
       return;
     }
@@ -415,11 +363,6 @@
     return ' <span class="verified-badge" aria-label="??? ??">??</span>';
   }
 
-  function getLocalPostById(id) {
-    var list = getLocalPosts();
-    return list.filter(function (p) { return p.id === id; })[0] || null;
-  }
-
   function formatRelativeDate(d) {
     var now = new Date();
     var diff = now - d;
@@ -473,7 +416,7 @@
     if (!postId) return false;
     if (viewCooldown[postId] && (Date.now() - viewCooldown[postId]) < VIEW_COOLDOWN_MS) return false;
     viewCooldown[postId] = Date.now();
-    if (!db || String(postId).indexOf('local_') === 0) return true;
+    if (!db) return true;
     var inc = firebase.firestore && firebase.firestore.FieldValue && firebase.firestore.FieldValue.increment;
     if (inc) db.collection('posts').doc(postId).update({ hits: inc(1) }).catch(function () {});
     return true;
@@ -504,7 +447,7 @@
     }, 3500);
   }
 
-  window.app = {
+  var app = {
     FEE_2026: FEE_2026,
     MERCHANT_FEE_2026: MERCHANT_FEE_2026,
     apiUrl: BASE,
@@ -585,54 +528,45 @@
         callback(null, null);
         return;
       }
+      if (!db) {
+        callback(null, null);
+        return;
+      }
       var called = false;
       function done(err, post) {
         if (called) return;
         called = true;
+        if (timeoutId) clearTimeout(timeoutId);
         callback(err, post);
       }
-      if (db) {
-        var ref = db.collection('posts').doc(postId);
-        ref.get()
-          .then(function (doc) {
-            if (doc.exists) {
-              try {
-                done(null, firestoreDocToPost(doc));
-              } catch (e) {
-                console.warn('[app.js getPostById] doc 변환 실패', postId, e);
-                done(null, null);
-              }
-            } else {
-              done(null, null);
-            }
-          })
-          .catch(function (e) {
-            console.error('[app.js getPostById] Firestore get 실패', postId, e);
+      var timeoutId = setTimeout(function () {
+        done(null, null);
+      }, 12000);
+      var ref = db.collection('posts').doc(postId);
+      ref.get()
+        .then(function (docSnap) {
+          if (!docSnap || !docSnap.exists) {
             done(null, null);
-          });
-        setTimeout(function () {
-          if (!called) done(null, null);
-        }, 10000);
-        return;
-      }
-      done(null, null);
+            return;
+          }
+          var post = null;
+          try {
+            post = firestoreDocToPost(docSnap);
+          } catch (e) {
+            console.warn('[app.js getPostById] doc 변환 실패', postId, e);
+          }
+          done(null, post);
+        })
+        .catch(function (e) {
+          console.error('[app.js getPostById] Firestore get 실패', postId, e);
+          done(null, null);
+        });
     },
     deleteAllCommunityPosts: function (callback) {
       if (!callback) return;
       if (!isOperator()) {
-        callback('???? ??? ? ???.');
+        callback('권한이 없어요.');
         return;
-      }
-      function clearLocal() {
-        try {
-          saveLocalPosts([]);
-          var keys = [];
-          for (var i = 0; i < localStorage.length; i++) {
-            var k = localStorage.key(i);
-            if (k && (k.indexOf(COMMENTS_STORAGE_PREFIX) === 0 || k === LIKES_STORAGE_KEY || k === LIKED_POSTS_KEY)) keys.push(k);
-          }
-          keys.forEach(function (k) { localStorage.removeItem(k); });
-        } catch (e) {}
       }
       if (!db) {
         if (callback) callback('데이터베이스에 연결되어 있지 않아요.');
@@ -654,17 +588,16 @@
         }
         return chain;
       }).then(function () {
-        clearLocal();
-        callback(null);
+        if (callback) callback(null);
       }).catch(function (err) {
-        callback(err && err.message ? err.message : '?? ? ??? ???.');
+        if (callback) callback(err && err.message ? err.message : '삭제에 실패했어요.');
       });
     },
     getPostLikeCount: getPostLikeCount,
     hasUserLikedPost: hasUserLikedPost,
     getUserLikedState: function (postId, callback) {
       if (!postId || !callback) return;
-      if (!db || String(postId).indexOf('local_') === 0) {
+      if (!db) {
         callback(false);
         return;
       }
@@ -710,10 +643,6 @@
         }, 'latest');
       });
     },
-
-    getLocalPosts: getLocalPosts,
-    addLocalPost: addLocalPost,
-    getLocalPostById: getLocalPostById,
 
     renderNews: function (containerId, list, linkPrefix) {
       var el = document.getElementById(containerId);
@@ -1063,4 +992,11 @@
     incrementPostViews: incrementPostViews,
     getPostViewCount: getPostViewCount
   };
+
+  if (typeof window !== 'undefined') {
+    window.app = app;
+  }
+  if (typeof module !== 'undefined' && module.exports) {
+    module.exports = app;
+  }
 })();
