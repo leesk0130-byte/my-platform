@@ -14,7 +14,7 @@
 |--------|-----------|
 | **타입** | 드롭다운에서 **CNAME** 선택 |
 | **호스트** | **@** (또는 비워두기. `@.bizimshop.co.kr` 이면 @만 남기기) |
-| **값/위치** | **my-platform.pages.dev** (복붙) |
+| **값/위치** | **my-platform.pages.dev.** (끝에 점(.) 붙이기. 가비아는 점으로 끝나야 함) |
 | **TTL** | 180 그대로 두기 |
 
 - **우선 순위** / **서비스** 는 비워두거나 기본값 그대로 두세요.
@@ -26,7 +26,7 @@
 ---
 
 **참고:** 호스트 **@** 에 CNAME을 막아둔 경우가 있습니다. 그때는  
-- **호스트**에 **www** 만 넣고 **값/위치**에 **my-platform.pages.dev** 넣어서 저장한 뒤,  
+- **호스트**에 **www** 만 넣고 **값/위치**에 **my-platform.pages.dev.** (끝에 점) 넣어서 저장한 뒤,  
 - 가비아 도메인 메뉴에서 **URL 리다이렉트**(또는 **도메인 연결/이동**)로 `bizimshop.co.kr` → `www.bizimshop.co.kr` 로 연결하면 됩니다.
 
 위까지 하신 뒤 **Cloudflare** 설정(아래 1번)도 해야 **bizimshop.co.kr** 로 접속됩니다.
@@ -52,8 +52,8 @@
 
 | 유형 | 호스트 | 값/위치 |
 |------|--------|---------|
-| **CNAME** | **@** (또는 비워두기, 루트 도메인) | **my-platform.pages.dev** |
-| **CNAME** | **www** | **my-platform.pages.dev** (선택: www도 쓰려면) |
+| **CNAME** | **@** (또는 비워두기, 루트 도메인) | **my-platform.pages.dev.** (가비아는 끝에 점 필수) |
+| **CNAME** | **www** | **my-platform.pages.dev.** (선택: www도 쓰려면) |
 
 - **@** = 메인 도메인(bizimshop.co.kr)
 - **www** = www.bizimshop.co.kr
