@@ -31,11 +31,19 @@
 
   var db = null;
   try {
-    if (window.FIREBASE_CONFIG && window.firebase && typeof window.firebase.firestore === 'function') {
-      if (!firebase.apps.length) firebase.initializeApp(window.FIREBASE_CONFIG);
+    var config = window.FIREBASE_CONFIG;
+    var hasFirebase = !!(window.firebase && typeof window.firebase.firestore === 'function');
+    if (config && hasFirebase) {
+      if (!firebase.apps.length) firebase.initializeApp(config);
       db = firebase.firestore();
     }
-  } catch (e) { db = null; }
+    if (!db) {
+      console.warn('[app.js] Firestore 미연결. config.js 확인: FIREBASE_CONFIG=', !!config, ', projectId=', config && config.projectId, ', firebase.firestore=', hasFirebase);
+    }
+  } catch (e) {
+    db = null;
+    console.error('[app.js] Firestore 초기화 예외', e);
+  }
 
   // 2026? ?? ??? ?? (2026.02.14 ?? ??)
   var FEE_2026 = {
@@ -934,7 +942,9 @@
       db.collection('posts').add(payload).then(function (ref) {
         if (callback) callback(null, { id: ref.id });
       }).catch(function (err) {
-        if (callback) callback(err && err.message ? err.message : 'Firestore ??? ?????.');
+        console.error('[app.js createPost] Firestore add 실패', err);
+        var msg = (err && (err.message || err.code)) ? String(err.message || err.code) : 'Firestore 저장에 실패했어요.';
+        if (callback) callback(msg);
       });
     },
 

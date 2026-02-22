@@ -171,7 +171,7 @@
         setRoot('<div class="loading-state"><div class="loading-spinner"></div><p>' + (msg || '글 목록을 불러오는 중이에요...') + '</p></div>');
       }
       function renderEmpty() {
-        setRoot('<div class="empty-state"><p class="empty-state-icon" aria-hidden="true">\uD83D\uDCDD</p><p class="empty-state-title">아직 작성된 글이 없어요</p><p class="empty-state-desc">첫 글을 작성해 보세요.</p><a href="write.html" class="btn btn-primary">글쓰기</a></div>');
+        setRoot('<div class="empty-state"><p class="empty-state-icon" aria-hidden="true">\uD83D\uDCDD</p><p class="empty-state-title">첫 글을 써보세요</p><p class="empty-state-desc">아직 작성된 글이 없어요. 지금 첫 글을 남겨 보세요.</p><a href="write.html" class="btn btn-primary">글쓰기</a></div>');
       }
       function renderNotFound() {
         setRoot('<div class="empty-state" style="margin:1.5rem 2rem;"><p class="empty-state-icon" aria-hidden="true">\uD83D\uDD0D</p><p class="empty-state-title">글이 없거나 삭제되었습니다</p><p class="empty-state-desc">요청하신 글을 찾을 수 없어요. 삭제되었거나 잘못된 주소일 수 있어요.</p><a href="community.html" class="btn btn-primary">목록으로 돌아가기</a></div>');
@@ -588,7 +588,16 @@
         setListUI(true);
         var sortOrder = (sortSelect && sortSelect.value) || sortBy;
         window.app.fetchPosts(board, 500, 0, function(err, items) {
-          if (err) { console.error('[community] fetchPosts 오류', err); setListUI(true); renderError(err); return; }
+          if (err) {
+            console.error('[community] fetchPosts 오류', err);
+            setListUI(true);
+            if (!(items && items.length)) {
+              renderEmpty();
+            } else {
+              renderError(err);
+            }
+            return;
+          }
           allFilteredItems = applyFilterAndSort(items || []);
           if (!append) currentShown = Math.min(PAGE_SIZE, allFilteredItems.length);
           else currentShown = Math.min(currentShown + PAGE_SIZE, allFilteredItems.length);
