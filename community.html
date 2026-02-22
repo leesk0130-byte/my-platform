@@ -277,7 +277,7 @@
         var actionHtml = canEdit
           ? '<div class="post-detail-actions" style="margin-top:0.5rem;"><a href="edit.html?id=' + encodeURIComponent(post.id) + '" class="btn btn-outline btn-sm">수정</a> <button type="button" class="post-delete-btn btn btn-outline btn-sm" data-post-id="' + (post.id || '') + '">삭제</button></div>'
           : '';
-        var saved = window.Bookmarks ? window.Bookmarks.isBookmarked(post.id) : false;
+        var saved = false;
         var bodyText = (post.body || '(내용 없음)').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/\n/g,'<br>');
         setRoot(
           '<div class="post-detail-wrap">' +
@@ -327,12 +327,18 @@
 
         /* 이벤트 바인딩 */
         var bookmarkBtn = document.getElementById('post-bookmark-btn');
-        if (bookmarkBtn) bookmarkBtn.addEventListener('click', function() {
-          var id = bookmarkBtn.getAttribute('data-post-id');
-          if (!id || !window.Bookmarks) return;
-          var ns = window.Bookmarks.toggle(id);
-          bookmarkBtn.textContent = ns ? '저장 취소' : '저장';
-        });
+        if (bookmarkBtn && window.Bookmarks) {
+          window.Bookmarks.isBookmarked(post.id, function(bookmarked) {
+            if (bookmarkBtn.parentNode) bookmarkBtn.textContent = bookmarked ? '저장 취소' : '저장';
+          });
+          bookmarkBtn.addEventListener('click', function() {
+            var id = bookmarkBtn.getAttribute('data-post-id');
+            if (!id || !window.Bookmarks) return;
+            window.Bookmarks.toggle(id, function(added) {
+              if (bookmarkBtn.parentNode) bookmarkBtn.textContent = added ? '저장 취소' : '저장';
+            });
+          });
+        }
         var shareBtn = document.getElementById('post-share-link-btn');
         if (shareBtn) shareBtn.addEventListener('click', function() {
           try { navigator.clipboard.writeText(location.href); shareBtn.textContent = '복사됨'; setTimeout(function() { shareBtn.textContent = '링크 복사'; }, 2000); } catch(e) {}

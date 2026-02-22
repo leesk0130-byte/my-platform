@@ -198,40 +198,53 @@
           nickname: (document.getElementById('write-nickname') || {}).value || '',
           industry: (document.getElementById('write-industry') || {}).value || '',
           monthlyVolume: (document.getElementById('write-monthly-volume') || {}).value || '',
-          pgUsed: (document.getElementById('write-pg-used') || {}).value || '',
-          ts: Date.now()
+          pgUsed: (document.getElementById('write-pg-used') || {}).value || ''
         };
         if (!o.title && !o.body) return;
-        try { localStorage.setItem(DRAFT_KEY, JSON.stringify(o)); } catch (e) {}
+        if (window.app && window.app.saveDraft) {
+          window.app.saveDraft(o, function() {});
+        } else {
+          try { localStorage.setItem(DRAFT_KEY, JSON.stringify(Object.assign({}, o, { ts: Date.now() }))); } catch (e) {}
+        }
       }
-      function loadDraft() {
-        try {
-          var s = localStorage.getItem(DRAFT_KEY);
-          if (!s) return null;
-          return JSON.parse(s);
-        } catch (e) { return null; }
+      function applyDraft(draft) {
+        if (!draft || (!draft.title && !draft.body)) return;
+        var t = document.getElementById('write-title');
+        var b = document.getElementById('write-body');
+        var brd = document.getElementById('write-board');
+        var nick = document.getElementById('write-nickname');
+        var ind = document.getElementById('write-industry');
+        var vol = document.getElementById('write-monthly-volume');
+        var pg = document.getElementById('write-pg-used');
+        if (t) t.value = draft.title || '';
+        if (b) b.value = draft.body || '';
+        if (brd) brd.value = draft.board || 'free';
+        if (nick) nick.value = draft.nickname || '';
+        if (ind) ind.value = draft.industry || '';
+        if (vol) vol.value = draft.monthlyVolume || '';
+        if (pg) pg.value = draft.pgUsed || '';
       }
       function clearDraft() {
-        try { localStorage.removeItem(DRAFT_KEY); } catch (e) {}
-      }
-      var draft = loadDraft();
-      if (draft && (draft.title || draft.body)) {
-        if (!titleParam && confirm('이어서 작성하시겠습니까? 임시 저장된 글이 있습니다.')) {
-          var t = document.getElementById('write-title');
-          var b = document.getElementById('write-body');
-          var brd = document.getElementById('write-board');
-          var nick = document.getElementById('write-nickname');
-          var ind = document.getElementById('write-industry');
-          var vol = document.getElementById('write-monthly-volume');
-          var pg = document.getElementById('write-pg-used');
-          if (t) t.value = draft.title || '';
-          if (b) b.value = draft.body || '';
-          if (brd) brd.value = draft.board || 'free';
-          if (nick) nick.value = draft.nickname || '';
-          if (ind) ind.value = draft.industry || '';
-          if (vol) vol.value = draft.monthlyVolume || '';
-          if (pg) pg.value = draft.pgUsed || '';
+        if (window.app && window.app.clearDraft) {
+          window.app.clearDraft(function() {});
+        } else {
+          try { localStorage.removeItem(DRAFT_KEY); } catch (e) {}
         }
+      }
+      if (window.app && window.app.getDraft) {
+        window.app.getDraft(function(err, draft) {
+          if (draft && (draft.title || draft.body) && !titleParam && confirm('이어서 작성하시겠습니까? 임시 저장된 글이 있습니다.')) {
+            applyDraft(draft);
+          }
+        });
+      } else {
+        try {
+          var s = localStorage.getItem(DRAFT_KEY);
+          var draft = s ? JSON.parse(s) : null;
+          if (draft && (draft.title || draft.body) && !titleParam && confirm('이어서 작성하시겠습니까? 임시 저장된 글이 있습니다.')) {
+            applyDraft(draft);
+          }
+        } catch (e) {}
       }
       setInterval(saveDraft, 10000);
 

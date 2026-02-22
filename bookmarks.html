@@ -61,32 +61,40 @@
     </div>
   </footer>
 
-  <script src="js/bookmarks.js"></script>
   <script src="https://www.gstatic.com/firebasejs/10.7.0/firebase-app-compat.js"></script>
   <script src="https://www.gstatic.com/firebasejs/10.7.0/firebase-auth-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/10.7.0/firebase-firestore-compat.js"></script>
   <script src="js/config.js"></script>
   <script src="js/app.js"></script>
+  <script src="js/bookmarks.js"></script>
   <script src="js/auth.js"></script>
   <script>
     (function() {
       if (window.trackEvent) window.trackEvent('pageview', { page: 'bookmarks' });
       var listEl = document.getElementById('bookmarks-list');
       var emptyEl = document.getElementById('bookmarks-empty');
-      var ids = window.Bookmarks ? window.Bookmarks.getIds() : [];
-      if (!ids.length) {
-        if (listEl) listEl.innerHTML = '';
-        if (emptyEl) emptyEl.style.display = 'block';
-        return;
+      function render(ids) {
+        ids = ids || [];
+        if (!ids.length) {
+          if (listEl) listEl.innerHTML = '';
+          if (emptyEl) emptyEl.style.display = 'block';
+          return;
+        }
+        if (window.app && window.app.getPostsByIds) {
+          window.app.getPostsByIds(ids, function(err, items) {
+            if (emptyEl) emptyEl.style.display = (items && items.length) ? 'none' : 'block';
+            if (listEl && items && items.length) {
+              window.app.renderPosts('bookmarks-list', items, 'community.html?id=', true);
+            } else if (listEl) listEl.innerHTML = '';
+          });
+        } else {
+          if (emptyEl) emptyEl.style.display = 'block';
+        }
       }
-      if (window.app && window.app.getPostsByIds) {
-        window.app.getPostsByIds(ids, function(err, items) {
-          if (emptyEl) emptyEl.style.display = (items && items.length) ? 'none' : 'block';
-          if (listEl && items && items.length) {
-            window.app.renderPosts('bookmarks-list', items, 'community.html?id=', true);
-          } else if (listEl) listEl.innerHTML = '';
-        });
+      if (window.app && window.app.getBookmarkIds) {
+        window.app.getBookmarkIds(function(err, ids) { render(ids); });
       } else {
-        if (emptyEl) emptyEl.style.display = 'block';
+        render([]);
       }
       var nav = document.getElementById('headerNav');
       var btn = document.querySelector('.nav-toggle');

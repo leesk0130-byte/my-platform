@@ -152,76 +152,60 @@
   }
 
   function deletePost(postId, callback) {
-    function doLocalDelete() {
-      var list = getLocalPosts().filter(function (p) { return p.id !== postId; });
-      saveLocalPosts(list);
-      if (callback) callback(null);
+    if (!db || String(postId).indexOf('local_') === 0) {
+      if (callback) callback('데이터베이스에 연결되어 있지 않거나 로컬 글은 삭제할 수 없어요.');
+      return;
     }
-    function tryDelete(post) {
-      if (!post) { if (callback) callback('?? ?? ? ???.'); return; }
-      if (!canEditPost(post)) { if (callback) callback('?? ??? ????.'); return; }
-      if (db && String(postId).indexOf('local_') !== 0) {
-        db.collection('posts').doc(postId).delete().then(function () { if (callback) callback(null); }).catch(function () { doLocalDelete(); });
-      } else {
-        doLocalDelete();
-      }
-    }
-    if (db && String(postId).indexOf('local_') !== 0) {
-      db.collection('posts').doc(postId).get().then(function (doc) {
-        tryDelete(doc.exists ? firestoreDocToPost(doc) : getLocalPostById(postId));
-      }).catch(function () {
-        tryDelete(getLocalPostById(postId));
+    db.collection('posts').doc(postId).get().then(function (doc) {
+      var post = doc.exists ? firestoreDocToPost(doc) : null;
+      if (!post) { if (callback) callback('글이 없어요.'); return; }
+      if (!canEditPost(post)) { if (callback) callback('수정 권한이 없어요.'); return; }
+      db.collection('posts').doc(postId).delete().then(function () { if (callback) callback(null); }).catch(function (e) {
+        if (callback) callback(e && (e.message || e.code) ? String(e.message || e.code) : '삭제에 실패했어요.');
       });
-    } else {
-      tryDelete(getLocalPostById(postId));
-    }
+    }).catch(function (e) {
+      if (callback) callback(e && (e.message || e.code) ? String(e.message || e.code) : '글이 없어요.');
+    });
   }
 
   function updatePost(postId, data, callback) {
-    function doLocalUpdate() {
-      var list = getLocalPosts();
-      var idx = list.findIndex(function (p) { return p.id === postId; });
-      if (idx === -1) { if (callback) callback('?? ?? ? ???.'); return; }
-      if (data.title != null) list[idx].title = data.title;
-      if (data.body != null) list[idx].body = data.body;
-      if (data.board != null) list[idx].board = data.board;
-      saveLocalPosts(list);
-      if (callback) callback(null, list[idx]);
+    if (!db || String(postId).indexOf('local_') === 0) {
+      if (callback) callback('데이터베이스에 연결되어 있지 않거나 로컬 글은 수정할 수 없어요.');
+      return;
     }
-    function tryUpdate(post) {
-      if (!post) { if (callback) callback('?? ?? ? ???.'); return; }
-      if (!canEditPost(post)) { if (callback) callback('?? ??? ????.'); return; }
-      if (db && String(postId).indexOf('local_') !== 0) {
-        var upd = {};
-        if (data.title != null) upd.title = data.title;
-        if (data.body != null) upd.body = data.body;
-        if (data.board != null) upd.board = data.board;
-        if (Object.keys(upd).length === 0) { if (callback) callback(null, post); return; }
-        db.collection('posts').doc(postId).update(upd).then(function () {
-          if (callback) callback(null, Object.assign({}, post, upd));
-        }).catch(function () { doLocalUpdate(); });
-      } else {
-        doLocalUpdate();
-      }
-    }
-    if (db && String(postId).indexOf('local_') !== 0) {
-      db.collection('posts').doc(postId).get().then(function (doc) {
-        tryUpdate(doc.exists ? firestoreDocToPost(doc) : getLocalPostById(postId));
-      }).catch(function () {
-        tryUpdate(getLocalPostById(postId));
+    db.collection('posts').doc(postId).get().then(function (doc) {
+      var post = doc.exists ? firestoreDocToPost(doc) : null;
+      if (!post) { if (callback) callback('글이 없어요.'); return; }
+      if (!canEditPost(post)) { if (callback) callback('수정 권한이 없어요.'); return; }
+      var upd = {};
+      if (data.title != null) upd.title = data.title;
+      if (data.body != null) upd.body = data.body;
+      if (data.board != null) upd.board = data.board;
+      if (Object.keys(upd).length === 0) { if (callback) callback(null, post); return; }
+      db.collection('posts').doc(postId).update(upd).then(function () {
+        if (callback) callback(null, Object.assign({}, post, upd));
+      }).catch(function (e) {
+        if (callback) callback(e && (e.message || e.code) ? String(e.message || e.code) : '수정에 실패했어요.');
       });
-    } else {
-      tryUpdate(getLocalPostById(postId));
-    }
+    }).catch(function (e) {
+      if (callback) callback(e && (e.message || e.code) ? String(e.message || e.code) : '글이 없어요.');
+    });
   }
 
   function togglePostNotice(postId, callback) {
-    var list = getLocalPosts();
-    var idx = list.findIndex(function (p) { return p.id === postId; });
-    if (idx === -1) { if (callback) callback('?? ?? ? ???.'); return; }
-    list[idx].notice = !list[idx].notice;
-    saveLocalPosts(list);
-    if (callback) callback(null);
+    if (!db || String(postId).indexOf('local_') === 0) {
+      if (callback) callback('데이터베이스에 연결되어 있지 않아요.');
+      return;
+    }
+    db.collection('posts').doc(postId).get().then(function (doc) {
+      if (!doc.exists) { if (callback) callback('글이 없어요.'); return; }
+      var notice = !doc.data().notice;
+      db.collection('posts').doc(postId).update({ notice: notice }).then(function () {
+        if (callback) callback(null);
+      }).catch(function (e) {
+        if (callback) callback(e && (e.message || e.code) ? String(e.message || e.code) : '반영에 실패했어요.');
+      });
+    }).catch(function () { if (callback) callback('글이 없어요.'); });
   }
 
   function getCommentsStorageKey(postId) { return COMMENTS_STORAGE_PREFIX + (postId || ''); }
@@ -248,49 +232,33 @@
     return m ? parseInt(m[1], 10) : 0;
   }
   function getComments(postId, callback) {
-    var url = BASE('api/community/posts/' + (postId || '') + '/comments');
-    function fallbackFirestore() {
-      if (db) {
-        db.collection('posts').doc(postId).collection('comments').orderBy('createdAt', 'asc').get()
-          .then(function (snap) {
-            var list = [];
-            snap.forEach(function (doc) {
-              var d = doc.data();
-              var createdAt = d.createdAt;
-              if (createdAt && typeof createdAt.toDate === 'function') createdAt = createdAt.toDate().toISOString();
-              else if (createdAt && typeof createdAt !== 'string' && createdAt && createdAt.seconds) createdAt = new Date(createdAt.seconds * 1000).toISOString();
-              list.push({
-                id: doc.id,
-                author: d.author || '??',
-                body: d.body || '',
-                parentId: d.parentId || null,
-                verified: !!d.verified,
-                createdAt: createdAt || ''
-              });
-            });
-            list.sort(function (a, b) { return commentSortKey(a) - commentSortKey(b); });
-            callback(null, list);
-          })
-          .catch(function () {
-            var local = getLocalComments(postId);
-            var hidden = getHiddenCommentIds(postId);
-            var mock = getMockComments(postId).filter(function (c) { return hidden.indexOf(c.id) === -1; });
-            var combined = local.concat(mock);
-            combined.sort(function (a, b) { return commentSortKey(a) - commentSortKey(b); });
-            callback(null, combined);
-          });
-        return;
-      }
-      var local = getLocalComments(postId);
-      var hidden = getHiddenCommentIds(postId);
-      var mock = getMockComments(postId).filter(function (c) { return hidden.indexOf(c.id) === -1; });
-      var combined = local.concat(mock);
-      combined.sort(function (a, b) { return commentSortKey(a) - commentSortKey(b); });
-      callback(null, combined);
+    if (!db || !postId) {
+      if (callback) callback(null, []);
+      return;
     }
-    fetch(url).then(function (res) { return res.ok ? res.json() : Promise.reject(); })
-      .then(function (data) { callback(null, data.items || data || []); })
-      .catch(fallbackFirestore);
+    db.collection('posts').doc(postId).collection('comments').orderBy('createdAt', 'asc').get()
+      .then(function (snap) {
+        var list = [];
+        snap.forEach(function (doc) {
+          var d = doc.data();
+          var createdAt = d.createdAt;
+          if (createdAt && typeof createdAt.toDate === 'function') createdAt = createdAt.toDate().toISOString();
+          else if (createdAt && typeof createdAt !== 'string' && createdAt && createdAt.seconds) createdAt = new Date(createdAt.seconds * 1000).toISOString();
+          list.push({
+            id: doc.id,
+            author: d.author || '??',
+            body: d.body || '',
+            parentId: d.parentId || null,
+            verified: !!d.verified,
+            createdAt: createdAt || ''
+          });
+        });
+        list.sort(function (a, b) { return commentSortKey(a) - commentSortKey(b); });
+        if (callback) callback(null, list);
+      })
+      .catch(function () {
+        if (callback) callback(null, []);
+      });
   }
   function addLocalComment(postId, data) {
     var list = getLocalComments(postId);
@@ -343,13 +311,17 @@
     if (ids.indexOf(commentId) === -1) { ids.push(commentId); localStorage.setItem(HIDDEN_COMMENTS_PREFIX + (postId || ''), JSON.stringify(ids)); }
   }
   function deleteComment(postId, commentId, callback) {
-    if ((commentId || '').toString().indexOf('comment_') === 0) {
-      var list = getLocalComments(postId).filter(function (c) { return c.id !== commentId; });
-      try { localStorage.setItem(getCommentsStorageKey(postId), JSON.stringify(list)); } catch (e) {}
-    } else {
-      addHiddenCommentId(postId, commentId);
+    if (!db || !postId || !commentId) {
+      if (callback) callback();
+      return;
     }
-    if (callback) callback();
+    db.collection('posts').doc(postId).collection('comments').doc(commentId).delete().then(function () {
+      var inc = firebase.firestore && firebase.firestore.FieldValue && firebase.firestore.FieldValue.increment;
+      if (inc) db.collection('posts').doc(postId).update({ commentCount: inc(-1) }).catch(function () {});
+      if (callback) callback();
+    }).catch(function () {
+      if (callback) callback();
+    });
   }
   function isOperator() {
     var u = getUser();
@@ -359,76 +331,60 @@
     return em === OPERATOR_EMAIL.toLowerCase();
   }
   function addComment(postId, data, callback) {
-    var url = BASE('api/community/posts/' + (postId || '') + '/comments');
-    var token = getToken();
-    var headers = { 'Content-Type': 'application/json' };
-    if (token) headers['Authorization'] = 'Bearer ' + token;
-    function fallbackFirestore() {
-      if (db) {
-        var payload = {
-          author: data.author || '??',
-          body: data.body || '',
-          parentId: data.parentId || null,
-          createdAt: new Date().toISOString(),
-          verified: false
-        };
-        db.collection('posts').doc(postId).collection('comments').add(payload).then(function (ref) {
-          var comment = { id: ref.id, author: payload.author, body: payload.body, parentId: payload.parentId, createdAt: payload.createdAt, verified: false };
-          var inc = firebase.firestore && firebase.firestore.FieldValue && firebase.firestore.FieldValue.increment;
-          if (inc) {
-            db.collection('posts').doc(postId).update({ commentCount: inc(1) }).catch(function () {});
-          }
-          if (callback) callback(null, comment);
-        }).catch(function () {
-          fallbackLocal();
-        });
-        return;
-      }
-      fallbackLocal();
+    if (!db || !postId) {
+      if (callback) callback('데이터베이스에 연결되어 있지 않아요.');
+      return;
     }
-    function fallbackLocal() {
-      try {
-        var comment = addLocalComment(postId, data);
-        if (callback) callback(null, comment);
-      } catch (e) {
-        if (callback) callback(e && e.message ? e.message : '?? ??? ?????.');
+    var payload = {
+      author: data.author || '??',
+      body: data.body || '',
+      parentId: data.parentId || null,
+      createdAt: new Date().toISOString(),
+      verified: false
+    };
+    db.collection('posts').doc(postId).collection('comments').add(payload).then(function (ref) {
+      var comment = { id: ref.id, author: payload.author, body: payload.body, parentId: payload.parentId, createdAt: payload.createdAt, verified: false };
+      var inc = firebase.firestore && firebase.firestore.FieldValue && firebase.firestore.FieldValue.increment;
+      if (inc) {
+        db.collection('posts').doc(postId).update({ commentCount: inc(1) }).catch(function () {});
       }
-    }
-    fetch(url, {
-      method: 'POST',
-      headers: headers,
-      body: JSON.stringify({ author: data.author || '??', body: data.body || '', parentId: data.parentId || null })
-    }).then(function (res) {
-      if (!res.ok) throw new Error('API failed');
-      return res.json();
-    }).then(function (result) {
-      if (result && result.id && callback) callback(null, result);
-      else if (callback) callback(result && (result.error || result.message) ? (result.error || result.message) : '?? ??');
-    }).catch(fallbackFirestore);
+      if (callback) callback(null, comment);
+    }).catch(function (e) {
+      if (callback) callback(e && (e.message || e.code) ? String(e.message || e.code) : '댓글 저장에 실패했어요.');
+    });
   }
   function togglePostLike(postId, callback) {
     var sid = String(postId);
-    var liked = getLikedPosts();
     if (!db || sid.indexOf('local_') === 0) {
-      setPostLike(postId, 1);
-      if (liked.indexOf(sid) === -1) setLikedPosts(liked.concat(sid));
-      if (callback) callback(null, getPostLikeCount(postId));
+      if (callback) callback(null, 0);
       return;
     }
-    var ref = db.collection('posts').doc(postId);
-    db.runTransaction(function (transaction) {
-      return transaction.get(ref).then(function (doc) {
-        if (!doc.exists) throw new Error('?? ????.');
-        var newLikes = (doc.data().likeCount || 0) + 1;
-        transaction.update(ref, { likeCount: newLikes });
-        return newLikes;
+    var userId = (getUser() && getUser().uid) || localStorage.getItem('merchant_plus_anon_id') || '';
+    if (!userId) {
+      if (callback) callback(null, 0);
+      return;
+    }
+    var likeRef = db.collection('posts').doc(postId).collection('likes').doc(userId);
+    likeRef.get().then(function (doc) {
+      var ref = db.collection('posts').doc(postId);
+      var inc = firebase.firestore && firebase.firestore.FieldValue && firebase.firestore.FieldValue.increment;
+      if (doc.exists) {
+        return likeRef.delete().then(function () {
+          if (inc) return ref.update({ likeCount: inc(-1) }).then(function () { return -1; });
+          return -1;
+        });
+      }
+      return likeRef.set({ at: firebase.firestore.FieldValue.serverTimestamp() }).then(function () {
+        if (inc) return ref.update({ likeCount: inc(1) }).then(function () { return 1; });
+        return 1;
       });
-    }).then(function (newCount) {
-      setPostLike(postId, newCount);
-      if (liked.indexOf(sid) === -1) setLikedPosts(liked.concat(sid));
-      if (callback) callback(null, newCount);
+    }).then(function () {
+      return db.collection('posts').doc(postId).get().then(function (doc) {
+        var newCount = doc.exists ? (doc.data().likeCount || 0) : 0;
+        if (callback) callback(null, newCount);
+      });
     }).catch(function (err) {
-      if (callback) callback(err && err.message ? err.message : '??? ??? ?????.');
+      if (callback) callback(err && err.message ? err.message : '좋아요 반영에 실패했어요.');
     });
   }
   function uploadImageToStorage(file, callback) {
@@ -499,46 +455,32 @@
     setUser(null);
   }
 
-  // ??? ?? ???
-  var POST_VIEWS_KEY = 'post_views_map';
-  var LAST_VIEWED_KEY = 'last_viewed_map';
-  var VIEW_COOLDOWN = 5 * 60 * 1000; // 5??? ?? (?? ?? ??)
-
-  function getPostViews() {
-    try {
-      return JSON.parse(localStorage.getItem(POST_VIEWS_KEY) || '{}');
-    } catch (e) {
-      return {};
+  function getUserIdOrAnonId() {
+    var u = getUser();
+    if (u && u.uid) return u.uid;
+    var anon = localStorage.getItem('merchant_plus_anon_id');
+    if (!anon) {
+      anon = 'anon_' + Date.now() + '_' + Math.random().toString(36).slice(2);
+      try { localStorage.setItem('merchant_plus_anon_id', anon); } catch (e) {}
     }
+    return anon;
   }
 
-  function getLastViewed() {
-    try {
-      return JSON.parse(localStorage.getItem(LAST_VIEWED_KEY) || '{}');
-    } catch (e) {
-      return {};
-    }
-  }
+  var viewCooldown = {};
+  var VIEW_COOLDOWN_MS = 5 * 60 * 1000;
 
   function incrementPostViews(postId) {
     if (!postId) return false;
-    var viewKey = 'view_' + postId;
-    var lastView = localStorage.getItem(viewKey);
-    if (lastView && (Date.now() - parseInt(lastView, 10)) < 300000) return false;
-    localStorage.setItem(viewKey, String(Date.now()));
-    if (db && String(postId).indexOf('local_') !== 0) {
-      var inc = firebase.firestore && firebase.firestore.FieldValue && firebase.firestore.FieldValue.increment;
-      if (inc) db.collection('posts').doc(postId).update({ hits: inc(1) }).catch(function () {});
-    }
-    var views = getPostViews();
-    views[postId] = (views[postId] || 0) + 1;
-    try { localStorage.setItem(POST_VIEWS_KEY, JSON.stringify(views)); } catch (e) {}
+    if (viewCooldown[postId] && (Date.now() - viewCooldown[postId]) < VIEW_COOLDOWN_MS) return false;
+    viewCooldown[postId] = Date.now();
+    if (!db || String(postId).indexOf('local_') === 0) return true;
+    var inc = firebase.firestore && firebase.firestore.FieldValue && firebase.firestore.FieldValue.increment;
+    if (inc) db.collection('posts').doc(postId).update({ hits: inc(1) }).catch(function () {});
     return true;
   }
 
   function getPostViewCount(postId) {
-    var views = getPostViews();
-    return views[postId] || 0;
+    return 0;
   }
 
   function showToast(message, type) {
@@ -629,53 +571,12 @@
             finish(list);
           })
           .catch(function (e) {
-            var msg = (e && (e.message || e.code)) ? String(e.message || e.code) : '??? ???? ????.';
             console.error('[app.js fetchPosts] Firestore get ??', e);
-            var local = getLocalPosts();
-            var list = local.map(function (p) {
-              var localComments = getLocalComments(p.id);
-              var additionalViews = typeof getPostViewCount === 'function' ? getPostViewCount(p.id) : 0;
-              return {
-                id: p.id,
-                title: p.title,
-                author: p.author,
-                board: p.board || 'free',
-                hits: (p.hits != null ? p.hits : 0) + additionalViews,
-                verified: p.verified,
-                notice: !!p.notice,
-                commentCount: localComments.length,
-                likeCount: getPostLikeCount(p.id),
-                body: p.body,
-                createdAt: p.createdAt
-              };
-            });
-            if (list.length > 0) {
-              finish(list);
-            } else if (callback) {
-              callback(null, [], 0);
-            }
+            if (callback) callback(null, [], 0);
           });
         return;
       }
-      var local = getLocalPosts();
-      var list = local.map(function (p) {
-        var localComments = getLocalComments(p.id);
-        var additionalViews = typeof getPostViewCount === 'function' ? getPostViewCount(p.id) : 0;
-        return {
-          id: p.id,
-          title: p.title,
-          author: p.author,
-          board: p.board || 'free',
-          hits: (p.hits != null ? p.hits : 0) + additionalViews,
-          verified: p.verified,
-          notice: !!p.notice,
-          commentCount: localComments.length,
-          likeCount: getPostLikeCount(p.id),
-          body: p.body,
-          createdAt: p.createdAt
-        };
-      });
-      finish(list);
+      if (callback) callback(null, [], 0);
     },
     getPostById: function (postId, callback) {
       if (!callback) return;
@@ -699,23 +600,22 @@
                 done(null, firestoreDocToPost(doc));
               } catch (e) {
                 console.warn('[app.js getPostById] doc 변환 실패', postId, e);
-                done(null, getLocalPostById(postId));
+                done(null, null);
               }
             } else {
-              done(null, getLocalPostById(postId) || null);
+              done(null, null);
             }
           })
           .catch(function (e) {
             console.error('[app.js getPostById] Firestore get 실패', postId, e);
-            var msg = (e && (e.message || e.code)) ? String(e.message || e.code) : '글을 불러오지 못했어요.';
-            done(msg, null);
+            done(null, null);
           });
         setTimeout(function () {
           if (!called) done(null, null);
         }, 10000);
         return;
       }
-      done('데이터베이스에 연결할 수 없어요.', getLocalPostById(postId) || null);
+      done(null, null);
     },
     deleteAllCommunityPosts: function (callback) {
       if (!callback) return;
@@ -729,14 +629,13 @@
           var keys = [];
           for (var i = 0; i < localStorage.length; i++) {
             var k = localStorage.key(i);
-            if (k && (k.indexOf(COMMENTS_STORAGE_PREFIX) === 0 || k === LIKES_STORAGE_KEY || k === LIKED_POSTS_KEY || k === POST_VIEWS_KEY || k === LAST_VIEWED_KEY)) keys.push(k);
+            if (k && (k.indexOf(COMMENTS_STORAGE_PREFIX) === 0 || k === LIKES_STORAGE_KEY || k === LIKED_POSTS_KEY)) keys.push(k);
           }
           keys.forEach(function (k) { localStorage.removeItem(k); });
         } catch (e) {}
       }
       if (!db) {
-        clearLocal();
-        callback(null);
+        if (callback) callback('데이터베이스에 연결되어 있지 않아요.');
         return;
       }
       db.collection('posts').get().then(function (snap) {
@@ -765,24 +664,20 @@
     hasUserLikedPost: hasUserLikedPost,
     getUserLikedState: function (postId, callback) {
       if (!postId || !callback) return;
+      if (!db || String(postId).indexOf('local_') === 0) {
+        callback(false);
+        return;
+      }
       var u = getUser();
       var anonId = localStorage.getItem('merchant_plus_anon_id');
       var userId = (u && u.uid) ? u.uid : (anonId || '');
-      if (db && String(postId).indexOf('local_') !== 0 && userId) {
-        db.collection('posts').doc(postId).collection('likes').doc(userId).get()
-          .then(function (doc) {
-            var liked = doc.exists;
-            if (liked) {
-              var arr = getLikedPosts();
-              if (arr.indexOf(String(postId)) === -1) setLikedPosts(arr.concat(String(postId)));
-              setPostLike(postId, 1);
-            }
-            callback(liked);
-          })
-          .catch(function () { callback(hasUserLikedPost(postId)); });
-      } else {
-        callback(hasUserLikedPost(postId));
+      if (!userId) {
+        callback(false);
+        return;
       }
+      db.collection('posts').doc(postId).collection('likes').doc(userId).get()
+        .then(function (doc) { callback(doc.exists); })
+        .catch(function () { callback(false); });
     },
     setPostLike: setPostLike,
     togglePostLike: togglePostLike,
@@ -1065,8 +960,106 @@
     },
 
     showToast: showToast,
-    
-    // ??? ?? ???
+
+    getBookmarkIds: function (callback) {
+      if (!db || !callback) return;
+      var uid = getUserIdOrAnonId();
+      db.collection('bookmarks').doc(uid).get().then(function (doc) {
+        var ids = (doc.exists && doc.data().postIds) ? doc.data().postIds : [];
+        callback(null, Array.isArray(ids) ? ids : []);
+      }).catch(function (e) { callback(e, []); });
+    },
+    addBookmark: function (postId, callback) {
+      if (!db || !postId) { if (callback) callback('연결되지 않았어요.'); return; }
+      var uid = getUserIdOrAnonId();
+      var ref = db.collection('bookmarks').doc(uid);
+      var arrUnion = firebase.firestore && firebase.firestore.FieldValue && firebase.firestore.FieldValue.arrayUnion;
+      if (!arrUnion) { if (callback) callback(null); return; }
+      ref.get().then(function (doc) {
+        if (doc.exists && (doc.data().postIds || []).indexOf(postId) !== -1) { if (callback) callback(null); return; }
+        return ref.set({ postIds: arrUnion(postId) }, { merge: true });
+      }).then(function () { if (callback) callback(null); }).catch(function (e) { if (callback) callback(e && e.message ? e.message : '저장 실패'); });
+    },
+    removeBookmark: function (postId, callback) {
+      if (!db || !postId) { if (callback) callback(null); return; }
+      var uid = getUserIdOrAnonId();
+      var ref = db.collection('bookmarks').doc(uid);
+      var arrRemove = firebase.firestore && firebase.firestore.FieldValue && firebase.firestore.FieldValue.arrayRemove;
+      if (!arrRemove) { if (callback) callback(null); return; }
+      ref.update({ postIds: arrRemove(postId) }).then(function () { if (callback) callback(null); }).catch(function () { if (callback) callback(null); });
+    },
+    toggleBookmark: function (postId, callback) {
+      var self = this;
+      this.getBookmarkIds(function (err, ids) {
+        if (err) { if (callback) callback(err, false); return; }
+        var isIn = ids.indexOf(postId) !== -1;
+        if (isIn) self.removeBookmark(postId, function () { if (callback) callback(null, false); });
+        else self.addBookmark(postId, function () { if (callback) callback(null, true); });
+      });
+    },
+    isBookmarked: function (postId, callback) {
+      this.getBookmarkIds(function (err, ids) {
+        if (callback) callback(!!(ids && ids.indexOf(postId) !== -1));
+      });
+    },
+
+    getDraft: function (callback) {
+      if (!db || !callback) return;
+      var uid = getUserIdOrAnonId();
+      db.collection('drafts').doc(uid).get().then(function (doc) {
+        callback(null, doc.exists ? doc.data() : null);
+      }).catch(function (e) { callback(e, null); });
+    },
+    saveDraft: function (data, callback) {
+      if (!db) { if (callback) callback('연결되지 않았어요.'); return; }
+      var uid = getUserIdOrAnonId();
+      var payload = Object.assign({}, data, { updatedAt: firebase.firestore.FieldValue.serverTimestamp() });
+      db.collection('drafts').doc(uid).set(payload, { merge: true }).then(function () { if (callback) callback(null); }).catch(function (e) { if (callback) callback(e && e.message ? e.message : '저장 실패'); });
+    },
+    clearDraft: function (callback) {
+      if (!db) { if (callback) callback(null); return; }
+      var uid = getUserIdOrAnonId();
+      db.collection('drafts').doc(uid).delete().then(function () { if (callback) callback(null); }).catch(function () { if (callback) callback(null); });
+    },
+
+    getSavedCalculations: function (callback) {
+      if (!db || !callback) return;
+      var uid = getUserIdOrAnonId();
+      db.collection('savedCalculations').where('userId', '==', uid).get().then(function (snap) {
+        var list = [];
+        snap.forEach(function (doc) {
+          var d = doc.data();
+          var ts = d.createdAt && d.createdAt.toDate ? d.createdAt.toDate().getTime() : (d.createdAt && d.createdAt.seconds ? d.createdAt.seconds * 1000 : 0);
+          list.push({ id: doc.id, name: d.name, params: d.params || {}, createdAt: ts });
+        });
+        list.sort(function (a, b) { return (b.createdAt || 0) - (a.createdAt || 0); });
+        callback(null, list);
+      }).catch(function (e) { callback(e, []); });
+    },
+    saveCalculation: function (item, callback) {
+      if (!db) { if (callback) callback('연결되지 않았어요.'); return; }
+      var uid = getUserIdOrAnonId();
+      db.collection('savedCalculations').add({
+        userId: uid,
+        name: item.name || '저장 계산',
+        params: item.params || {},
+        createdAt: firebase.firestore.FieldValue.serverTimestamp()
+      }).then(function (ref) { if (callback) callback(null, ref.id); }).catch(function (e) { if (callback) callback(e && e.message ? e.message : '저장 실패'); });
+    },
+    deleteSavedCalculation: function (id, callback) {
+      if (!db || !id) { if (callback) callback(null); return; }
+      db.collection('savedCalculations').doc(id).delete().then(function () { if (callback) callback(null); }).catch(function () { if (callback) callback(null); });
+    },
+    getSavedCalculationById: function (id, callback) {
+      if (!db || !id || !callback) return;
+      db.collection('savedCalculations').doc(id).get().then(function (doc) {
+        if (!doc.exists) { callback(null, null); return; }
+        var d = doc.data();
+        var ts = d.createdAt && d.createdAt.toDate ? d.createdAt.toDate().getTime() : (d.createdAt && d.createdAt.seconds ? d.createdAt.seconds * 1000 : 0);
+        callback(null, { id: doc.id, name: d.name, params: d.params || {}, createdAt: ts });
+      }).catch(function (e) { callback(e, null); });
+    },
+
     incrementPostViews: incrementPostViews,
     getPostViewCount: getPostViewCount
   };
