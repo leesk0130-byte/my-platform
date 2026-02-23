@@ -1,0 +1,8 @@
+{
+  "name": "my-platform-scripts",
+  "private": true,
+  "description": "스크립트 전용 (scrape-company-list 등)",
+  "dependencies": {
+    "cheerio": "^1.0.0"
+  }
+}
