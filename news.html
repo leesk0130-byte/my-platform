@@ -167,14 +167,99 @@
       var m = document.getElementById('newsWriteModal');
       if (m) m.remove();
     }
+    function seedNewsBatch() {
+      var token = window.app && window.app.getToken && window.app.getToken();
+      if (!token) {
+        alert('먼저 우측 상단에서 관리자 로그인 해 주세요.');
+        return;
+      }
+      if (!confirm('인터넷에서 정리한 쇼핑몰 관련 뉴스 10개를 한 번에 등록할까요?')) return;
+      var NEWS_BATCH = [
+        {
+          title: '2026년 PG 수수료 공시 확대, 소상공인 부담 완화 방향',
+          category: 'PG수수료',
+          content: '금융당국이 전자금융업·PG사의 결제수수료 공시 대상을 단계적으로 확대하면서, 온라인 쇼핑몰 가맹점의 수수료 비교 환경이 개선되고 있습니다.\n2025년에는 월평균 거래규모 5,000억원 이상 사업자, 2027년에는 2,000억원 이상, 2028년에는 모든 선불업자와 PG업자로 공시 의무가 확대될 예정입니다.\n가맹점주는 공시된 수수료 정보를 참고해 PG사를 비교·교체함으로써 수수료 부담을 줄일 수 있습니다.\n원문: https://www.insnews.co.kr/news/articleView.html?idxno=86423'
+        },
+        {
+          title: '네이버페이, 설 맞아 영세·중소 가맹점 현장결제 수수료 전액 지원',
+          category: '간편결제',
+          content: '네이버페이가 설 연휴를 앞두고 오프라인 현장결제(네이버페이 QR 등)를 사용하는 영세·중소 가맹점을 대상으로 결제 수수료를 전액 지원하는 이벤트를 진행했습니다.\n간편결제 수수료가 일반 카드 결제보다 높은 편이라는 지적 속에서, 일정 기간 동안 수수료를 면제해 소상공인의 부담을 줄이겠다는 취지입니다.\n온라인 쇼핑몰과 오프라인 매장을 함께 운영하는 사업자는 네이버페이 정책 변화를 참고해 결제 수단 구성과 프로모션 전략을 점검할 필요가 있습니다.\n원문: https://m.etnews.com/20260211000226'
+        },
+        {
+          title: '소상공인 결제 수수료 낮추는 PG사 규율체계 강화 방안',
+          category: 'PG수수료',
+          content: '금융위원회는 소상공인 결제 수수료 부담을 낮추기 위해 PG사 규율체계를 강화하는 방안을 추진하고 있습니다.\n가맹점에 고지하는 청구서에서 결제수수료를 다른 비용과 명확히 구분해 안내하도록 의무화하고, 수수료율 변경 시 사전 고지 의무도 강화됩니다.\n또한 선불업자·상위 PG업자의 재무건전성을 평가하는 제도를 도입해, 결제 인프라 리스크를 줄이겠다는 목표를 제시했습니다.\n원문: https://www.newsis.com/view/NISX20250930_0003350176'
+        },
+        {
+          title: '빅테크 간편결제 수수료, 카드사 최대 7배…공시제도 개편 예고',
+          category: '간편결제',
+          content: '일부 빅테크 간편결제 서비스의 수수료율이 카드사 수수료의 최대 7배에 이른다는 분석이 나오고 있습니다.\n특히 영세·중소 가맹점 구간에서 간편결제 수수료가 카드보다 훨씬 높아, 온라인 쇼핑몰 입장에서는 간편결제 도입 시 비용 구조를 면밀히 따져볼 필요가 있습니다.\n금융당국은 상반기 중 수수료 공시 항목을 확대하고 제도를 개편해, 간편결제 사업자 간 경쟁을 유도하고 수수료 인하를 유도하겠다고 밝혔습니다.\n원문: https://cm.asiae.co.kr/article/2025020911365940846'
+        },
+        {
+          title: '온라인 쇼핑몰 필수 비용: 2026년 PG 수수료·창업비용 정리',
+          category: '창업가이드',
+          content: '온라인 쇼핑몰 창업 시 가장 많이 묻는 질문 중 하나가 “PG 수수료와 초기 비용”입니다.\n2026년 기준 일반 카드 결제 수수료는 대략 2~3.5% 수준이며, 간편결제는 이보다 높은 편입니다. 영세 가맹점(연매출 3억원 이하)은 0.5~1%대 우대 수수료 구간을 적용받을 수 있습니다.\n또한 쇼핑몰 솔루션 비용, 도메인·호스팅, 마케팅 예산까지 고려해야 실제 손에 남는 이익을 계산할 수 있습니다.\n원문: https://c26.ssdp.co.kr/8544'
+        },
+        {
+          title: '전자상거래법 시행령 개정: 다크패턴 규제와 정기결제 표시의무 강화',
+          category: '전자상거래법',
+          content: '공정거래위원회는 온라인 다크패턴(숨은 유료전환, 반복 간섭 등)을 규제하기 위해 전자상거래법 시행령·시행규칙 개정을 2025년부터 시행했습니다.\n정기결제 요금 인상이나 무료체험 후 유료 전환 시, 최소 30일 이내에 소비자에게 명확하게 고지하고 동의를 받아야 합니다.\n또한 첫 화면에서 총 결제금액을 분명하게 보여줘야 하며, 위반 시 과태료와 영업정지 등 제재가 강화됩니다.\n온라인 쇼핑몰은 자동결제, 구독 서비스, 프로모션 설계 시 이 규정을 반드시 반영해야 합니다.\n원문: https://www.intn.co.kr/news/articleView.html?idxno=2041606'
+        },
+        {
+          title: '2025년 전자상거래법 집행 5대 제재 사례와 2026년 전망',
+          category: '전자상거래법',
+          content: '법률 업계 분석에 따르면 2025년 전자상거래법 집행에서 공정위는 온라인 플랫폼의 표시·고지 의무 위반과 소비자 기만 행위를 집중 제재했습니다.\nOTT·음원·온라인 쇼핑몰 등 4개 사업자에 과태료가 부과됐고, 해외 직구 플랫폼에는 수십억원대 과징금이 내려졌습니다.\n2026년에는 거짓·과장 광고, 기만적 UI, 해외 플랫폼의 소비자 보호 의무 위반 등에 대한 제재가 한층 강화될 것으로 전망됩니다.\n온라인 쇼핑몰 운영자는 상품 상세 페이지와 결제 프로세스의 표시·광고 문구를 다시 한번 점검할 필요가 있습니다.\n원문: https://www.lawtimes.co.kr/news/articleView.html?idxno=215573'
+        },
+        {
+          title: '가맹본부·배달앱 갑질 근절 위한 가맹사업법·전자상거래법 개정안',
+          category: '가맹·플랫폼',
+          content: '국회에서는 가맹본부와 배달앱의 이른바 “갑질” 행위를 줄이기 위한 가맹사업법·전자상거래법 개정안이 논의되고 있습니다.\n가맹점에게 과도한 광고비·프로모션 비용을 전가하거나, 불투명한 수수료 체계를 운영하는 행위를 제한하는 내용이 포함돼 있습니다.\n온라인 쇼핑몰·가맹점 사업자는 향후 법 개정에 따라 플랫폼과의 계약 조건, 광고 집행 구조를 재검토해야 할 수 있습니다.\n원문: https://www.apej.kr/news/6321'
+        },
+        {
+          title: '2025년 소상공인 디지털 전환 바우처: 온라인 쇼핑몰 구축 지원',
+          category: '소상공인지원',
+          content: '정부는 2025년 소상공인 디지털 전환 바우처 사업을 통해 온라인 쇼핑몰 구축과 디지털 마케팅을 지원하고 있습니다.\n최대 500만원 한도 내에서 온라인몰 구축, 마케팅 콘텐츠 제작, SNS 광고, 전자결제 시스템, CRM 도입 등에 70~90%까지 비용을 지원합니다.\n사업자등록 후 6개월 이상, 상시근로자·매출 기준을 충족하는 소상공인이 대상이며, 소상공인마당·디지털바우처 사이트에서 온라인 신청을 받습니다.\n기존 쇼핑몰 리뉴얼이나 신규 구축을 고민하는 가맹점주라면 공고 시기를 잘 챙기는 것이 좋습니다.\n원문: https://poliplan.tistory.com/entry/2025%EB%85%84-%EC%86%8C%EC%83%81%EA%B3%B5%EC%9D%B8-%EB%94%94%EC%A7%80%ED%84%B8-%EC%A0%84%ED%99%98-%EB%B0%94%EC%9A%B0%EC%B2%98-%EC%8B%A0%EC%B2%AD-%EB%B0%A9%EB%B2%95%EA%B3%BC-%EC%A7%80%EC%9B%90%EB%82%B4%EC%9A%A9-%EC%B4%9D%EC%A0%95%EB%A6%AC'
+        },
+        {
+          title: '온라인 판로 지원: 소상공인 e커머스 입점·라이브커머스 지원 확대',
+          category: '소상공인지원',
+          content: '중소벤처기업부는 2025년 소상공인 온라인 판로 지원 사업을 통해 최대 10만개사를 대상으로 다양한 e커머스 지원을 제공할 계획입니다.\n온라인 쇼핑몰 입점, TV홈쇼핑·라이브커머스 방송 제작, 글로벌 플랫폼 진출, 교육 프로그램 등 10여개 이상의 세부 사업이 포함됩니다.\n자체 쇼핑몰만 운영하던 가맹점도 이 사업을 활용해 종합몰·라이브커머스 채널로 판로를 넓힐 수 있습니다.\n사업 공고는 기업마당·비즈인포 등 정부 지원사업 포털에서 확인할 수 있습니다.\n원문: https://www.bizinfo.go.kr/web/lay1/bbs/S1T122C128/AS/74/view.do?pblancId=PBLN_000000000104212'
+        },
+      ];
+      (async function () {
+        for (var i = 0; i < NEWS_BATCH.length; i++) {
+          var item = NEWS_BATCH[i];
+          try {
+            var res = await fetch('/api/news', {
+              method: 'POST',
+              headers: {
+                'Content-Type': 'application/json',
+                'Authorization': 'Bearer ' + token,
+              },
+              body: JSON.stringify(item),
+            });
+            var data = await res.json();
+            console.log('뉴스 등록 결과:', item.title, res.status, data);
+          } catch (e) {
+            console.error('뉴스 등록 실패:', item.title, e);
+          }
+        }
+        alert('뉴스 10개 등록 시도 완료! (브라우저 콘솔 로그도 확인 가능)');
+        if (window.newsRender && window.newsRender.reload) window.newsRender.reload(); else location.reload();
+      })();
+    }
+
     function renderOperatorUI() {
       if (!slot) return;
-      slot.innerHTML = '<button type="button" id="news-write-btn" class="btn btn-primary btn-sm">+ 뉴스 작성</button>';
+      slot.innerHTML = '<button type="button" id="news-write-btn" class="btn btn-primary btn-sm">+ 뉴스 작성</button>' +
+        '<button type="button" id="news-seed-btn" class="btn btn-outline btn-sm" style="margin-left:8px;">뉴스 10개 자동 채우기</button>';
       var wrap = document.createElement('div');
       wrap.innerHTML = newsWriteModalHTML();
       var modal = wrap.firstElementChild;
       document.body.appendChild(modal);
       bindModalEvents();
+      var seedBtn = document.getElementById('news-seed-btn');
+      if (seedBtn && !seedBtn._bound) { seedBtn._bound = true; seedBtn.addEventListener('click', seedNewsBatch); }
     }
     function updateByAuth() {
       if (isOperator()) renderOperatorUI();
