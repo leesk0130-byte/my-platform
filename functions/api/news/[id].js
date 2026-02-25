@@ -44,6 +44,27 @@ export async function onRequestGet({ env, params }) {
   } catch (e) { return json({ error: e.message }, 500); }
 }
 
+export async function onRequestPut({ env, request, params }) {
+  var ok = await verifyOperator(request, env);
+  if (!ok) return json({ error: 'Unauthorized' }, 401);
+  try {
+    var body = await request.json();
+    var title = body.title;
+    var category = body.category != null ? body.category : undefined;
+    var content = body.content;
+    if (!title || !content) return json({ error: 'title and content required' }, 400);
+    var now = Date.now();
+    await env.DB.prepare(
+      'UPDATE news SET title = ?, category = ?, content = ?, updated_at = ? WHERE id = ?'
+    ).bind(title, category || 'general', content, now, params.id).run();
+    var row = await env.DB.prepare(
+      'SELECT id, title, category, content, created_at, updated_at FROM news WHERE id = ?'
+    ).bind(params.id).first();
+    if (!row) return json({ error: 'Not found' }, 404);
+    return json(Object.assign({}, row, { date: formatDate(row.created_at) }));
+  } catch (e) { return json({ error: e.message }, 500); }
+}
+
 export async function onRequestDelete({ env, request, params }) {
   var ok = await verifyOperator(request, env);
   if (!ok) return json({ error: 'Unauthorized' }, 401);
@@ -57,7 +78,7 @@ export async function onRequestOptions() {
   return new Response(null, {
     headers: {
       'Access-Control-Allow-Origin': '*',
-      'Access-Control-Allow-Methods': 'GET, DELETE, OPTIONS',
+      'Access-Control-Allow-Methods': 'GET, PUT, DELETE, OPTIONS',
       'Access-Control-Allow-Headers': 'Content-Type, Authorization',
     },
   });

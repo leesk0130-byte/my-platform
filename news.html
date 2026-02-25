@@ -106,7 +106,7 @@
             '<form id="newsWriteForm" onsubmit="return false;">' +
               '<div class="form-group"><label for="news-title">제목 <span style="color:#dc2626;">*</span></label><input type="text" id="news-title" placeholder="뉴스 제목을 입력하세요" required style="width:100%;"></div>' +
               '<div class="form-group"><label for="news-category">카테고리</label><select id="news-category" style="width:100%;padding:10px;border:1px solid #e2e8f0;border-radius:8px;">' +
-                '<option value="공지">공지</option><option value="PG수수료">PG수수료</option><option value="전자상거래">전자상거래</option><option value="정책/제도">정책/제도</option><option value="쇼핑몰뉴스">쇼핑몰뉴스</option><option value="일반">일반</option></select></div>' +
+                '<option value="공지">공지</option><option value="PG수수료">PG수수료</option><option value="간편결제">간편결제</option><option value="전자상거래">전자상거래</option><option value="전자상거래법">전자상거래법</option><option value="정책/제도">정책/제도</option><option value="쇼핑몰뉴스">쇼핑몰뉴스</option><option value="창업가이드">창업가이드</option><option value="가맹·플랫폼">가맹·플랫폼</option><option value="소상공인지원">소상공인지원</option><option value="일반">일반</option></select></div>' +
               '<div class="form-group"><label for="news-content">본문 <span style="color:#dc2626;">*</span></label><textarea id="news-content" rows="10" placeholder="뉴스 본문을 입력하세요" required style="width:100%;padding:12px;border:1px solid #e2e8f0;border-radius:8px;font-size:0.9375rem;line-height:1.7;resize:vertical;"></textarea></div>' +
               '<div id="news-write-error" style="display:none;color:#dc2626;font-size:0.875rem;margin-bottom:8px;"></div>' +
               '<div class="modal-footer" style="gap:8px;"><button type="button" class="btn btn-outline" id="news-modal-cancel">취소</button><button type="submit" class="btn btn-primary" id="news-submit-btn">등록하기</button></div>' +
@@ -119,12 +119,33 @@
     }
     function closeModal() {
       var m = document.getElementById('newsWriteModal');
-      if (m) { m.classList.remove('is-open'); m.setAttribute('aria-hidden', 'true'); document.body.style.overflow = ''; }
+      if (m) {
+        m.classList.remove('is-open'); m.setAttribute('aria-hidden', 'true'); document.body.style.overflow = '';
+        delete m.dataset.editId;
+        var h3 = m.querySelector('.modal-header h3');
+        if (h3) h3.textContent = '뉴스 작성';
+        var sub = document.getElementById('news-submit-btn');
+        if (sub) sub.textContent = '등록하기';
+      }
       var form = document.getElementById('newsWriteForm');
       if (form) form.reset();
       var err = document.getElementById('news-write-error');
       if (err) { err.textContent = ''; err.style.display = 'none'; }
     }
+    window.openNewsEditModal = function (item) {
+      var m = document.getElementById('newsWriteModal');
+      if (!m) return;
+      document.getElementById('news-title').value = item.title || '';
+      var catEl = document.getElementById('news-category');
+      catEl.value = item.category || '일반';
+      document.getElementById('news-content').value = item.content || '';
+      m.dataset.editId = item.id || '';
+      var h3 = m.querySelector('.modal-header h3');
+      if (h3) h3.textContent = '뉴스 수정';
+      var sub = document.getElementById('news-submit-btn');
+      if (sub) sub.textContent = '저장';
+      openModal();
+    };
     function bindModalEvents() {
       var btn = document.getElementById('news-write-btn');
       if (btn && !btn._bound) { btn._bound = true; btn.addEventListener('click', openModal); }
@@ -147,17 +168,21 @@
           if (!title || !content) { if (errEl) { errEl.textContent = '제목과 본문을 입력해주세요.'; errEl.style.display = 'block'; } return; }
           var token = window.app && window.app.getToken && window.app.getToken();
           if (!token) { if (errEl) { errEl.textContent = '로그인이 필요합니다.'; errEl.style.display = 'block'; } return; }
-          if (submitBtn) { submitBtn.disabled = true; submitBtn.textContent = '등록 중...'; }
-          fetch('/api/news', { method: 'POST', headers: { 'Content-Type': 'application/json', 'Authorization': 'Bearer ' + token }, body: JSON.stringify({ title: title, category: category, content: content }) })
+          var m = document.getElementById('newsWriteModal');
+          var editId = m && m.dataset.editId;
+          if (submitBtn) { submitBtn.disabled = true; submitBtn.textContent = editId ? '저장 중...' : '등록 중...'; }
+          var url = editId ? '/api/news/' + encodeURIComponent(editId) : '/api/news';
+          var method = editId ? 'PUT' : 'POST';
+          fetch(url, { method: method, headers: { 'Content-Type': 'application/json', 'Authorization': 'Bearer ' + token }, body: JSON.stringify({ title: title, category: category, content: content }) })
             .then(function (r) { return r.json().then(function (d) { return { ok: r.ok, data: d }; }); })
             .then(function (res) {
-              if (!res.ok) throw new Error(res.data.error || '등록 실패');
+              if (!res.ok) throw new Error(res.data.error || (editId ? '수정 실패' : '등록 실패'));
               closeModal();
               if (window.newsRender && window.newsRender.reload) window.newsRender.reload(); else location.reload();
             })
             .catch(function (err) {
               if (errEl) { errEl.textContent = err.message || '오류가 발생했습니다.'; errEl.style.display = 'block'; }
-              if (submitBtn) { submitBtn.disabled = false; submitBtn.textContent = '등록하기'; }
+              if (submitBtn) { submitBtn.disabled = false; submitBtn.textContent = editId ? '저장' : '등록하기'; }
             });
         });
       }
