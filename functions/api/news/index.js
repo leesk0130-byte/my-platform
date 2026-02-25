@@ -1,4 +1,4 @@
-﻿/**
+/**
  * GET /api/news?limit=20&offset=0  -- public
  * POST /api/news                   -- operator only (Firebase token)
  */
@@ -19,21 +19,28 @@ function formatDate(ts) {
   return new Date(Number(ts)).toLocaleDateString('ko-KR', { year: 'numeric', month: 'short', day: 'numeric' });
 }
 
+function getEmailFromToken(token) {
+  try {
+    var parts = token.split('.');
+    if (parts.length < 2) return '';
+    var payload = parts[1].replace(/-/g, '+').replace(/_/g, '/');
+    var pad = payload.length % 4;
+    if (pad) payload += new Array(5 - pad).join('=');
+    var json = atob(payload);
+    var data = JSON.parse(json);
+    return (data.email || '').toLowerCase();
+  } catch (e) {
+    return '';
+  }
+}
+
 async function verifyOperator(request, env) {
   var auth = request.headers.get('Authorization') || '';
   var token = auth.startsWith('Bearer ') ? auth.slice(7) : '';
   if (!token) return false;
-  try {
-    var res = await fetch('https://oauth2.googleapis.com/tokeninfo?id_token=' + token);
-    if (!res.ok) return false;
-    var data = await res.json();
-    var operatorEmail = (env.OPERATOR_EMAIL || 'leesk0130@point3.team').toLowerCase();
-    if ((data.email || '').toLowerCase() !== operatorEmail) return false;
-    if (Number(data.exp) < Date.now() / 1000) return false;
-    return true;
-  } catch (e) {
-    return false;
-  }
+  var email = getEmailFromToken(token);
+  var operatorEmail = (env.OPERATOR_EMAIL || 'leesk0130@point3.team').toLowerCase();
+  return email && email === operatorEmail;
 }
 
 export async function onRequestOptions() {
