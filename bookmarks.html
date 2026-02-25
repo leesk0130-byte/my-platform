@@ -6,7 +6,7 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <meta name="theme-color" content="#0f172a">
   <title>내가 저장한 글 | 가맹점숲</title>
-  <meta name="description" content="가맹점숲 커뮤니티에서 저장한 글 목록입니다.">
+  <meta name="description" content="가맹점숲에서 저장한 글 목록입니다.">
   <meta name="robots" content="noindex, nofollow">
   <link rel="canonical" href="https://bizimshop.co.kr/bookmarks.html">
   <link rel="stylesheet" href="css/common.css">
@@ -19,7 +19,6 @@
     <h1><a href="index.html">가맹점숲</a></h1>
     <button type="button" class="nav-toggle" aria-label="메뉴 열기" aria-expanded="false" data-toggle-nav><span></span><span></span><span></span></button>
     <nav class="header-nav" id="headerNav" aria-label="메인 메뉴">
-      <a href="community.html">커뮤니티</a>
       <a href="pg.html">PG 수수료</a>
       <a href="calculator.html">수수료 비교 계산기</a>
       <a href="news.html">최신 공지/뉴스</a>
@@ -31,10 +30,10 @@
   </header>
 
   <main id="main" class="container">
-    <nav class="breadcrumb" aria-label="breadcrumb"><a href="index.html">홈</a> <span class="bc-sep">/</span> <a href="community.html">커뮤니티</a> <span class="bc-sep">/</span> <strong>내가 저장한 글</strong></nav>
+    <nav class="breadcrumb" aria-label="breadcrumb"><a href="index.html">홈</a> <span class="bc-sep">/</span> <strong>내가 저장한 글</strong></nav>
     <div class="hero">
       <h2>내가 저장한 글</h2>
-      <p>커뮤니티에서 북마크한 글을 모아봤어요. 저장은 글 상세에서 별/북마크 버튼으로 할 수 있습니다.</p>
+      <p>저장한 뉴스·가이드 글을 모아봤어요. 뉴스 상세에서 별/북마크 버튼으로 저장할 수 있습니다.</p>
     </div>
     <section class="section">
       <div class="card">
@@ -42,8 +41,8 @@
         <div id="bookmarks-empty" class="empty-state" style="display:none;">
           <p class="empty-state-icon" aria-hidden="true">📌</p>
           <p class="empty-state-title">저장한 글이 없어요</p>
-          <p class="empty-state-desc">커뮤니티에서 마음에 드는 글에 북마크를 눌러 보세요.</p>
-          <a href="community.html" class="btn btn-primary">커뮤니티 가기</a>
+          <p class="empty-state-desc">뉴스·가이드에서 마음에 드는 글에 북마크를 눌러 보세요.</p>
+          <a href="news.html" class="btn btn-primary">뉴스 보기</a>
         </div>
       </div>
     </section>
@@ -52,7 +51,7 @@
   <footer>
     <div class="footer-inner">
       <p><a href="about.html">가맹점숲이란?</a> | <a href="must-know.html">꼭 알아야 할 것</a> | <a href="terms.html">이용약관</a> | <a href="privacy.html">개인정보처리방침</a> | <a href="verify.html">인증/제휴 문의</a></p>
-      <p>© 2025–2026 가맹점숲. 온라인 가맹점 정보 & 커뮤니티. All rights reserved.</p>
+      <p>© 2025–2026 가맹점숲. 온라인 가맹점 정보. All rights reserved.</p>
       <div class="footer-contact">
         <h4>문의</h4>
         <p>이메일: <a href="mailto:leesk0130@naver.com?subject=가맹점숲 문의">leesk0130@naver.com</a></p>
@@ -84,7 +83,7 @@
           window.app.getPostsByIds(ids, function(err, items) {
             if (emptyEl) emptyEl.style.display = (items && items.length) ? 'none' : 'block';
             if (listEl && items && items.length) {
-              window.app.renderPosts('bookmarks-list', items, 'community.html?id=', true);
+              window.app.renderPosts('bookmarks-list', items, 'news.html?id=', true);
             } else if (listEl) listEl.innerHTML = '';
           });
         } else {

@@ -658,7 +658,7 @@
     },
 
     renderPostsHTML: function (list, detailUrl, showBoardBadge) {
-      var base = detailUrl || 'community.html?id=';
+      var base = detailUrl || 'news.html?id=';
       var boardLabels = { free: '??', fee: '???/??', qna: '????', info: '????' };
       var isOp = isOperator();
       function firstImageUrl(body) {
@@ -695,7 +695,7 @@
     renderPosts: function (containerId, list, detailUrl, showBoardBadge) {
       var el = document.getElementById(containerId);
       if (!el) return;
-      var base = detailUrl || 'community.html?id=';
+      var base = detailUrl || 'news.html?id=';
       var boardLabels = { free: '??', fee: '???/??', qna: '????', info: '????' };
       var isOp = isOperator();
       function firstImageUrl(body) {

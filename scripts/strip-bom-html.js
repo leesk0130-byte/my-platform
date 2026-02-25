@@ -7,8 +7,8 @@ const path = require('path');
 
 const root = path.join(__dirname, '..');
 const htmlFiles = [
-  'index.html', 'community.html', 'write.html', 'calculator.html', 'pg.html',
-  'edit.html', 'calculator-saved.html', 'bookmarks.html', 'news.html', 'about.html',
+  'index.html', 'calculator.html', 'pg.html',
+  'calculator-saved.html', 'bookmarks.html', 'news.html', 'about.html',
   'must-know.html', 'verify.html', 'privacy.html', 'terms.html',
   'must-know/cash-receipt.html', 'must-know/chargeback.html', 'must-know/review.html',
   'must-know/tax-invoice.html', 'must-know/virtual-account.html', 'must-know/refund.html',

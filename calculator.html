@@ -166,15 +166,14 @@
     <h1><a href="index.html">가맹점숲</a></h1>
     <button type="button" class="nav-toggle" aria-label="메뉴 열기" aria-expanded="false" data-toggle-nav><span></span><span></span><span></span></button>
     <nav class="header-nav" id="headerNav" aria-label="메인 메뉴">
-      <a href="community.html">커뮤니티</a>
       <a href="pg.html">PG 수수료</a>
       <a href="calculator.html" class="active">수수료 비교 계산기</a>
       <a href="news.html">최신 공지/뉴스</a>
       <a href="verify.html">인증/제휴 문의</a>
     </nav>
-    <form class="header-search" action="community.html" method="get" role="search" aria-label="사이트 검색">
-      <label for="header-search-q" class="sr-only">뉴스·가이드·커뮤니티 검색</label>
-      <input type="search" id="header-search-q" name="q" placeholder="뉴스·가이드·커뮤니티 검색" autocomplete="off" aria-label="검색어">
+    <form class="header-search" action="news.html" method="get" role="search" aria-label="사이트 검색">
+      <label for="header-search-q" class="sr-only">뉴스·가이드 검색</label>
+      <input type="search" id="header-search-q" name="q" placeholder="뉴스·가이드 검색" autocomplete="off" aria-label="검색어">
       <button type="submit" class="btn btn-outline btn-sm">검색</button>
     </form>
     <div class="header-auth" id="headerAuth" aria-label="로그인 상태">
@@ -345,7 +344,7 @@
             <dd class="calc-result-total" id="result-save-amount">0원</dd>
           </dl>
           <div id="calc-cta-community" class="calc-cta-community" style="display:none; margin-top:1rem; padding-top:1rem; border-top:1px solid #99f6e4;">
-            <a id="calc-cta-link" href="#" class="btn btn-primary">이 PG사로 바꿀까? 커뮤니티에 질문하기</a>
+            <a id="calc-cta-link" href="news.html?q=수수료" class="btn btn-primary">뉴스에서 수수료 정보 보기</a>
           </div>
         </div>
         <!-- 계산 결과 하단 광고 (애드센스 디스플레이) -->
@@ -358,13 +357,13 @@
 
     <section class="section" id="calc-related-section">
       <div class="card" style="background:var(--color-surface,#fff);border:1px solid #e2e8f0;">
-        <h3 style="font-size:1rem;font-weight:700;margin-bottom:10px;">관련 가이드 · 커뮤니티</h3>
+        <h3 style="font-size:1rem;font-weight:700;margin-bottom:10px;">관련 가이드</h3>
         <div style="display:flex;flex-wrap:wrap;gap:10px;">
           <a href="pg.html" class="btn btn-outline btn-sm">PG 수수료 비교표</a>
           <a href="must-know.html#pg-checklist" class="btn btn-outline btn-sm">PG 계약 체크리스트</a>
           <a href="must-know/settlement-delay.html" class="btn btn-outline btn-sm">정산 지연 가이드</a>
           <a href="must-know/refund.html" class="btn btn-outline btn-sm">환불 가이드</a>
-          <a href="community.html?q=수수료" class="btn btn-outline btn-sm">수수료 커뮤니티</a>
+          <a href="news.html?q=수수료" class="btn btn-outline btn-sm">뉴스에서 수수료 검색</a>
           <a href="calculator-saved.html" class="btn btn-outline btn-sm">저장한 계산 목록</a>
         </div>
       </div>
@@ -615,7 +614,7 @@
         var ctaBox = document.getElementById('calc-cta-community');
         var ctaLink = document.getElementById('calc-cta-link');
         if (ctaBox && ctaLink && saveAmount >= 100000) {
-          ctaLink.href = 'write.html?board=fee&title=' + encodeURIComponent('[수수료 고민] PG사 바꾸면 월 ' + toKoreanAmount(saveAmount) + ' 절약되는데 어떤가요?');
+          ctaLink.href = 'news.html?q=수수료';
           ctaBox.style.display = 'block';
         } else if (ctaBox) {
           ctaBox.style.display = 'none';
@@ -820,7 +819,6 @@
       </button>
     </div>
     <nav class="drawer-nav" aria-label="모바일 메뉴">
-      <a href="community.html"  class="drawer-link">커뮤니티</a>
       <a href="pg.html"         class="drawer-link">PG 수수료 표</a>
       <a href="calculator.html" class="drawer-link active">수수료 계산기</a>
       <a href="news.html"       class="drawer-link">뉴스</a>

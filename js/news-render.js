@@ -24,7 +24,7 @@
       '<div class="empty-state">' +
         '<p class="empty-state-title">뉴스 준비 중입니다</p>' +
         '<p class="empty-state-desc">곧 운영자가 최신 뉴스를 등록할 예정입니다. 잠시 후 다시 확인해 주세요.</p>' +
-        '<a href="community.html" class="btn btn-outline btn-sm" style="margin-top:12px;">커뮤니티 보러가기</a>' +
+        '<a href="index.html" class="btn btn-outline btn-sm" style="margin-top:12px;">홈으로</a>' +
       '</div>';
   }
 
@@ -33,7 +33,7 @@
       '<div class="empty-state">' +
         '<p class="empty-state-title">등록된 뉴스가 없습니다</p>' +
         '<p class="empty-state-desc">곧 최신 쇼핑몰·PG 뉴스가 올라올 예정입니다.</p>' +
-        '<a href="community.html" class="btn btn-outline btn-sm" style="margin-top:12px;">커뮤니티 보러가기</a>' +
+        '<a href="index.html" class="btn btn-outline btn-sm" style="margin-top:12px;">홈으로</a>' +
       '</div>';
   }
 
