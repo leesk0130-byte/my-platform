@@ -80,6 +80,35 @@
       });
   }
 
+  function attachOperatorActions(root, item) {
+    if (!window.app || !window.app.isOperator || !window.app.isOperator()) return;
+    var token = window.app.getToken && window.app.getToken();
+    if (!token) return;
+    var wrap = root.querySelector('.news-detail');
+    if (!wrap) return;
+    if (wrap.querySelector('.news-detail-actions')) return;
+    var actions = document.createElement('div');
+    actions.className = 'news-detail-actions';
+    actions.style.cssText = 'margin-top:1.25rem;padding-top:1rem;border-top:1px solid #e2e8f0;display:flex;gap:10px;';
+    actions.innerHTML = '<button type="button" class="btn btn-outline btn-sm" id="news-edit-btn">수정</button><button type="button" class="btn btn-outline btn-sm" style="color:#dc2626;" id="news-delete-btn">삭제</button>';
+    wrap.appendChild(actions);
+    var editBtn = document.getElementById('news-edit-btn');
+    var deleteBtn = document.getElementById('news-delete-btn');
+    if (editBtn) editBtn.addEventListener('click', function () {
+      if (window.openNewsEditModal) window.openNewsEditModal(item);
+    });
+    if (deleteBtn) deleteBtn.addEventListener('click', function () {
+      if (!confirm('이 뉴스를 삭제할까요?')) return;
+      fetch(BASE('api/news/' + encodeURIComponent(item.id)), {
+        method: 'DELETE',
+        headers: { 'Authorization': 'Bearer ' + token },
+      })
+        .then(function (r) { return r.ok ? Promise.resolve() : r.json().then(function (d) { throw new Error(d.error || '삭제 실패'); }); })
+        .then(function () { window.location.href = 'news.html'; })
+        .catch(function (err) { alert(err.message || '삭제에 실패했어요.'); });
+    });
+  }
+
   function loadDetail(id, root) {
     showSkeleton(root);
     fetch(BASE('api/news/' + encodeURIComponent(id)))
@@ -89,32 +118,11 @@
       })
       .then(function (item) {
         renderDetail(item, root);
-        if (window.app && window.app.isOperator && window.app.isOperator()) {
-          var token = window.app.getToken && window.app.getToken();
-          if (!token) return;
-          var wrap = root.querySelector('.news-detail');
-          if (!wrap) return;
-          var actions = document.createElement('div');
-          actions.className = 'news-detail-actions';
-          actions.style.cssText = 'margin-top:1.25rem;padding-top:1rem;border-top:1px solid #e2e8f0;display:flex;gap:10px;';
-          actions.innerHTML = '<button type="button" class="btn btn-outline btn-sm" id="news-edit-btn">수정</button><button type="button" class="btn btn-outline btn-sm" style="color:#dc2626;" id="news-delete-btn">삭제</button>';
-          wrap.appendChild(actions);
-          var editBtn = document.getElementById('news-edit-btn');
-          var deleteBtn = document.getElementById('news-delete-btn');
-          if (editBtn) editBtn.addEventListener('click', function () {
-            if (window.openNewsEditModal) window.openNewsEditModal(item);
-          });
-          if (deleteBtn) deleteBtn.addEventListener('click', function () {
-            if (!confirm('이 뉴스를 삭제할까요?')) return;
-            fetch(BASE('api/news/' + encodeURIComponent(item.id)), {
-              method: 'DELETE',
-              headers: { 'Authorization': 'Bearer ' + token },
-            })
-              .then(function (r) { return r.ok ? Promise.resolve() : r.json().then(function (d) { throw new Error(d.error || '삭제 실패'); }); })
-              .then(function () { window.location.href = 'news.html'; })
-              .catch(function (err) { alert(err.message || '삭제에 실패했어요.'); });
-          });
-        }
+        attachOperatorActions(root, item);
+        window.addEventListener('authStateChanged', function () {
+          attachOperatorActions(root, item);
+        });
+        setTimeout(function () { attachOperatorActions(root, item); }, 500);
       })
       .catch(function (err) {
         showError(root, err && err.message ? err.message : '글을 불러오지 못했어요.');
