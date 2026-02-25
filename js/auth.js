@@ -21,7 +21,7 @@
             '<div id="login-success" class="msg-success" style="display:none;"></div>' +
             '<div class="modal-footer"><button type="submit" class="btn btn-primary" id="login-submit-btn">로그인</button></div>' +
           '</form>' +
-          '<p class="modal-switch">아직 회원이 아니신가요? <a href="#" data-open-modal="signupModal">회원가입</a></p>' +
+          '' +
         '</div>' +
       '</div>' +
     '</div>';
@@ -105,35 +105,36 @@
     return { loggedIn: !!window.app.isLoggedIn(), user: window.app.getUser ? window.app.getUser() : null };
   }
 
+  function isNewsPage() {
+    return typeof window !== 'undefined' && window.location && (window.location.pathname || '').indexOf('news.html') !== -1;
+  }
+
   function renderAuthActions() {
     var el = document.getElementById('auth-actions');
     if (!el) return;
     var s = getAuthState();
-    if (s.loggedIn && s.user) {
-      var name = (s.user.name || s.user.email || '회원') + '님';
-      el.innerHTML =
-        '<span class="header-user">' + name + '</span>' +
-        '<button type="button" class="btn btn-outline" data-auth="logout">로그아웃</button>';
-    } else {
-      el.innerHTML =
-        '<button type="button" class="btn btn-outline" data-auth="login">로그인</button>' +
-        '<button type="button" class="btn btn-primary" data-auth="signup">회원가입</button>';
-    }
+    var onNews = isNewsPage();
 
-    /* 드로어 auth 동기화 */
+    /* 방문자용 로그인/회원가입은 뉴스 페이지만 표시(관리자 로그인). 그 외 페이지는 로그인 시 로그아웃만 */
+    if (s.loggedIn && s.user) {
+      el.innerHTML = '<button type="button" class="btn btn-outline" data-auth="logout">로그아웃</button>';
+    } else if (onNews) {
+      el.innerHTML = '<button type="button" class="btn btn-outline" data-auth="login">관리자 로그인</button>';
+    } else {
+      el.innerHTML = '';
+    }
+    var headerAuth = el.closest && el.closest('.header-auth');
+    if (headerAuth) headerAuth.style.display = el.innerHTML ? '' : 'none';
+
+    /* 드로어 auth: 뉴스에서만 관리자 로그인 노출, 로그인 시 로그아웃만 */
     var da = document.getElementById('drawerAuth');
     if (da) {
       if (s.loggedIn && s.user) {
-        var name2 = (s.user.name || s.user.email || '회원') + '님';
-        da.innerHTML =
-          '<p class="drawer-auth-label">계정</p>' +
-          '<span class="drawer-auth-user">' + name2 + '</span>' +
-          '<button type="button" class="drawer-auth-btn" data-auth="logout">로그아웃</button>';
+        da.innerHTML = '<p class="drawer-auth-label">관리자</p><button type="button" class="drawer-auth-btn" data-auth="logout">로그아웃</button>';
+      } else if (onNews) {
+        da.innerHTML = '<p class="drawer-auth-label">관리자</p><button type="button" class="drawer-auth-btn" data-auth="login">관리자 로그인</button>';
       } else {
-        da.innerHTML =
-          '<p class="drawer-auth-label">계정</p>' +
-          '<button type="button" class="drawer-auth-btn" data-auth="login">로그인</button>' +
-          '<button type="button" class="drawer-auth-btn drawer-auth-btn--primary" data-auth="signup">회원가입</button>';
+        da.innerHTML = '';
       }
     }
   }
