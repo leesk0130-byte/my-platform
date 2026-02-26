@@ -9,7 +9,7 @@ const root = path.join(__dirname, '..');
 const htmlFiles = [
   'index.html', 'calculator.html', 'pg.html',
   'calculator-saved.html', 'bookmarks.html', 'news.html', 'about.html',
-  'must-know.html', 'verify.html', 'privacy.html', 'terms.html',
+  'must-know.html', 'privacy.html', 'terms.html',
   'must-know/cash-receipt.html', 'must-know/chargeback.html', 'must-know/review.html',
   'must-know/tax-invoice.html', 'must-know/virtual-account.html', 'must-know/refund.html',
   'must-know/settlement-hold.html', 'must-know/settlement-delay.html',

@@ -57,12 +57,6 @@
     <priority>0.7</priority>
   </url>
   <url>
-    <loc>https://bizimshop.co.kr/verify.html</loc>
-    <lastmod>2026-02-11</lastmod>
-    <changefreq>monthly</changefreq>
-    <priority>0.6</priority>
-  </url>
-  <url>
     <loc>https://bizimshop.co.kr/terms.html</loc>
     <lastmod>2026-02-11</lastmod>
     <changefreq>yearly</changefreq>
