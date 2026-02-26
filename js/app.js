@@ -659,7 +659,7 @@
 
     renderPostsHTML: function (list, detailUrl, showBoardBadge) {
       var base = detailUrl || 'news.html?id=';
-      var boardLabels = { free: '??', fee: '???/??', qna: '????', info: '????' };
+      var boardLabels = { free: '자유', fee: '수수료/정산', qna: '질문답변', info: '정보' };
       var isOp = isOperator();
       function firstImageUrl(body) {
         if (!body) return null;
@@ -670,11 +670,15 @@
         var href = base + (p.id || '');
         var board = p.board || 'free';
         var badge = showBoardBadge ? '<span class="feed-board-badge">' + (boardLabels[board] || board) + '</span>' : '';
-        var noticeBadge = p.notice ? '<span class="notice-badge">??</span>' : '';
+        var noticeBadge = p.notice ? '<span class="notice-badge">공지</span>' : '';
         var verified = (p.verified === true || isAuthorVerified(p.author)) ? verifiedBadgeHtml(true, p.author) : '';
-        var likeStr = (p.likeCount != null && p.likeCount > 0) ? ' ? ?? ' + p.likeCount : '';
+        var metaParts = [];
         var dateStr = (p.createdAt ? formatRelativeDate(new Date(p.createdAt)) : '') || (p.date || '');
-        var meta = (p.author ? p.author + ' ? ' : '') + dateStr + (p.hits != null ? ' ? ?? ' + p.hits : '') + likeStr + verified;
+        if (p.author) metaParts.push(p.author);
+        if (dateStr) metaParts.push(dateStr);
+        if (p.hits != null) metaParts.push('조회 ' + p.hits);
+        if (p.likeCount != null && p.likeCount > 0) metaParts.push('좋아요 ' + p.likeCount);
+        var meta = metaParts.join(' · ') + verified;
         var commentCount = p.commentCount || 0;
         var commentBadge = commentCount > 0 ? '<span class="comment-count-badge">' + commentCount + '</span>' : '';
         var noticeBtn = isOp ? '<button type="button" class="notice-toggle-btn btn btn-outline btn-sm" data-post-id="' + (p.id || '').replace(/"/g, '&quot;') + '">' + (p.notice ? '?? ??' : '??') + '</button>' : '';
