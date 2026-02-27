@@ -359,17 +359,19 @@
   function isAuthorVerified(author) { return VERIFIED_AUTHORS[author] === true; }
   function verifiedBadgeHtml(verified, author) {
     if (!verified) return '';
-    if (author === '???') return ' <span class="operator-badge" aria-label="???">???</span>';
-    return ' <span class="verified-badge" aria-label="??? ??">??</span>';
+    if (author === '운영자') {
+      return ' <span class="operator-badge" aria-label="운영자">운영자</span>';
+    }
+    return ' <span class="verified-badge" aria-label="인증 회원">인증</span>';
   }
 
   function formatRelativeDate(d) {
     var now = new Date();
     var diff = now - d;
-    if (diff < 60000) return '?? ?';
-    if (diff < 3600000) return Math.floor(diff / 60000) + '? ?';
-    if (diff < 86400000) return Math.floor(diff / 3600000) + '?? ?';
-    if (diff < 604800000) return Math.floor(diff / 86400000) + '? ?';
+    if (diff < 60000) return '방금 전';
+    if (diff < 3600000) return Math.floor(diff / 60000) + '분 전';
+    if (diff < 86400000) return Math.floor(diff / 3600000) + '시간 전';
+    if (diff < 604800000) return Math.floor(diff / 86400000) + '일 전';
     return d.toLocaleDateString('ko-KR', { year: 'numeric', month: 'short', day: 'numeric' });
   }
 
@@ -380,14 +382,14 @@
     if (t) localStorage.setItem('token', t); else localStorage.removeItem('token');
   }
   function setUser(u) {
-    if (u && u.email === OPERATOR_EMAIL) { u = Object.assign({}, u, { name: '???' }); }
+    if (u && u.email === OPERATOR_EMAIL) { u = Object.assign({}, u, { name: '운영자' }); }
     if (u) localStorage.setItem('user', JSON.stringify(u)); else localStorage.removeItem('user');
   }
   function getUser() {
     try {
       var u = localStorage.getItem('user');
       u = u ? JSON.parse(u) : null;
-      if (u && u.email === OPERATOR_EMAIL) { u = Object.assign({}, u, { name: '???' }); }
+      if (u && u.email === OPERATOR_EMAIL) { u = Object.assign({}, u, { name: '운영자' }); }
       return u;
     } catch (e) { return null; }
   }
