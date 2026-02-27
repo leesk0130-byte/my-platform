@@ -46,7 +46,7 @@
       var link = 'news.html?id=' + (n.id || '');
       var badge = (n.category || n.badge) ? '<span class="news-badge">' + (n.category || n.badge) + '</span>' : '';
       var date = n.date || (n.created_at ? new Date(n.created_at).toLocaleDateString('ko-KR', { year: 'numeric', month: 'short', day: 'numeric' }) : '');
-      return '<li class="news-item"><a href="' + link + '"><span class="news-title">' + (n.title || '') + '</span>' + badge + '<div class="news-meta">' + date + ' · 가맹점숲</div></a></li>';
+      return '<li class="news-item"><a href="' + link + '"><span class="news-title">' + (n.title || '') + '</span>' + badge + '<div class="news-meta">' + date + '</div></a></li>';
     }).join('') + '</ul>';
     root.innerHTML = html;
   }
@@ -58,7 +58,7 @@
     root.innerHTML =
       '<div class="news-detail">' +
         '<h1 class="news-detail-title">' + (item.title || '') + '</h1>' +
-        '<div class="news-detail-meta">' + category + ' ' + date + ' · 가맹점숲</div>' +
+        '<div class="news-detail-meta">' + category + ' ' + date + '</div>' +
         '<div class="news-detail-body">' + body + '</div>' +
       '</div>';
   }
