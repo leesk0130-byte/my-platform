@@ -54,13 +54,77 @@
   function renderDetail(item, root) {
     var date = item.date || (item.created_at ? new Date(item.created_at).toLocaleDateString('ko-KR', { year: 'numeric', month: 'short', day: 'numeric' }) : '');
     var category = (item.category || item.badge) ? '<span class="news-badge">' + (item.category || item.badge) + '</span>' : '';
-    var body = (item.content || item.body || '').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/\n/g, '<br>');
+    var rawBody = (item.content || item.body || '');
+    var body = rawBody.replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/\n/g, '<br>');
     root.innerHTML =
       '<div class="news-detail">' +
         '<h1 class="news-detail-title">' + (item.title || '') + '</h1>' +
         '<div class="news-detail-meta">' + category + ' ' + date + '</div>' +
         '<div class="news-detail-body">' + body + '</div>' +
       '</div>';
+
+    // --- SEO: 동적으로 제목/메타/구조화 데이터 설정 ---
+    try {
+      var title = (item.title || '').slice(0, 80);
+      if (title) {
+        document.title = title + ' | 가맹점숲 쇼핑몰 뉴스';
+      }
+      var descSource = rawBody.replace(/\s+/g, ' ').trim();
+      var desc = descSource.slice(0, 140);
+      var metaDesc = document.querySelector('meta[name="description"]');
+      if (!metaDesc) {
+        metaDesc = document.createElement('meta');
+        metaDesc.name = 'description';
+        document.head.appendChild(metaDesc);
+      }
+      if (desc) metaDesc.content = desc;
+
+      var ogTitle = document.querySelector('meta[property="og:title"]');
+      if (ogTitle && title) ogTitle.setAttribute('content', title);
+      var ogDesc = document.querySelector('meta[property="og:description"]');
+      if (ogDesc && desc) ogDesc.setAttribute('content', desc);
+
+      // NewsArticle JSON-LD
+      var ldId = 'news-ld-json';
+      var oldLd = document.getElementById(ldId);
+      if (oldLd && oldLd.parentNode) oldLd.parentNode.removeChild(oldLd);
+      var ld = document.createElement('script');
+      ld.type = 'application/ld+json';
+      ld.id = ldId;
+      var createdIso = item.created_at ? new Date(item.created_at).toISOString() : new Date().toISOString();
+      var updatedIso = item.updated_at ? new Date(item.updated_at).toISOString() : createdIso;
+      var url = window.location.href;
+      var articleBody = descSource.slice(0, 5000);
+      ld.textContent = JSON.stringify({
+        "@context": "https://schema.org",
+        "@type": "NewsArticle",
+        "headline": title || item.title || '',
+        "datePublished": createdIso,
+        "dateModified": updatedIso,
+        "author": {
+          "@type": "Organization",
+          "name": "가맹점숲",
+          "url": "https://bizimshop.co.kr/"
+        },
+        "publisher": {
+          "@type": "Organization",
+          "name": "가맹점숲",
+          "logo": {
+            "@type": "ImageObject",
+            "url": "https://bizimshop.co.kr/og-image.svg"
+          }
+        },
+        "mainEntityOfPage": {
+          "@type": "WebPage",
+          "@id": url
+        },
+        "articleSection": item.category || '',
+        "articleBody": articleBody
+      });
+      document.head.appendChild(ld);
+    } catch (e) {
+      // SEO용 코드 실패 시에도 페이지는 그대로 동작
+    }
   }
 
   function loadList(root) {
