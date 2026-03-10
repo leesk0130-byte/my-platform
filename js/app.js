@@ -10,7 +10,7 @@
         if (user) {
           user.getIdToken().then(function (token) {
             setToken(token);
-            var name = (user.email === OPERATOR_EMAIL) ? '???' : (user.displayName || user.email || '');
+            var name = (user.email === OPERATOR_EMAIL) ? '운영자' : (user.displayName || user.email || '');
             setUser({ name: name, email: user.email || '', uid: user.uid });
             try { window.dispatchEvent(new CustomEvent('authStateChanged', { detail: { user: user } })); } catch (e) {}
           });
@@ -32,22 +32,16 @@
   var db = null;
   try {
     var config = window.FIREBASE_CONFIG;
-    console.log('[app.js] config 확인: config.js에서 FIREBASE_CONFIG 읽음, projectId=', config && config.projectId);
     var hasFirebase = !!(window.firebase && typeof window.firebase.firestore === 'function');
     if (config && hasFirebase) {
       if (!firebase.apps.length) firebase.initializeApp(config);
       db = firebase.firestore();
-      console.log('[app.js] Firestore 연결됨. db.collection("posts") 사용 가능.');
-    }
-    if (!db) {
-      console.warn('[app.js] Firestore 미연결. config.js 확인: FIREBASE_CONFIG=', !!config, ', projectId=', config && config.projectId, ', firebase.firestore=', hasFirebase);
     }
   } catch (e) {
     db = null;
-    console.error('[app.js] Firestore 초기화 예외', e);
   }
 
-  // 2026? ?? ??? ?? (2026.02.14 ?? ??)
+  // 2026년 카드 수수료 기준 (2026.02.14 인하분)
   var FEE_2026 = {
     CARD_YOUNG: 0.40,
     CARD_MID_1: 1.00,
@@ -68,7 +62,7 @@
       id: docSnap.id,
       title: d.title || '',
       body: d.body || '',
-      author: d.author || '??',
+      author: d.author || '익명',
       authorId: d.authorId != null ? d.authorId : null,
       board: d.board || 'free',
       hits: typeof d.hits === 'number' ? d.hits : 0,
@@ -83,13 +77,29 @@
     };
   }
 
-  // ??? API(GET /api/news)??? ??. ????/?? ??.
+  // Firestore news 컬렉션 문서를 뉴스 아이템으로 변환
+  function firestoreDocToNews(docSnap) {
+    if (!docSnap || !docSnap.exists) return null;
+    var d = docSnap.data ? docSnap.data() : docSnap;
+    var createdAt = d.createdAt;
+    if (createdAt && typeof createdAt.toDate === 'function') createdAt = createdAt.toDate().getTime();
+    else if (createdAt && createdAt.seconds) createdAt = createdAt.seconds * 1000;
+    else if (typeof createdAt === 'string') createdAt = new Date(createdAt).getTime();
+    return {
+      id: docSnap.id,
+      title: d.title || '',
+      content: d.content || d.body || '',
+      category: d.category || '',
+      date: createdAt ? new Date(createdAt).toLocaleDateString('ko-KR', { year: 'numeric', month: 'short', day: 'numeric' }) : '',
+      created_at: createdAt || 0,
+      updated_at: d.updated_at || createdAt || 0
+    };
+  }
 
-  // ???? ? ?? ?? ? ?? ?? ??
   var MOCK_POSTS = [];
   var MOCK_COMMENTS = {};
   var COMMENTS_STORAGE_PREFIX = 'merchant_plus_comments_';
-  var VERIFIED_AUTHORS = { '???': true };
+  var VERIFIED_AUTHORS = { '운영자': true };
   var OPERATOR_EMAIL = 'leesk0130@point3.team';
 
   function canEditPost(post) {
@@ -101,27 +111,19 @@
   }
 
   function deletePost(postId, callback) {
-    if (!db) {
-      if (callback) callback('데이터베이스에 연결되어 있지 않아요.');
-      return;
-    }
+    if (!db) { if (callback) callback('데이터베이스에 연결되어 있지 않아요.'); return; }
     db.collection('posts').doc(postId).get().then(function (doc) {
       var post = doc.exists ? firestoreDocToPost(doc) : null;
       if (!post) { if (callback) callback('글이 없어요.'); return; }
       if (!canEditPost(post)) { if (callback) callback('수정 권한이 없어요.'); return; }
-      db.collection('posts').doc(postId).delete().then(function () { if (callback) callback(null); }).catch(function (e) {
-        if (callback) callback(e && (e.message || e.code) ? String(e.message || e.code) : '삭제에 실패했어요.');
-      });
-    }).catch(function (e) {
-      if (callback) callback(e && (e.message || e.code) ? String(e.message || e.code) : '글이 없어요.');
-    });
+      db.collection('posts').doc(postId).delete()
+        .then(function () { if (callback) callback(null); })
+        .catch(function (e) { if (callback) callback(e && (e.message || e.code) ? String(e.message || e.code) : '삭제에 실패했어요.'); });
+    }).catch(function (e) { if (callback) callback(e && (e.message || e.code) ? String(e.message || e.code) : '글이 없어요.'); });
   }
 
   function updatePost(postId, data, callback) {
-    if (!db) {
-      if (callback) callback('데이터베이스에 연결되어 있지 않아요.');
-      return;
-    }
+    if (!db) { if (callback) callback('데이터베이스에 연결되어 있지 않아요.'); return; }
     db.collection('posts').doc(postId).get().then(function (doc) {
       var post = doc.exists ? firestoreDocToPost(doc) : null;
       if (!post) { if (callback) callback('글이 없어요.'); return; }
@@ -131,44 +133,26 @@
       if (data.body != null) upd.body = data.body;
       if (data.board != null) upd.board = data.board;
       if (Object.keys(upd).length === 0) { if (callback) callback(null, post); return; }
-      db.collection('posts').doc(postId).update(upd).then(function () {
-        if (callback) callback(null, Object.assign({}, post, upd));
-      }).catch(function (e) {
-        if (callback) callback(e && (e.message || e.code) ? String(e.message || e.code) : '수정에 실패했어요.');
-      });
-    }).catch(function (e) {
-      if (callback) callback(e && (e.message || e.code) ? String(e.message || e.code) : '글이 없어요.');
-    });
+      db.collection('posts').doc(postId).update(upd)
+        .then(function () { if (callback) callback(null, Object.assign({}, post, upd)); })
+        .catch(function (e) { if (callback) callback(e && (e.message || e.code) ? String(e.message || e.code) : '수정에 실패했어요.'); });
+    }).catch(function (e) { if (callback) callback(e && (e.message || e.code) ? String(e.message || e.code) : '글이 없어요.'); });
   }
 
   function togglePostNotice(postId, callback) {
-    if (!db) {
-      if (callback) callback('데이터베이스에 연결되어 있지 않아요.');
-      return;
-    }
+    if (!db) { if (callback) callback('데이터베이스에 연결되어 있지 않아요.'); return; }
     db.collection('posts').doc(postId).get().then(function (doc) {
       if (!doc.exists) { if (callback) callback('글이 없어요.'); return; }
       var notice = !doc.data().notice;
-      db.collection('posts').doc(postId).update({ notice: notice }).then(function () {
-        if (callback) callback(null);
-      }).catch(function (e) {
-        if (callback) callback(e && (e.message || e.code) ? String(e.message || e.code) : '반영에 실패했어요.');
-      });
+      db.collection('posts').doc(postId).update({ notice: notice })
+        .then(function () { if (callback) callback(null); })
+        .catch(function (e) { if (callback) callback(e && (e.message || e.code) ? String(e.message || e.code) : '반영에 실패했어요.'); });
     }).catch(function () { if (callback) callback('글이 없어요.'); });
   }
 
   function getCommentsStorageKey(postId) { return COMMENTS_STORAGE_PREFIX + (postId || ''); }
   function getLocalComments(postId) {
-    try {
-      return JSON.parse(localStorage.getItem(getCommentsStorageKey(postId)) || '[]');
-    } catch (e) { return []; }
-  }
-  function getMockComments(postId) {
-    var now = Date.now();
-    return (MOCK_COMMENTS[postId] || []).map(function (c, i) {
-      var createdAt = new Date(now - 3600000 * (i + 2)).toISOString();
-      return { id: c.id, author: c.author, body: c.body, verified: c.verified, createdAt: createdAt };
-    });
+    try { return JSON.parse(localStorage.getItem(getCommentsStorageKey(postId)) || '[]'); } catch (e) { return []; }
   }
   function commentSortKey(c) {
     if (c.createdAt != null) {
@@ -181,10 +165,7 @@
     return m ? parseInt(m[1], 10) : 0;
   }
   function getComments(postId, callback) {
-    if (!db || !postId) {
-      if (callback) callback(null, []);
-      return;
-    }
+    if (!db || !postId) { if (callback) callback(null, []); return; }
     db.collection('posts').doc(postId).collection('comments').orderBy('createdAt', 'asc').get()
       .then(function (snap) {
         var list = [];
@@ -195,7 +176,7 @@
           else if (createdAt && typeof createdAt !== 'string' && createdAt && createdAt.seconds) createdAt = new Date(createdAt.seconds * 1000).toISOString();
           list.push({
             id: doc.id,
-            author: d.author || '??',
+            author: d.author || '익명',
             body: d.body || '',
             parentId: d.parentId || null,
             verified: !!d.verified,
@@ -205,9 +186,7 @@
         list.sort(function (a, b) { return commentSortKey(a) - commentSortKey(b); });
         if (callback) callback(null, list);
       })
-      .catch(function () {
-        if (callback) callback(null, []);
-      });
+      .catch(function () { if (callback) callback(null, []); });
   }
   function addLocalComment(postId, data) {
     var list = getLocalComments(postId);
@@ -215,7 +194,7 @@
     var comment = {
       id: id,
       parentId: data.parentId || null,
-      author: data.author || '??',
+      author: data.author || '익명',
       body: data.body || '',
       verified: false,
       createdAt: new Date().toISOString()
@@ -235,9 +214,7 @@
   function setLikedPosts(arr) {
     try { localStorage.setItem(LIKED_POSTS_KEY, JSON.stringify(arr)); } catch (e) {}
   }
-  function hasUserLikedPost(postId) {
-    return getLikedPosts().indexOf(String(postId)) !== -1;
-  }
+  function hasUserLikedPost(postId) { return getLikedPosts().indexOf(String(postId)) !== -1; }
   function getPostLikeCount(postId) {
     var m = getLikesMap();
     return typeof m[postId] === 'number' ? m[postId] : 0;
@@ -251,67 +228,53 @@
 
   var HIDDEN_COMMENTS_PREFIX = 'merchant_plus_hidden_comments_';
   function getHiddenCommentIds(postId) {
-    try {
-      return JSON.parse(localStorage.getItem(HIDDEN_COMMENTS_PREFIX + (postId || '')) || '[]');
-    } catch (e) { return []; }
+    try { return JSON.parse(localStorage.getItem(HIDDEN_COMMENTS_PREFIX + (postId || '')) || '[]'); } catch (e) { return []; }
   }
   function addHiddenCommentId(postId, commentId) {
     var ids = getHiddenCommentIds(postId);
     if (ids.indexOf(commentId) === -1) { ids.push(commentId); localStorage.setItem(HIDDEN_COMMENTS_PREFIX + (postId || ''), JSON.stringify(ids)); }
   }
   function deleteComment(postId, commentId, callback) {
-    if (!db || !postId || !commentId) {
-      if (callback) callback();
-      return;
-    }
+    if (!db || !postId || !commentId) { if (callback) callback(); return; }
     db.collection('posts').doc(postId).collection('comments').doc(commentId).delete().then(function () {
       var inc = firebase.firestore && firebase.firestore.FieldValue && firebase.firestore.FieldValue.increment;
       if (inc) db.collection('posts').doc(postId).update({ commentCount: inc(-1) }).catch(function () {});
       if (callback) callback();
-    }).catch(function () {
-      if (callback) callback();
-    });
+    }).catch(function () { if (callback) callback(); });
   }
   function isOperator() {
     var u = getUser();
     if (!u) return false;
-    if (u.name === '???') return true;
+    if (u.name === '운영자') return true;
     var em = (u.email || '').toString().toLowerCase().trim();
     return em === OPERATOR_EMAIL.toLowerCase();
   }
+
+  // addComment: postId, { author, body, parentId }, callback(err, comment)
   function addComment(postId, data, callback) {
-    if (!db || !postId) {
-      if (callback) callback('데이터베이스에 연결되어 있지 않아요.');
-      return;
-    }
+    if (!db || !postId) { if (callback) callback('데이터베이스에 연결되어 있지 않아요.'); return; }
+    var u = getUser();
     var payload = {
-      author: data.author || '??',
+      author: data.author || (u && u.name) || '익명',
       body: data.body || '',
       parentId: data.parentId || null,
       createdAt: new Date().toISOString(),
-      verified: false
+      verified: isOperator()
     };
     db.collection('posts').doc(postId).collection('comments').add(payload).then(function (ref) {
-      var comment = { id: ref.id, author: payload.author, body: payload.body, parentId: payload.parentId, createdAt: payload.createdAt, verified: false };
+      var comment = { id: ref.id, author: payload.author, body: payload.body, parentId: payload.parentId, createdAt: payload.createdAt, verified: payload.verified };
       var inc = firebase.firestore && firebase.firestore.FieldValue && firebase.firestore.FieldValue.increment;
-      if (inc) {
-        db.collection('posts').doc(postId).update({ commentCount: inc(1) }).catch(function () {});
-      }
+      if (inc) db.collection('posts').doc(postId).update({ commentCount: inc(1) }).catch(function () {});
       if (callback) callback(null, comment);
     }).catch(function (e) {
       if (callback) callback(e && (e.message || e.code) ? String(e.message || e.code) : '댓글 저장에 실패했어요.');
     });
   }
+
   function togglePostLike(postId, callback) {
-    if (!db) {
-      if (callback) callback(null, 0);
-      return;
-    }
+    if (!db) { if (callback) callback(null, 0); return; }
     var userId = (getUser() && getUser().uid) || localStorage.getItem('merchant_plus_anon_id') || '';
-    if (!userId) {
-      if (callback) callback(null, 0);
-      return;
-    }
+    if (!userId) { if (callback) callback(null, 0); return; }
     var likeRef = db.collection('posts').doc(postId).collection('likes').doc(userId);
     likeRef.get().then(function (doc) {
       var ref = db.collection('posts').doc(postId);
@@ -335,9 +298,10 @@
       if (callback) callback(err && err.message ? err.message : '좋아요 반영에 실패했어요.');
     });
   }
+
   function uploadImageToStorage(file, callback) {
     if (!window.firebase || !window.firebase.storage) {
-      if (callback) callback('??? ??? ??? ????? Firebase Storage? ?????.');
+      if (callback) callback('이미지 업로드를 위해 Firebase Storage가 필요합니다.');
       return;
     }
     try {
@@ -347,21 +311,21 @@
         ref.getDownloadURL().then(function (url) {
           if (callback) callback(null, url);
         }).catch(function (err) {
-          if (callback) callback(err && err.message ? err.message : 'URL? ???? ????.');
+          if (callback) callback(err && err.message ? err.message : '업로드 URL을 가져오지 못했어요.');
         });
       }).catch(function (err) {
-        if (callback) callback(err && err.message ? err.message : '???? ?????.');
+        if (callback) callback(err && err.message ? err.message : '업로드에 실패했어요.');
       });
     } catch (e) {
-      if (callback) callback(e && e.message ? e.message : '??? ? ??? ???.');
+      if (callback) callback(e && e.message ? e.message : '업로드 중 오류가 발생했어요.');
     }
   }
+
   function isAuthorVerified(author) { return VERIFIED_AUTHORS[author] === true; }
+
   function verifiedBadgeHtml(verified, author) {
     if (!verified) return '';
-    if (author === '운영자') {
-      return ' <span class="operator-badge" aria-label="운영자">운영자</span>';
-    }
+    if (author === '운영자') return ' <span class="operator-badge" aria-label="운영자">운영자</span>';
     return ' <span class="verified-badge" aria-label="인증 회원">인증</span>';
   }
 
@@ -375,9 +339,7 @@
     return d.toLocaleDateString('ko-KR', { year: 'numeric', month: 'short', day: 'numeric' });
   }
 
-  function getToken() {
-    return localStorage.getItem('token');
-  }
+  function getToken() { return localStorage.getItem('token'); }
   function setToken(t) {
     if (t) localStorage.setItem('token', t); else localStorage.removeItem('token');
   }
@@ -424,13 +386,11 @@
     return true;
   }
 
-  function getPostViewCount(postId) {
-    return 0;
-  }
+  function getPostViewCount(postId) { return 0; }
 
   function showToast(message, type) {
     var text = (message || '').toString().trim();
-    if (text === '?? ? ?? ??? ???.' || text === '') return;
+    if (!text) return;
     type = type || 'default';
     var container = document.getElementById('toast-container');
     if (!container) {
@@ -444,9 +404,43 @@
     toast.setAttribute('role', 'alert');
     toast.textContent = text;
     container.appendChild(toast);
-    setTimeout(function () {
-      if (toast.parentNode) toast.parentNode.removeChild(toast);
-    }, 3500);
+    setTimeout(function () { if (toast.parentNode) toast.parentNode.removeChild(toast); }, 3500);
+  }
+
+  // 게시물 목록 렌더링 공통 함수
+  function buildPostItemHTML(p, base, showBoardBadge) {
+    var boardLabels = { free: '자유', fee: '수수료/정산', qna: '질문답변', info: '정보' };
+    var href = base + (p.id || '');
+    var board = p.board || 'free';
+    var badge = showBoardBadge ? '<span class="feed-board-badge">' + (boardLabels[board] || board) + '</span>' : '';
+    var noticeBadge = p.notice ? '<span class="notice-badge">공지</span>' : '';
+    var verified = (p.verified === true || isAuthorVerified(p.author)) ? verifiedBadgeHtml(true, p.author) : '';
+    var metaParts = [];
+    var dateStr = (p.createdAt ? formatRelativeDate(new Date(p.createdAt)) : '') || (p.date || '');
+    if (p.author) metaParts.push(p.author);
+    if (dateStr) metaParts.push(dateStr);
+    if (p.hits != null) metaParts.push('조회 ' + p.hits);
+    if (p.likeCount != null && p.likeCount > 0) metaParts.push('좋아요 ' + p.likeCount);
+    var meta = metaParts.join(' · ') + verified;
+    var commentCount = p.commentCount || 0;
+    var commentBadge = commentCount > 0 ? '<span class="comment-count-badge">' + commentCount + '</span>' : '';
+    var noticeBtn = isOperator() ? '<button type="button" class="notice-toggle-btn btn btn-outline btn-sm" data-post-id="' + (p.id || '').replace(/"/g, '&quot;') + '">' + (p.notice ? '공지 해제' : '공지') + '</button>' : '';
+    function firstImageUrl(body) {
+      if (!body) return null;
+      var m = body.match(/<img[^>]+src=["']([^"']+)["']/i) || body.match(/(https?:\/\/[^\s<>"']+\.(?:jpe?g|png|gif|webp))/i);
+      return m ? m[1] : null;
+    }
+    var thumbUrl = firstImageUrl(p.body);
+    var thumbHtml = thumbUrl ? '<span class="feed-item-thumb"><img src="' + thumbUrl.replace(/"/g, '&quot;') + '" alt="" width="56" height="56" loading="lazy"></span>' : '';
+    return '<li class="feed-item feed-item-row">' +
+      '<a href="' + href + '" class="feed-title-wrapper">' +
+        '<span class="feed-title-content feed-title-row">' + noticeBadge + badge + '<span class="feed-title-text">' + (p.title || '') + '</span></span>' +
+        commentBadge +
+      '</a>' +
+      (thumbHtml ? thumbHtml : '') +
+      '<span class="feed-meta">' + meta + '</span>' +
+      (noticeBtn ? '<span class="feed-operator-actions">' + noticeBtn + '</span>' : '') +
+    '</li>';
   }
 
   var app = {
@@ -460,16 +454,29 @@
     isLoggedIn: function () { return !!getToken(); },
     logout: logout,
 
+    // fetchNews: /api/news 우선, 실패 시 Firestore news 컬렉션 fallback
     fetchNews: function (limit, offset, callback) {
       var url = BASE('api/news') + '?limit=' + (limit || 10) + '&offset=' + (offset || 0);
-      fetch(url).then(function (res) { return res.ok ? res.json() : Promise.reject(new Error(res.statusText || 'Network error')); })
+      fetch(url)
+        .then(function (res) { return res.ok ? res.json() : Promise.reject(new Error('api_fail')); })
         .then(function (data) {
           var items = data.items || data || [];
           var total = data.total != null ? data.total : items.length;
           callback(null, items, total);
         })
-        .catch(function (err) {
-          callback(err && err.message ? err.message : '??? ???? ????.', [], 0);
+        .catch(function () {
+          // API 실패 시 Firestore news 컬렉션으로 fallback
+          if (!db) { callback(null, [], 0); return; }
+          db.collection('news').orderBy('createdAt', 'desc').limit(limit || 10).get()
+            .then(function (snap) {
+              var items = [];
+              snap.forEach(function (doc) {
+                var n = firestoreDocToNews(doc);
+                if (n) items.push(n);
+              });
+              callback(null, items, items.length);
+            })
+            .catch(function () { callback(null, [], 0); });
         });
     },
 
@@ -492,48 +499,30 @@
         if (callback) callback(null, filtered.slice(off, off + lim), filtered.length);
       }
       if (db) {
-        console.log('[app.js fetchPosts] Firestore db.collection("posts") 쿼리 실행');
         db.collection('posts').orderBy('createdAt', 'desc').get()
           .then(function (snap) {
-            console.log('[app.js fetchPosts] Firestore 응답 문서 수=', snap.size, '(데이터가 실제로 들어있는지 확인)');
-            if (snap.empty) {
-              if (callback) callback(null, [], 0);
-              return;
-            }
+            if (snap.empty) { if (callback) callback(null, [], 0); return; }
             var list = [];
-            try {
-              snap.forEach(function (doc) {
-                try {
-                  var p = firestoreDocToPost(doc);
-                  if (p) list.push(p);
-                } catch (docErr) {
-                  console.warn('[app.js fetchPosts] doc ?? ??, ???', doc.id, docErr);
-                }
-              });
-            } catch (e) {
-              console.error('[app.js fetchPosts] forEach ? ??', e);
-            }
+            snap.forEach(function (doc) {
+              try {
+                var p = firestoreDocToPost(doc);
+                if (p) list.push(p);
+              } catch (docErr) {}
+            });
             finish(list);
           })
-          .catch(function (e) {
-            console.error('[app.js fetchPosts] Firestore get ??', e);
-            if (callback) callback(null, [], 0);
-          });
+          .catch(function () { if (callback) callback(null, [], 0); });
         return;
       }
       if (callback) callback(null, [], 0);
     },
+
+    // 단건 조회: Firestore posts 컬렉션에서 직접 조회 (전체 목록 find 방식 제거)
     getPostById: function (postId, callback) {
       if (!callback) return;
       postId = (postId || '').toString().trim();
-      if (!postId) {
-        callback(null, null);
-        return;
-      }
-      if (!db) {
-        callback(null, null);
-        return;
-      }
+      if (!postId) { callback(null, null); return; }
+      if (!db) { callback(null, null); return; }
       var called = false;
       function done(err, post) {
         if (called) return;
@@ -541,39 +530,21 @@
         if (timeoutId) clearTimeout(timeoutId);
         callback(err, post);
       }
-      var timeoutId = setTimeout(function () {
-        done(null, null);
-      }, 12000);
-      var ref = db.collection('posts').doc(postId);
-      ref.get()
+      var timeoutId = setTimeout(function () { done(null, null); }, 12000);
+      db.collection('posts').doc(postId).get()
         .then(function (docSnap) {
-          if (!docSnap || !docSnap.exists) {
-            done(null, null);
-            return;
-          }
+          if (!docSnap || !docSnap.exists) { done(null, null); return; }
           var post = null;
-          try {
-            post = firestoreDocToPost(docSnap);
-          } catch (e) {
-            console.warn('[app.js getPostById] doc 변환 실패', postId, e);
-          }
+          try { post = firestoreDocToPost(docSnap); } catch (e) {}
           done(null, post);
         })
-        .catch(function (e) {
-          console.error('[app.js getPostById] Firestore get 실패', postId, e);
-          done(null, null);
-        });
+        .catch(function () { done(null, null); });
     },
+
     deleteAllCommunityPosts: function (callback) {
       if (!callback) return;
-      if (!isOperator()) {
-        callback('권한이 없어요.');
-        return;
-      }
-      if (!db) {
-        if (callback) callback('데이터베이스에 연결되어 있지 않아요.');
-        return;
-      }
+      if (!isOperator()) { callback('권한이 없어요.'); return; }
+      if (!db) { if (callback) callback('데이터베이스에 연결되어 있지 않아요.'); return; }
       db.collection('posts').get().then(function (snap) {
         var refs = [];
         snap.forEach(function (doc) { refs.push(doc.ref); });
@@ -589,27 +560,19 @@
           })());
         }
         return chain;
-      }).then(function () {
-        if (callback) callback(null);
-      }).catch(function (err) {
-        if (callback) callback(err && err.message ? err.message : '삭제에 실패했어요.');
-      });
+      }).then(function () { if (callback) callback(null); })
+        .catch(function (err) { if (callback) callback(err && err.message ? err.message : '삭제에 실패했어요.'); });
     },
+
     getPostLikeCount: getPostLikeCount,
     hasUserLikedPost: hasUserLikedPost,
     getUserLikedState: function (postId, callback) {
       if (!postId || !callback) return;
-      if (!db) {
-        callback(false);
-        return;
-      }
+      if (!db) { callback(false); return; }
       var u = getUser();
       var anonId = localStorage.getItem('merchant_plus_anon_id');
       var userId = (u && u.uid) ? u.uid : (anonId || '');
-      if (!userId) {
-        callback(false);
-        return;
-      }
+      if (!userId) { callback(false); return; }
       db.collection('posts').doc(postId).collection('likes').doc(userId).get()
         .then(function (doc) { callback(doc.exists); })
         .catch(function () { callback(false); });
@@ -619,16 +582,22 @@
 
     getPostsByIds: function (ids, callback) {
       if (!ids || !ids.length) { if (callback) callback(null, []); return; }
-      var self = this;
-      this.fetchPosts('all', 500, 0, function (err, list) {
-        if (err || !list) { if (callback) callback(null, []); return; }
-        var idSet = {};
-        ids.forEach(function (id) { idSet[id] = true; });
-        var byId = {};
-        list.forEach(function (p) { if (idSet[p.id]) byId[p.id] = p; });
-        var ordered = ids.map(function (id) { return byId[id]; }).filter(Boolean);
-        if (callback) callback(null, ordered);
-      }, 'latest');
+      // 개별 getPostById로 조회 (fetchPosts 전체 로드 방식 대신)
+      var results = [];
+      var pending = ids.length;
+      ids.forEach(function (id) {
+        app.getPostById(id, function (err, post) {
+          if (post) results.push(post);
+          pending--;
+          if (pending === 0) {
+            // 원래 ids 순서 유지
+            var byId = {};
+            results.forEach(function (p) { byId[p.id] = p; });
+            var ordered = ids.map(function (id) { return byId[id]; }).filter(Boolean);
+            if (callback) callback(null, ordered);
+          }
+        });
+      });
     },
 
     getRelatedPosts: function (postId, limit, callback) {
@@ -638,9 +607,7 @@
         var board = post.board || 'free';
         self.fetchPosts(board, 100, 0, function (err, list) {
           if (err || !list) { if (callback) callback(null, []); return; }
-          var related = list
-            .filter(function (p) { return p.id !== postId; })
-            .slice(0, limit || 5);
+          var related = list.filter(function (p) { return p.id !== postId; }).slice(0, limit || 5);
           if (callback) callback(null, related);
         }, 'latest');
       });
@@ -659,95 +626,43 @@
       }).join('');
     },
 
+    // renderPostsHTML, renderPosts 모두 buildPostItemHTML 공통 함수 사용
     renderPostsHTML: function (list, detailUrl, showBoardBadge) {
       var base = detailUrl || 'news.html?id=';
-      var boardLabels = { free: '자유', fee: '수수료/정산', qna: '질문답변', info: '정보' };
-      var isOp = isOperator();
-      function firstImageUrl(body) {
-        if (!body) return null;
-        var m = body.match(/<img[^>]+src=["']([^"']+)["']/i) || body.match(/(https?:\/\/[^\s<>"']+\.(?:jpe?g|png|gif|webp))/i);
-        return m ? m[1] : null;
-      }
-      return (list || []).map(function (p) {
-        var href = base + (p.id || '');
-        var board = p.board || 'free';
-        var badge = showBoardBadge ? '<span class="feed-board-badge">' + (boardLabels[board] || board) + '</span>' : '';
-        var noticeBadge = p.notice ? '<span class="notice-badge">공지</span>' : '';
-        var verified = (p.verified === true || isAuthorVerified(p.author)) ? verifiedBadgeHtml(true, p.author) : '';
-        var metaParts = [];
-        var dateStr = (p.createdAt ? formatRelativeDate(new Date(p.createdAt)) : '') || (p.date || '');
-        if (p.author) metaParts.push(p.author);
-        if (dateStr) metaParts.push(dateStr);
-        if (p.hits != null) metaParts.push('조회 ' + p.hits);
-        if (p.likeCount != null && p.likeCount > 0) metaParts.push('좋아요 ' + p.likeCount);
-        var meta = metaParts.join(' · ') + verified;
-        var commentCount = p.commentCount || 0;
-        var commentBadge = commentCount > 0 ? '<span class="comment-count-badge">' + commentCount + '</span>' : '';
-        var noticeBtn = isOp ? '<button type="button" class="notice-toggle-btn btn btn-outline btn-sm" data-post-id="' + (p.id || '').replace(/"/g, '&quot;') + '">' + (p.notice ? '?? ??' : '??') + '</button>' : '';
-        var thumbUrl = firstImageUrl(p.body);
-        var thumbHtml = thumbUrl ? '<span class="feed-item-thumb"><img src="' + thumbUrl.replace(/"/g, '&quot;') + '" alt="" width="56" height="56" loading="lazy"></span>' : '';
-        return '<li class="feed-item feed-item-row">' +
-          '<a href="' + href + '" class="feed-title-wrapper">' +
-            '<span class="feed-title-content feed-title-row">' + noticeBadge + badge + '<span class="feed-title-text">' + (p.title || '') + '</span></span>' +
-            commentBadge +
-          '</a>' +
-          (thumbHtml ? thumbHtml : '') +
-          '<span class="feed-meta">' + meta + '</span>' +
-          (noticeBtn ? '<span class="feed-operator-actions">' + noticeBtn + '</span>' : '') +
-        '</li>';
-      }).join('');
+      return (list || []).map(function (p) { return buildPostItemHTML(p, base, showBoardBadge); }).join('');
     },
 
     renderPosts: function (containerId, list, detailUrl, showBoardBadge) {
       var el = document.getElementById(containerId);
       if (!el) return;
       var base = detailUrl || 'news.html?id=';
-      var boardLabels = { free: '??', fee: '???/??', qna: '????', info: '????' };
-      var isOp = isOperator();
-      function firstImageUrl(body) {
-        if (!body) return null;
-        var m = body.match(/<img[^>]+src=["']([^"']+)["']/i) || body.match(/(https?:\/\/[^\s<>"']+\.(?:jpe?g|png|gif|webp))/i);
-        return m ? m[1] : null;
-      }
-      el.innerHTML = (list || []).map(function (p) {
-        var href = base + (p.id || '');
-        var board = p.board || 'free';
-        var badge = showBoardBadge ? '<span class="feed-board-badge">' + (boardLabels[board] || board) + '</span>' : '';
-        var noticeBadge = p.notice ? '<span class="notice-badge">??</span>' : '';
-        var verified = (p.verified === true || isAuthorVerified(p.author)) ? verifiedBadgeHtml(true, p.author) : '';
-        var likeStr = (p.likeCount != null && p.likeCount > 0) ? ' ? ?? ' + p.likeCount : '';
-        var dateStr = (p.createdAt ? formatRelativeDate(new Date(p.createdAt)) : '') || (p.date || '');
-        var meta = (p.author ? p.author + ' ? ' : '') + dateStr + (p.hits != null ? ' ? ?? ' + p.hits : '') + likeStr + verified;
-        var commentCount = p.commentCount || 0;
-        var commentBadge = commentCount > 0 ? '<span class="comment-count-badge">' + commentCount + '</span>' : '';
-        var noticeBtn = isOp ? '<button type="button" class="notice-toggle-btn btn btn-outline btn-sm" data-post-id="' + (p.id || '').replace(/"/g, '&quot;') + '">' + (p.notice ? '?? ??' : '??') + '</button>' : '';
-        var thumbUrl = firstImageUrl(p.body);
-        var thumbHtml = thumbUrl ? '<span class="feed-item-thumb"><img src="' + thumbUrl.replace(/"/g, '&quot;') + '" alt="" width="56" height="56" loading="lazy"></span>' : '';
-        return '<li class="feed-item feed-item-row">' +
-          '<a href="' + href + '" class="feed-title-wrapper">' +
-            '<span class="feed-title-content feed-title-row">' + noticeBadge + badge + '<span class="feed-title-text">' + (p.title || '') + '</span></span>' +
-            commentBadge +
-          '</a>' +
-          (thumbHtml ? thumbHtml : '') +
-          '<span class="feed-meta">' + meta + '</span>' +
-          (noticeBtn ? '<span class="feed-operator-actions">' + noticeBtn + '</span>' : '') +
-        '</li>';
-      }).join('');
+      el.innerHTML = (list || []).map(function (p) { return buildPostItemHTML(p, base, showBoardBadge); }).join('');
     },
 
     getNoticePosts: function (board, callback) {
-      var notices = [
-        { id: '4', title: '?? ?? ? PG? ?? ? ?????', board: 'info', notice: true }
-      ];
-      var filtered = (!board || board === 'all') ? notices : notices.filter(function (n) { return n.board === board; });
-      if (callback) callback(null, filtered);
+      // 하드코딩 공지 제거 - Firestore에서 실제 공지 조회
+      if (!db) { if (callback) callback(null, []); return; }
+      var q = db.collection('posts').where('notice', '==', true);
+      if (board && board !== 'all') q = q.where('board', '==', board);
+      q.get()
+        .then(function (snap) {
+          var list = [];
+          snap.forEach(function (doc) {
+            var p = firestoreDocToPost(doc);
+            if (p) list.push(p);
+          });
+          if (callback) callback(null, list);
+        })
+        .catch(function () { if (callback) callback(null, []); });
     },
+
     getComments: getComments,
     addComment: addComment,
     addLocalComment: addLocalComment,
     deleteComment: deleteComment,
     isOperator: isOperator,
     togglePostNotice: togglePostNotice,
+
     renderComments: function (containerId, list, opts) {
       var el = document.getElementById(containerId);
       if (!el) return;
@@ -756,7 +671,7 @@
       var canDelete = opts.canDelete === true && postId;
       var onReply = opts.onReply || null;
       if (!list || list.length === 0) {
-        el.innerHTML = '<li class="comment-empty">?? ??? ???. ? ??? ?? ???.</li>';
+        el.innerHTML = '<li class="comment-empty">아직 댓글이 없어요. 첫 댓글을 남겨 보세요.</li>';
         return;
       }
       var topLevel = list.filter(function (c) { return !c.parentId; });
@@ -770,9 +685,9 @@
       function renderOne(c, isReply) {
         var verified = (c.verified === true || isAuthorVerified(c.author)) ? verifiedBadgeHtml(true, c.author) : '';
         var commentDateStr = (c.createdAt ? formatRelativeDate(new Date(c.createdAt)) : '') || (c.date || '');
-        var metaText = '<span class="comment-meta-info">' + (c.author || '??') + verified + ' ? ' + commentDateStr + '</span>';
-        var delBtn = canDelete ? '<button type="button" class="comment-delete-btn" data-post-id="' + (postId || '').replace(/"/g, '&quot;') + '" data-comment-id="' + (c.id || '').replace(/"/g, '&quot;') + '" aria-label="?? ??">??</button>' : '';
-        var replyBtn = onReply ? '<button type="button" class="comment-reply-btn" data-comment-id="' + (c.id || '').replace(/"/g, '&quot;') + '" aria-label="??">??</button>' : '';
+        var metaText = '<span class="comment-meta-info">' + (c.author || '익명') + verified + ' · ' + commentDateStr + '</span>';
+        var delBtn = canDelete ? '<button type="button" class="comment-delete-btn" data-post-id="' + (postId || '').replace(/"/g, '&quot;') + '" data-comment-id="' + (c.id || '').replace(/"/g, '&quot;') + '" aria-label="댓글 삭제">삭제</button>' : '';
+        var replyBtn = onReply ? '<button type="button" class="comment-reply-btn" data-comment-id="' + (c.id || '').replace(/"/g, '&quot;') + '" aria-label="답글">답글</button>' : '';
         var bodyHtml = (c.body || '').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/\n/g, '<br>');
         var replyClass = isReply ? ' comment-item-reply' : '';
         var html = '<li class="comment-item' + replyClass + '" data-comment-id="' + (c.id || '').replace(/"/g, '&quot;') + '"><div class="comment-meta">' + metaText + ' ' + replyBtn + delBtn + '</div><div class="comment-body">' + bodyHtml + '</div></li>';
@@ -782,20 +697,18 @@
       }
       el.innerHTML = topLevel.sort(function (a, b) { return commentSortKey(a) - commentSortKey(b); }).map(function (c) { return renderOne(c, false); }).join('');
     },
+
     isAuthorVerified: isAuthorVerified,
     verifiedBadgeHtml: verifiedBadgeHtml,
     uploadImageToStorage: uploadImageToStorage,
 
     createPost: function (data, callback) {
-      if (!db) {
-        if (callback) callback('?????? ??? ??????. config.js? ?????.');
-        return;
-      }
+      if (!db) { if (callback) callback('데이터베이스에 연결되어 있지 않아요. config.js를 확인해 주세요.'); return; }
       var u = getUser();
       var payload = {
         title: data.title || '',
         body: data.body || '',
-        author: data.author || '??',
+        author: data.author || (u && u.name) || '익명',
         authorId: u ? u.uid : null,
         board: data.board || 'free',
         notice: !!(data.notice),
@@ -805,14 +718,12 @@
         hits: 0,
         likeCount: 0,
         commentCount: 0,
-        verified: false,
+        verified: isOperator(),
         createdAt: firebase.firestore.FieldValue.serverTimestamp()
       };
       db.collection('posts').add(payload).then(function (ref) {
-        console.log('Firestore 저장 성공');
         if (callback) callback(null, { id: ref.id });
       }).catch(function (err) {
-        console.error('[app.js createPost] Firestore add 실패', err);
         var msg = (err && (err.message || err.code)) ? String(err.message || err.code) : 'Firestore 저장에 실패했어요.';
         if (callback) callback(msg);
       });
@@ -835,7 +746,13 @@
           })
           .catch(function (err) {
             var code = err.code || '';
-            var msg = code === 'auth/user-not-found' ? '???? ?? ??????.' : code === 'auth/wrong-password' ? '????? ???.' : code === 'auth/invalid-email' ? '??? ??? ??? ???.' : code === 'auth/too-many-requests' ? '?? ? ?? ??? ???.' : code === 'auth/operation-not-allowed' ? '??? ???? ???? ????. Firebase ???? ???/???? ??? ? ???.' : code === 'auth/unauthorized-domain' ? '? ??? ???? Firebase ?? ??? ???. Firebase ?? ? Authentication ? ?? ? ??? ???? ? ??? ??? ???.' : (err.message || '??? ??');
+            var msg = code === 'auth/user-not-found' ? '등록되지 않은 이메일이에요.'
+              : code === 'auth/wrong-password' ? '비밀번호가 틀렸어요.'
+              : code === 'auth/invalid-email' ? '이메일 형식이 올바르지 않아요.'
+              : code === 'auth/too-many-requests' ? '로그인 시도가 너무 많아요. 잠시 후 다시 시도해 주세요.'
+              : code === 'auth/operation-not-allowed' ? '이메일/비밀번호 로그인이 비활성화되어 있어요.'
+              : code === 'auth/unauthorized-domain' ? '이 도메인은 Firebase 인증이 허용되지 않아요.'
+              : (err.message || '로그인에 실패했어요.');
             if (callback) callback(msg);
           });
         return;
@@ -850,11 +767,9 @@
             setToken(data.token);
             setUser(data.user || {});
             if (callback) callback(null, data);
-          } else if (callback) callback(data.error || '??? ??');
+          } else if (callback) callback(data.error || '로그인에 실패했어요.');
         })
-        .catch(function (err) {
-          if (callback) callback('??? ??? ? ???. ??? ? ?? ??????.');
-        });
+        .catch(function () { if (callback) callback('네트워크 오류가 발생했어요. 잠시 후 다시 시도해 주세요.'); });
     },
 
     signup: function (name, email, password, callback) {
@@ -872,7 +787,12 @@
           })
           .catch(function (err) {
             var code = err.code || '';
-            var msg = code === 'auth/email-already-in-use' ? '?? ?? ?? ??????.' : code === 'auth/weak-password' ? '????? 6? ?????.' : code === 'auth/invalid-email' ? '??? ??? ??? ???.' : code === 'auth/operation-not-allowed' ? '??? ??? ???? ????. Firebase ???? ???/???? ??? ? ???.' : code === 'auth/unauthorized-domain' ? '? ??? ???? Firebase ?? ??? ???. Firebase ?? ? Authentication ? ?? ? ??? ???? ? ??? ??? ???.' : (err.message || '?? ??');
+            var msg = code === 'auth/email-already-in-use' ? '이미 사용 중인 이메일이에요.'
+              : code === 'auth/weak-password' ? '비밀번호는 6자 이상이어야 해요.'
+              : code === 'auth/invalid-email' ? '이메일 형식이 올바르지 않아요.'
+              : code === 'auth/operation-not-allowed' ? '이메일/비밀번호 가입이 비활성화되어 있어요.'
+              : code === 'auth/unauthorized-domain' ? '이 도메인은 Firebase 인증이 허용되지 않아요.'
+              : (err.message || '회원가입에 실패했어요.');
             if (callback) callback(msg);
           });
         return;
@@ -887,11 +807,9 @@
             setToken(data.token);
             setUser(data.user || {});
             if (callback) callback(null, data);
-          } else if (callback) callback(data.error || '?? ??');
+          } else if (callback) callback(data.error || '회원가입에 실패했어요.');
         })
-        .catch(function () {
-          if (callback) callback('??? ??? ? ???. ??? ? ?? ???????.');
-        });
+        .catch(function () { if (callback) callback('네트워크 오류가 발생했어요. 잠시 후 다시 시도해 주세요.'); });
     },
 
     showToast: showToast,
@@ -913,7 +831,8 @@
       ref.get().then(function (doc) {
         if (doc.exists && (doc.data().postIds || []).indexOf(postId) !== -1) { if (callback) callback(null); return; }
         return ref.set({ postIds: arrUnion(postId) }, { merge: true });
-      }).then(function () { if (callback) callback(null); }).catch(function (e) { if (callback) callback(e && e.message ? e.message : '저장 실패'); });
+      }).then(function () { if (callback) callback(null); })
+        .catch(function (e) { if (callback) callback(e && e.message ? e.message : '저장 실패'); });
     },
     removeBookmark: function (postId, callback) {
       if (!db || !postId) { if (callback) callback(null); return; }
@@ -921,7 +840,9 @@
       var ref = db.collection('bookmarks').doc(uid);
       var arrRemove = firebase.firestore && firebase.firestore.FieldValue && firebase.firestore.FieldValue.arrayRemove;
       if (!arrRemove) { if (callback) callback(null); return; }
-      ref.update({ postIds: arrRemove(postId) }).then(function () { if (callback) callback(null); }).catch(function () { if (callback) callback(null); });
+      ref.update({ postIds: arrRemove(postId) })
+        .then(function () { if (callback) callback(null); })
+        .catch(function () { if (callback) callback(null); });
     },
     toggleBookmark: function (postId, callback) {
       var self = this;
@@ -941,20 +862,24 @@
     getDraft: function (callback) {
       if (!db || !callback) return;
       var uid = getUserIdOrAnonId();
-      db.collection('drafts').doc(uid).get().then(function (doc) {
-        callback(null, doc.exists ? doc.data() : null);
-      }).catch(function (e) { callback(e, null); });
+      db.collection('drafts').doc(uid).get()
+        .then(function (doc) { callback(null, doc.exists ? doc.data() : null); })
+        .catch(function (e) { callback(e, null); });
     },
     saveDraft: function (data, callback) {
       if (!db) { if (callback) callback('연결되지 않았어요.'); return; }
       var uid = getUserIdOrAnonId();
       var payload = Object.assign({}, data, { updatedAt: firebase.firestore.FieldValue.serverTimestamp() });
-      db.collection('drafts').doc(uid).set(payload, { merge: true }).then(function () { if (callback) callback(null); }).catch(function (e) { if (callback) callback(e && e.message ? e.message : '저장 실패'); });
+      db.collection('drafts').doc(uid).set(payload, { merge: true })
+        .then(function () { if (callback) callback(null); })
+        .catch(function (e) { if (callback) callback(e && e.message ? e.message : '저장 실패'); });
     },
     clearDraft: function (callback) {
       if (!db) { if (callback) callback(null); return; }
       var uid = getUserIdOrAnonId();
-      db.collection('drafts').doc(uid).delete().then(function () { if (callback) callback(null); }).catch(function () { if (callback) callback(null); });
+      db.collection('drafts').doc(uid).delete()
+        .then(function () { if (callback) callback(null); })
+        .catch(function () { if (callback) callback(null); });
     },
 
     getSavedCalculations: function (callback) {
@@ -979,11 +904,14 @@
         name: item.name || '저장 계산',
         params: item.params || {},
         createdAt: firebase.firestore.FieldValue.serverTimestamp()
-      }).then(function (ref) { if (callback) callback(null, ref.id); }).catch(function (e) { if (callback) callback(e && e.message ? e.message : '저장 실패'); });
+      }).then(function (ref) { if (callback) callback(null, ref.id); })
+        .catch(function (e) { if (callback) callback(e && e.message ? e.message : '저장 실패'); });
     },
     deleteSavedCalculation: function (id, callback) {
       if (!db || !id) { if (callback) callback(null); return; }
-      db.collection('savedCalculations').doc(id).delete().then(function () { if (callback) callback(null); }).catch(function () { if (callback) callback(null); });
+      db.collection('savedCalculations').doc(id).delete()
+        .then(function () { if (callback) callback(null); })
+        .catch(function () { if (callback) callback(null); });
     },
     getSavedCalculationById: function (id, callback) {
       if (!db || !id || !callback) return;
@@ -1001,8 +929,5 @@
 
   if (typeof window !== 'undefined') {
     window.app = app;
-  }
-  if (typeof module !== 'undefined' && module.exports) {
-    module.exports = app;
   }
 })();

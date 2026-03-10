@@ -85,6 +85,7 @@
 
   <script src="https://www.gstatic.com/firebasejs/10.7.0/firebase-app-compat.js"></script>
   <script src="https://www.gstatic.com/firebasejs/10.7.0/firebase-auth-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/10.7.0/firebase-firestore-compat.js"></script>
   <script src="js/config.js"></script>
   <script src="js/app.js"></script>
   <script src="js/auth.js"></script>
@@ -175,16 +176,38 @@
           if (submitBtn) { submitBtn.disabled = true; submitBtn.textContent = editId ? '저장 중...' : '등록 중...'; }
           var url = editId ? '/api/news/' + encodeURIComponent(editId) : '/api/news';
           var method = editId ? 'PUT' : 'POST';
-          fetch(url, { method: method, headers: { 'Content-Type': 'application/json', 'Authorization': 'Bearer ' + token }, body: JSON.stringify({ title: title, category: category, content: content }) })
+          var payload = { title: title, category: category, content: content };
+
+          function saveToFirestore() {
+            var db = (window.firebase && window.firebase.apps && window.firebase.apps.length && typeof window.firebase.firestore === 'function') ? window.firebase.firestore() : null;
+            if (!db) {
+              if (errEl) { errEl.textContent = '저장에 실패했어요. (DB 미연결)'; errEl.style.display = 'block'; }
+              if (submitBtn) { submitBtn.disabled = false; submitBtn.textContent = editId ? '저장' : '등록하기'; }
+              return;
+            }
+            var docData = { title: title, category: category, content: content, createdAt: window.firebase.firestore.FieldValue.serverTimestamp() };
+            var promise = editId
+              ? db.collection('news').doc(editId).update({ title: title, category: category, content: content })
+              : db.collection('news').add(docData);
+            promise.then(function () {
+              closeModal();
+              if (window.newsRender && window.newsRender.reload) window.newsRender.reload(); else location.reload();
+            }).catch(function (e) {
+              if (errEl) { errEl.textContent = (e && e.message) ? e.message : '저장에 실패했어요.'; errEl.style.display = 'block'; }
+              if (submitBtn) { submitBtn.disabled = false; submitBtn.textContent = editId ? '저장' : '등록하기'; }
+            });
+          }
+
+          fetch(url, { method: method, headers: { 'Content-Type': 'application/json', 'Authorization': 'Bearer ' + token }, body: JSON.stringify(payload) })
             .then(function (r) { return r.json().then(function (d) { return { ok: r.ok, data: d }; }); })
             .then(function (res) {
               if (!res.ok) throw new Error(res.data.error || (editId ? '수정 실패' : '등록 실패'));
               closeModal();
               if (window.newsRender && window.newsRender.reload) window.newsRender.reload(); else location.reload();
             })
-            .catch(function (err) {
-              if (errEl) { errEl.textContent = err.message || '오류가 발생했습니다.'; errEl.style.display = 'block'; }
-              if (submitBtn) { submitBtn.disabled = false; submitBtn.textContent = editId ? '저장' : '등록하기'; }
+            .catch(function () {
+              // API 실패 → Firestore 직접 저장
+              saveToFirestore();
             });
         });
       }
@@ -254,24 +277,37 @@
         },
       ];
       (async function () {
+        var db = (window.firebase && window.firebase.apps && window.firebase.apps.length && typeof window.firebase.firestore === 'function') ? window.firebase.firestore() : null;
+        var successCount = 0;
         for (var i = 0; i < NEWS_BATCH.length; i++) {
           var item = NEWS_BATCH[i];
+          var saved = false;
+          // REST API 시도
           try {
             var res = await fetch('/api/news', {
               method: 'POST',
-              headers: {
-                'Content-Type': 'application/json',
-                'Authorization': 'Bearer ' + token,
-              },
+              headers: { 'Content-Type': 'application/json', 'Authorization': 'Bearer ' + token },
               body: JSON.stringify(item),
             });
-            var data = await res.json();
-            console.log('뉴스 등록 결과:', item.title, res.status, data);
-          } catch (e) {
-            console.error('뉴스 등록 실패:', item.title, e);
+            if (res.ok) { saved = true; successCount++; }
+          } catch (e) {}
+          // API 실패 시 Firestore 직접 저장
+          if (!saved && db) {
+            try {
+              await db.collection('news').add({
+                title: item.title,
+                category: item.category,
+                content: item.content,
+                createdAt: window.firebase.firestore.FieldValue.serverTimestamp()
+              });
+              saved = true;
+              successCount++;
+            } catch (e) {
+              console.error('Firestore 저장 실패:', item.title, e);
+            }
           }
         }
-        alert('뉴스 10개 등록 시도 완료! (브라우저 콘솔 로그도 확인 가능)');
+        alert('뉴스 ' + successCount + '개 등록 완료!');
         if (window.newsRender && window.newsRender.reload) window.newsRender.reload(); else location.reload();
       })();
     }
