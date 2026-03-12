@@ -3125,3 +3125,30 @@ img, video, iframe { max-width: 100%; height: auto; }
     overflow: visible;
   }
 }
+
+/* ── 11. AdSense 광고 슬롯: CLS 방지용 높이 예약 ── */
+.ad-slot {
+  width: 100%;
+  margin: 18px 0;
+  border-radius: 12px;
+  background: transparent;
+}
+.ad-slot[data-ad-layout="in-article"] { margin: 22px 0; }
+.ad-slot-inner {
+  width: 100%;
+  min-height: 120px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+/* 데스크탑: 디스플레이 배너 기본 높이 */
+@media (min-width: 768px) {
+  .ad-slot-inner { min-height: 160px; }
+  .ad-slot.ad-slot-sidebar .ad-slot-inner { min-height: 250px; }
+}
+/* 로딩 전/차단 시에도 레이아웃 유지 */
+.ad-slot.is-empty .ad-slot-inner {
+  border: 1px dashed var(--color-border);
+  color: var(--color-text-subtle);
+  font-size: 0.875rem;
+}
