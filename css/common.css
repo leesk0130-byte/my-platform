@@ -261,6 +261,41 @@ header .site-logo a:hover { text-decoration: none; opacity: 0.9; }
   box-shadow: 0 4px 16px rgba(5, 150, 105, 0.3);
 }
 
+/* 홈/뉴스: 가맹점 정보 카드 그리드 */
+.info-grid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: var(--space-4);
+}
+@media (max-width: 768px) {
+  .info-grid {
+    grid-template-columns: minmax(0, 1fr);
+  }
+}
+.info-card {
+  background: var(--color-surface);
+  border-radius: var(--radius-lg);
+  border: 1px solid var(--color-border-soft);
+  padding: var(--space-4);
+  box-shadow: var(--shadow-sm);
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-3);
+}
+.info-card h3 {
+  font-size: var(--text-md);
+  font-weight: 700;
+}
+.info-card p {
+  font-size: var(--text-sm);
+  color: var(--color-text-subtle);
+  line-height: 1.7;
+}
+.info-card .btn {
+  align-self: flex-start;
+  font-size: var(--text-sm);
+}
+
 /* ===== 광고 · 프로모 배너 ===== */
 .ad-slot {
   background: #e2e8f0;
