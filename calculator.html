@@ -400,12 +400,17 @@
         <!-- A vs B 비교 전체 입력 -->
         <div id="calc-fee-compare" class="calc-fee-rates" style="display:none;">
           <p class="calc-desc">PG A와 B의 거래 조건과 수수료율을 각각 입력하면 나란히 비교해 드립니다. <a href="pg.html">PG 수수료 참고</a></p>
+          <!-- 공통: 회사명 -->
+          <div class="form-group" style="max-width:320px; margin-bottom:1.25rem;">
+            <label for="company-name">내 회사(상호) 이름 <span style="font-weight:400;color:#94a3b8;">(선택 · 결과에 표시됩니다)</span></label>
+            <input type="text" id="company-name" placeholder="예: 가맹점숲몰" autocomplete="off" maxlength="30">
+          </div>
           <div class="compare-inputs">
             <!-- PG A 컬럼 -->
             <div class="compare-col compare-col-a">
               <div class="compare-col-header">PG A</div>
               <div class="form-group">
-                <label for="pg-name-a">PG사 이름 (선택)</label>
+                <label for="pg-name-a">결제수단</label>
                 <input type="text" id="pg-name-a" placeholder="예: 토스페이먼츠" autocomplete="off" maxlength="20">
               </div>
               <!-- 거래액 (비율 모드) -->
@@ -459,7 +464,7 @@
             <div class="compare-col compare-col-b">
               <div class="compare-col-header">PG B</div>
               <div class="form-group">
-                <label for="pg-name-b">PG사 이름 (선택)</label>
+                <label for="pg-name-b">결제수단</label>
                 <input type="text" id="pg-name-b" placeholder="예: KG이니시스" autocomplete="off" maxlength="20">
               </div>
               <!-- 거래액 (비율 모드) -->
@@ -521,7 +526,7 @@
 
         <!-- 결과 카드 -->
         <div id="calc-result" class="calc-result" style="display:none;" aria-live="polite">
-          <h4 class="calc-result-title">계산 결과 (연간 기준)</h4>
+          <h4 class="calc-result-title">계산 결과 (연간 기준)<span id="result-company-name" style="font-size:0.85rem;font-weight:500;color:#64748b;margin-left:0.6rem;"></span></h4>
           <p class="calc-result-summary" id="calc-result-summary"></p>
 
           <dl class="calc-result-list" id="calc-result-single">
@@ -923,12 +928,17 @@
         if (labelA) labelA.textContent = nameA;
         if (labelB) labelB.textContent = nameB;
 
+        /* 회사명 결과 타이틀 표시 */
+        var companyName = (document.getElementById('company-name').value.trim());
+        var companySpan = document.getElementById('result-company-name');
+        if (companySpan) companySpan.textContent = companyName ? '— ' + companyName : '';
+
         /* 입력 조건 요약 */
-        function buildInputSummary(side, total, cardR, cashR, cardRt, cashRt, isRatio) {
+        function buildInputSummary(side, total, cardR, cashR, cardRt, cashRt, isRatioMode) {
           var el = document.getElementById('compare-input-summary-' + side);
           if (!el) return;
           var rows = [];
-          if (isRatio) {
+          if (isRatioMode) {
             rows.push(['연 거래액', toKoreanAmount(total)]);
             rows.push(['카드/현금 비율', cardR + '% / ' + cashR + '%']);
           } else {
@@ -939,7 +949,9 @@
           }
           rows.push(['카드 수수료율', cardRt + '%']);
           rows.push(['현금 수수료율', cashRt + '%']);
-          el.innerHTML = rows.map(function(r) {
+          var companyName = (document.getElementById('company-name').value.trim());
+          var companyRow = companyName ? '<div class="cis-row" style="margin-bottom:0.3rem;padding-bottom:0.3rem;border-bottom:1px dashed #e2e8f0;"><span class="cis-label">업체명</span><span class="cis-val" style="color:#0f766e;">' + companyName + '</span></div>' : '';
+          el.innerHTML = companyRow + rows.map(function(r) {
             return '<div class="cis-row"><span class="cis-label">' + r[0] + '</span><span class="cis-val">' + r[1] + '</span></div>';
           }).join('');
         }
@@ -1026,6 +1038,9 @@
       var cardRate = toNum(document.getElementById('card-rate').value);
       var cashRate = toNum(document.getElementById('cash-rate').value);
       summaryEl.textContent = '연 ' + toKoreanAmount(totalAmount) + ' | 카드 ' + cardRatioPct + '% (수수료 ' + cardRate + '%) / 현금 ' + cashRatioPct + '% (수수료 ' + cashRate + '%)';
+      /* 회사명 단일 모드에도 반영 */
+      var companySpanS = document.getElementById('result-company-name');
+      if (companySpanS) companySpanS.textContent = '';
       var cardFee  = Math.round(cardAmount * cardRate / 100);
       var cashFee  = Math.round(cashAmount * cashRate / 100);
       var totalFee = cardFee + cashFee;
@@ -1082,7 +1097,8 @@
         cardRateB:    toNum(document.getElementById('card-rate-b').value),
         cashRateB:    toNum(document.getElementById('cash-rate-b').value),
         pgNameA:     document.getElementById('pg-name-a').value.trim(),
-        pgNameB:     document.getElementById('pg-name-b').value.trim()
+        pgNameB:     document.getElementById('pg-name-b').value.trim(),
+        companyName: document.getElementById('company-name').value.trim()
       };
     }
     function setFormState(s) {
@@ -1114,6 +1130,7 @@
       document.getElementById('cash-rate-b').value    = s.cashRateB  != null ? s.cashRateB  : 1.5;
       if (s.pgNameA) document.getElementById('pg-name-a').value = s.pgNameA;
       if (s.pgNameB) document.getElementById('pg-name-b').value = s.pgNameB;
+      if (s.companyName) document.getElementById('company-name').value = s.companyName;
       amountInputIds.forEach(updateAmountKr);
       validate();
     }
@@ -1151,7 +1168,8 @@
         'cardAmtB=' + s.cardAmountB, 'cashAmtB=' + s.cashAmountB,
         'cardRateB=' + s.cardRateB, 'cashRateB=' + s.cashRateB,
         'pgNameA=' + encodeURIComponent(s.pgNameA || ''),
-        'pgNameB=' + encodeURIComponent(s.pgNameB || '')
+        'pgNameB=' + encodeURIComponent(s.pgNameB || ''),
+        'company=' + encodeURIComponent(s.companyName || '')
       ];
       var url = location.origin + location.pathname + '?' + q.join('&');
       var btn = this;
@@ -1246,7 +1264,8 @@
         cardRateB: toNum(params.get('cardRateB')) || 2.8,
         cashRateB: toNum(params.get('cashRateB')) || 1.5,
         pgNameA: decodeURIComponent(params.get('pgNameA') || ''),
-        pgNameB: decodeURIComponent(params.get('pgNameB') || '')
+        pgNameB: decodeURIComponent(params.get('pgNameB') || ''),
+        companyName: decodeURIComponent(params.get('company') || '')
       });
     }
 
