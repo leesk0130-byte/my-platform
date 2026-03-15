@@ -36,6 +36,53 @@
     .pg-table-wrap tbody tr.pg-row-advantage td { font-weight: 600; color: #065f46; }
     .pg-table-wrap .pg-cell-highlight { background: #d1fae5 !important; font-weight: 700; }
     .pg-source { font-size: 0.8125rem; color: #64748b; margin-top: 0.5rem; }
+    /* ── 계산기 CTA 배너 ── */
+    .calc-cta-banner {
+      background: linear-gradient(135deg, #0f172a 0%, #1e293b 100%);
+      border-radius: 16px;
+      padding: 1.75rem 2rem;
+      margin-bottom: 1.75rem;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 1.5rem;
+      flex-wrap: wrap;
+    }
+    .calc-cta-banner-text h1 {
+      font-size: 1.3rem;
+      font-weight: 800;
+      color: #fff;
+      margin: 0 0 0.4rem;
+      line-height: 1.3;
+    }
+    .calc-cta-banner-text p {
+      font-size: 0.9rem;
+      color: #94a3b8;
+      margin: 0;
+      line-height: 1.6;
+    }
+    .calculator-button {
+      display: inline-flex;
+      align-items: center;
+      gap: 0.4rem;
+      background: linear-gradient(135deg, #0d9488, #0f766e);
+      color: #fff;
+      font-size: 0.95rem;
+      font-weight: 700;
+      padding: 0.75rem 1.5rem;
+      border-radius: 12px;
+      text-decoration: none;
+      white-space: nowrap;
+      transition: opacity 0.15s;
+      flex-shrink: 0;
+    }
+    .calculator-button:hover { opacity: 0.9; }
+    .calculator-button::after { content: ' →'; }
+    @media (max-width: 600px) {
+      .calc-cta-banner { padding: 1.25rem; }
+      .calc-cta-banner-text h1 { font-size: 1.1rem; }
+      .calculator-button { width: 100%; justify-content: center; }
+    }
   </style>
   <script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-3006893636342653" crossorigin="anonymous"></script>
 </head>
@@ -64,6 +111,16 @@
       <div class="page-head">
         <nav class="breadcrumb" aria-label="breadcrumb"><a href="index.html">홈</a> <span class="bc-sep">/</span> <strong>PG 수수료</strong></nav>
       </div>
+
+      <!-- 계산기 CTA 배너 -->
+      <div class="calc-cta-banner">
+        <div class="calc-cta-banner-text">
+          <h1>PG 수수료 계산기</h1>
+          <p>PG 수수료를 계산하고 싶다면 아래 계산기를 이용하세요.<br>카드·계좌결제·간편결제 수수료를 연간 기준으로 비교할 수 있습니다.</p>
+        </div>
+        <a href="calculator.html" class="calculator-button">PG 수수료 계산기 바로가기</a>
+      </div>
+
       <section class="hero-green" aria-label="안내">
         <span class="pg-badge" aria-label="최신 업데이트">2025년 2월 최신 업데이트 완료</span>
         <h2>2025년 PG 수수료 비교</h2>
@@ -243,6 +300,11 @@
           <a href="must-know.html#pg-checklist" class="btn btn-outline">PG 계약 체크리스트</a>
           <a href="must-know.html#settlement" class="btn btn-outline">정산 지연 대응 가이드</a>
         </div>
+        <p style="margin-top:1.25rem;font-size:0.875rem;color:#475569;line-height:1.8;">
+          위 표에서 확인한 수수료율을 직접 입력해 보고 싶다면
+          <a href="calculator.html" style="font-weight:700;color:#0d9488;">PG 수수료 계산기</a>를 이용하세요.
+          카드결제·계좌결제 비율과 수수료율을 넣으면 연간 PG 비용과 PG사 간 절감액을 바로 비교할 수 있습니다.
+        </p>
       </div>
     </section>
     </div>
