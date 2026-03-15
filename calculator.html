@@ -526,7 +526,10 @@
 
         <!-- 결과 카드 -->
         <div id="calc-result" class="calc-result" style="display:none;" aria-live="polite">
-          <h4 class="calc-result-title">계산 결과 (연간 기준)<span id="result-company-name" style="font-size:0.85rem;font-weight:500;color:#64748b;margin-left:0.6rem;"></span></h4>
+          <div id="result-company-banner" style="display:none; text-align:center; margin-bottom:0.85rem; padding-bottom:0.85rem; border-bottom:1px solid #99f6e4;">
+            <span id="result-company-name" style="font-size:1.25rem; font-weight:800; color:#0f766e; letter-spacing:-0.01em;"></span>
+          </div>
+          <h4 class="calc-result-title">계산 결과 <span style="font-size:0.8rem;font-weight:500;color:#94a3b8;">(연간 기준)</span></h4>
           <p class="calc-result-summary" id="calc-result-summary"></p>
 
           <dl class="calc-result-list" id="calc-result-single">
@@ -931,7 +934,9 @@
         /* 회사명 결과 타이틀 표시 */
         var companyName = (document.getElementById('company-name').value.trim());
         var companySpan = document.getElementById('result-company-name');
-        if (companySpan) companySpan.textContent = companyName ? '— ' + companyName : '';
+        var companyBanner = document.getElementById('result-company-banner');
+        if (companySpan) companySpan.textContent = companyName || '';
+        if (companyBanner) companyBanner.style.display = companyName ? 'block' : 'none';
 
         /* 입력 조건 요약 */
         function buildInputSummary(side, total, cardR, cashR, cardRt, cashRt, isRatioMode) {
@@ -1040,7 +1045,9 @@
       summaryEl.textContent = '연 ' + toKoreanAmount(totalAmount) + ' | 카드 ' + cardRatioPct + '% (수수료 ' + cardRate + '%) / 현금 ' + cashRatioPct + '% (수수료 ' + cashRate + '%)';
       /* 회사명 단일 모드에도 반영 */
       var companySpanS = document.getElementById('result-company-name');
+      var companyBannerS = document.getElementById('result-company-banner');
       if (companySpanS) companySpanS.textContent = '';
+      if (companyBannerS) companyBannerS.style.display = 'none';
       var cardFee  = Math.round(cardAmount * cardRate / 100);
       var cashFee  = Math.round(cashAmount * cashRate / 100);
       var totalFee = cardFee + cashFee;
