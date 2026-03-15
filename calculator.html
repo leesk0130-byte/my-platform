@@ -508,12 +508,14 @@
             <dd id="result-cash-amount">0원</dd>
             <dt>연간 카드 수수료</dt>
             <dd id="result-card-fee">0원</dd>
-            <dt>현금 수수료</dt>
+            <dt>연간 현금 수수료</dt>
             <dd id="result-cash-fee">0원</dd>
             <dt class="calc-result-total">연간 총 수수료</dt>
             <dd class="calc-result-total" id="result-total-fee">0원</dd>
-            <dt>연간 실 수령 예상</dt>
-            <dd id="result-net">0원</dd>
+            <dt>월 평균 수수료</dt>
+            <dd id="result-monthly-fee">0원</dd>
+            <dt>수수료 비중</dt>
+            <dd id="result-fee-ratio">0%</dd>
           </dl>
           <p class="calc-result-rate" id="result-rate-pct" style="display:none;"></p>
 
@@ -528,9 +530,9 @@
                   <dd id="result-cash-fee-a">0원</dd>
                   <dt class="calc-result-total">연간 총 수수료</dt>
                   <dd class="calc-result-total" id="result-fee-a">0원</dd>
-                  <dt>연간 실 수령 예상</dt>
-                  <dd id="result-net-a">0원</dd>
-                  <dt>수수료율</dt>
+                  <dt>월 평균 수수료</dt>
+                  <dd id="result-monthly-a">0원</dd>
+                  <dt>수수료 비중</dt>
                   <dd id="result-rate-a">0%</dd>
                 </dl>
               </div>
@@ -543,9 +545,9 @@
                   <dd id="result-cash-fee-b">0원</dd>
                   <dt class="calc-result-total">연간 총 수수료</dt>
                   <dd class="calc-result-total" id="result-fee-b">0원</dd>
-                  <dt>연간 실 수령 예상</dt>
-                  <dd id="result-net-b">0원</dd>
-                  <dt>수수료율</dt>
+                  <dt>월 평균 수수료</dt>
+                  <dd id="result-monthly-b">0원</dd>
+                  <dt>수수료 비중</dt>
                   <dd id="result-rate-b">0%</dd>
                 </dl>
               </div>
@@ -871,13 +873,11 @@
         var cardFeeA = Math.round(cardAmtA * crA / 100);
         var cashFeeA = Math.round(cashAmtA * nrA / 100);
         var feeA     = cardFeeA + cashFeeA;
-        var netA     = totalA - feeA;
         var ratePctA = totalA > 0 ? (feeA / totalA * 100).toFixed(2) : '0';
 
         var cardFeeB = Math.round(cardAmtB * crB / 100);
         var cashFeeB = Math.round(cashAmtB * nrB / 100);
         var feeB     = cardFeeB + cashFeeB;
-        var netB     = totalB - feeB;
         var ratePctB = totalB > 0 ? (feeB / totalB * 100).toFixed(2) : '0';
 
         document.getElementById('calc-result').style.display = 'block';
@@ -897,14 +897,16 @@
         setResult('result-card-fee-a', cardFeeA);
         setResult('result-cash-fee-a', cashFeeA);
         setResult('result-fee-a', feeA);
-        setResult('result-net-a', netA);
+        var monthlyA = Math.round(feeA / 12);
+        setResult('result-monthly-a', monthlyA);
         var rateElA = document.getElementById('result-rate-a');
         if (rateElA) rateElA.textContent = ratePctA + '%';
 
         setResult('result-card-fee-b', cardFeeB);
         setResult('result-cash-fee-b', cashFeeB);
         setResult('result-fee-b', feeB);
-        setResult('result-net-b', netB);
+        var monthlyB = Math.round(feeB / 12);
+        setResult('result-monthly-b', monthlyB);
         var rateElB = document.getElementById('result-rate-b');
         if (rateElB) rateElB.textContent = ratePctB + '%';
 
@@ -975,17 +977,19 @@
       var cardFee  = Math.round(cardAmount * cardRate / 100);
       var cashFee  = Math.round(cashAmount * cashRate / 100);
       var totalFee = cardFee + cashFee;
-      var net      = totalAmount - totalFee;
       setResult('result-total-amount', totalAmount);
       setResult('result-card-amount',  cardAmount);
       setResult('result-cash-amount',  cashAmount);
       setResult('result-card-fee',     cardFee);
       setResult('result-cash-fee',     cashFee);
       setResult('result-total-fee',    totalFee);
-      setResult('result-net',          net);
+      var monthlyFee = Math.round(totalFee / 12);
+      setResult('result-monthly-fee', monthlyFee);
       var ratePct = totalAmount > 0 ? (totalFee / totalAmount * 100).toFixed(2) : '0';
       var ratePctEl = document.getElementById('result-rate-pct');
-      if (ratePctEl) ratePctEl.textContent = '전체 수수료율 ' + ratePct + '% (연 거래액 대비)';
+      if (ratePctEl) ratePctEl.style.display = 'none';
+      var feeRatioEl = document.getElementById('result-fee-ratio');
+      if (feeRatioEl) feeRatioEl.textContent = ratePct + '%';
       var ctaBox = document.getElementById('calc-cta-community');
       if (ctaBox) ctaBox.style.display = 'none';
 
