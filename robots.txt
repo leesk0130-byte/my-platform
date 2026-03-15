@@ -1,4 +1,8 @@
 User-agent: *
 Allow: /
 
+# 네이버 검색로봇(Yeti) 수집 허용
+User-agent: Yeti
+Allow: /
+
 Sitemap: https://bizimshop.co.kr/sitemap.xml

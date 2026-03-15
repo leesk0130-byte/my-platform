@@ -64,7 +64,8 @@
             <span>가맹점 운영 가이드</span>
             <span id="news-write-slot"></span>
           </h3>
-          <ul class="feed-list" style="margin-top:1rem;">
+          <p id="news-search-result" style="display:none; margin-top:0.5rem; font-size:0.9375rem; color:#475569;" aria-live="polite"></p>
+          <ul class="feed-list" style="margin-top:1rem;" id="news-feed-list">
             <li class="feed-item">
               <a href="guides/pg-fee-comparison.html" class="feed-title-wrapper">
                 <span class="feed-title-content">
@@ -130,7 +131,7 @@
               <span class="feed-meta">PG 수수료 · 2025-03-08</span>
             </li>
             <li class="feed-item">
-              <a href="guides/pg-fee-comparison.html" class="feed-title-wrapper">
+              <a href="pg.html" class="feed-title-wrapper">
                 <span class="feed-title-content">
                   <span class="feed-title-text">토스페이먼츠 vs KG이니시스 vs 나이스 vs NHN KCP, 뭐가 다른가</span>
                 </span>
@@ -202,7 +203,7 @@
               <span class="feed-meta">간편결제 · 2025-02-27</span>
             </li>
             <li class="feed-item">
-              <a href="guides/pg-fee-comparison.html" class="feed-title-wrapper">
+              <a href="pg.html" class="feed-title-wrapper">
                 <span class="feed-title-content">
                   <span class="feed-title-text">가입비 면제만 보고 PG 선택하면 안 되는 이유</span>
                 </span>
@@ -218,7 +219,7 @@
               <span class="feed-meta">결제 오류 · 2025-02-25</span>
             </li>
             <li class="feed-item">
-              <a href="guides/pg-integration-hosting.html" class="feed-title-wrapper">
+              <a href="guides/easy-pay-fees.html" class="feed-title-wrapper">
                 <span class="feed-title-content">
                   <span class="feed-title-text">결제창 이탈률이 높은 쇼핑몰의 공통점</span>
                 </span>
@@ -226,7 +227,7 @@
               <span class="feed-meta">UX · 2025-02-24</span>
             </li>
             <li class="feed-item">
-              <a href="guides/pg-integration-hosting.html" class="feed-title-wrapper">
+              <a href="must-know.html#law" class="feed-title-wrapper">
                 <span class="feed-title-content">
                   <span class="feed-title-text">체크아웃 페이지에서 꼭 보여줘야 하는 정보</span>
                 </span>
@@ -282,7 +283,7 @@
               <span class="feed-meta">보안 · 2025-02-17</span>
             </li>
             <li class="feed-item">
-              <a href="guides/chargeback-response.html" class="feed-title-wrapper">
+              <a href="must-know/settlement-delay.html" class="feed-title-wrapper">
                 <span class="feed-title-content">
                   <span class="feed-title-text">결제 장애가 났을 때 운영자가 먼저 해야 할 일</span>
                 </span>
@@ -591,5 +592,37 @@
     </nav>
   </aside>
   <script src="js/drawer.js"></script>
+  <script>
+  (function () {
+    if (/[?&]id=/.test(window.location.search)) return;
+    var list = document.getElementById('news-feed-list');
+    var resultEl = document.getElementById('news-search-result');
+    var searchInput = document.getElementById('header-search-q');
+    var params = new URLSearchParams(window.location.search);
+    var q = (params.get('q') || '').trim().toLowerCase();
+    if (!list || !list.querySelectorAll) return;
+    var items = list.querySelectorAll('.feed-item');
+    if (q && items.length) {
+      var visible = 0;
+      for (var i = 0; i < items.length; i++) {
+        var li = items[i];
+        var titleEl = li.querySelector('.feed-title-text');
+        var metaEl = li.querySelector('.feed-meta');
+        var title = (titleEl && titleEl.textContent) ? titleEl.textContent.trim().toLowerCase() : '';
+        var meta = (metaEl && metaEl.textContent) ? metaEl.textContent.trim().toLowerCase() : '';
+        var match = title.indexOf(q) !== -1 || meta.indexOf(q) !== -1;
+        li.style.display = match ? '' : 'none';
+        if (match) visible++;
+      }
+      if (resultEl) {
+        resultEl.textContent = '검색: "' + params.get('q').trim() + '" (' + visible + '건)';
+        resultEl.style.display = 'block';
+      }
+      if (searchInput) searchInput.value = params.get('q').trim();
+    } else if (resultEl) {
+      resultEl.style.display = 'none';
+    }
+  })();
+  </script>
 </body>
 </html>

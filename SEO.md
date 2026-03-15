@@ -85,3 +85,37 @@
   3) 며칠~몇 주 기다리면 구글 검색에 조금씩 노출됨  
 
 현재 **공식 도메인은 https://bizimshop.co.kr** 이며, canonical·og:url·sitemap 모두 이 주소로 맞춰 두었습니다.
+
+---
+
+## 6. 네이버 검색 노출 체크리스트 (미노출 시 확인)
+
+네이버에 사이트가 안 나올 때 점검할 5가지입니다.
+
+| # | 항목 | bizimshop.co.kr 상태 | 당신이 할 일 |
+|---|------|----------------------|--------------|
+| 1 | **robots.txt / noindex** | ✅ robots.txt에 `Allow: /` 설정, 네이버 로봇(Yeti) 허용 추가. 주요 페이지는 `index, follow`. | 없음. (admin·verify 등 noindex 페이지는 의도적.) |
+| 2 | **서버에서 네이버 로봇 차단** | 코드로 확인 불가. | Cloudflare·방화벽에서 **Yeti**(네이버 검색로봇) 차단 여부 확인. [검색로봇 확인 가이드](https://searchadvisor.naver.com/guide) 참고. |
+| 3 | **웹 표준 / 대표 URL** | ✅ 각 페이지에 `<link rel="canonical">` 설정. | **네이버 서치어드바이저**에서 사이트 등록 후 **대표 URL**이 `https://bizimshop.co.kr/` 로 인식되는지 확인. sitemap에 canonical 주소만 넣어 두었음 (예: `/calculator`). |
+| 4 | **중복 문서** | ✅ canonical로 대표 URL 통일. sitemap을 canonical 주소 기준으로 수정함 (calculator → /calculator). | 다른 도메인·서브도메인에 같은 콘텐츠 올리지 않기. www와 비www 중 하나로 리다이렉트 권장. |
+| 5 | **콘텐츠 품질** | PG 수수료 계산기·가이드 등 정상 정보 제공. 성인·불법·스팸 아님. | 게시판이 있다면 스팸·도배 방지. |
+
+### 적용해 둔 수정 사항 (네이버용)
+
+- **robots.txt**: `User-agent: Yeti` + `Allow: /` 추가 (네이버 검색로봇 명시 허용).
+- **sitemap.xml**: 계산기 페이지 URL을 `https://bizimshop.co.kr/calculator` 로 통일 (canonical과 동일).
+- **canonical**: 메인 `/`, 계산기 `/calculator` 등 대표 URL 일치 확인됨.
+
+### 네이버에 직접 요청
+
+1. **네이버 서치어드바이저** (https://searchadvisor.naver.com) 에서 사이트 등록 및 소유 인증 (이미 네이버 사이트 인증 메타 태그 적용됨).
+2. **URL 제출** 또는 **사이트맵 제출**로 `https://bizimshop.co.kr/sitemap.xml` 제출.
+3. 수집·색인까지 **며칠~몇 주** 걸릴 수 있음.
+
+### sitemap.xml 400 오류 시 (크롤러/감사 도구)
+
+검색 결과에는 sitemap이 보이는데 요청 시 400이 나오면, **서버/WAF(Cloudflare 등)** 에서 XML 또는 특정 User-Agent를 막고 있을 수 있습니다.
+
+- **Cloudflare**: 방화벽 규칙에서 `sitemap.xml` GET 요청을 허용하는지 확인. Page Rules 또는 Transform Rules로 `Content-Type: application/xml` 응답 추가.
+- **정적 호스팅**: `sitemap.xml` 파일이 루트에 있고, 해당 경로가 200 OK로 서빙되는지 `curl -I https://bizimshop.co.kr/sitemap.xml` 로 확인.
+- **웹서버(NGINX/Apache)**: sitemap.xml 경로에 대해 `application/xml` MIME 타입과 200 응답이 나가도록 설정.
