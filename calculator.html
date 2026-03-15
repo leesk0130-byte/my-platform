@@ -155,6 +155,7 @@
     .faq-a::before { content: 'A. '; color: #64748b; font-weight: 600; }
     /* ── 계산 버튼 비활성 ── */
     #calc-do:disabled { opacity: 0.45; cursor: not-allowed; }
+    #calc-save:disabled, #calc-share:disabled, #calc-image-save:disabled { opacity: 0.5; cursor: not-allowed; }
     /* ── A vs B 비교 입력 레이아웃 ── */
     .compare-inputs {
       display: grid;
@@ -334,7 +335,7 @@
     <button type="button" class="nav-toggle" aria-label="메뉴 열기" aria-expanded="false" data-toggle-nav><span></span><span></span><span></span></button>
     <nav class="header-nav" id="headerNav" aria-label="메인 메뉴">
       <a href="pg.html">PG 수수료</a>
-      <a href="calculator.html" class="active">수수료 비교 계산기</a>
+      <a href="calculator.html" class="active">PG 수수료 계산기</a>
       <a href="news.html">가맹점 정보</a>
     </nav>
     <form class="header-search" action="news.html" method="get" role="search" aria-label="사이트 검색">
@@ -438,7 +439,7 @@
             <div class="form-group">
               <label for="card-rate">카드 수수료율 (%)</label>
               <input type="number" id="card-rate" inputmode="decimal" placeholder="예: 3.2" min="0" max="100" step="0.01" value="3.2">
-              <p class="form-hint" style="margin-top:0.35rem;">2026년 영세(연매출 3억 이하) 우대 수수료 <strong>0.4%</strong> 적용 시 <button type="button" class="calc-preset-btn" id="calc-preset-young" style="margin-left:0.25rem;">0.4% 적용</button></p>
+              <p class="form-hint" style="margin-top:0.35rem;">2026년 영세(연매출 3억 이하) 우대 수수료 <strong>0.4%</strong> <button type="button" class="calc-preset-btn" id="calc-preset-young" style="margin-left:0.25rem;">0.4% 적용</button></p>
             </div>
             <div class="form-group">
               <label for="cash-rate">현금·실시간이체 수수료율 (%)</label>
@@ -567,10 +568,10 @@
 
         <!-- 액션 버튼 -->
         <div class="calc-actions">
-          <button type="button" class="btn btn-primary" id="calc-do">수수료 계산하기</button>
-          <button type="button" class="btn btn-outline" id="calc-save">저장</button>
-          <button type="button" class="btn btn-outline" id="calc-share">결과 공유하기</button>
-          <button type="button" class="btn btn-outline" id="calc-image-save">이미지로 저장</button>
+          <button type="button" class="btn btn-primary" id="calc-do" data-testid="calc-do">수수료 계산하기</button>
+          <button type="button" class="btn btn-outline" id="calc-save" disabled title="계산을 먼저 실행해 주세요.">저장</button>
+          <button type="button" class="btn btn-outline" id="calc-share" disabled title="계산을 먼저 실행해 주세요.">결과 공유하기</button>
+          <button type="button" class="btn btn-outline" id="calc-image-save" disabled title="계산을 먼저 실행해 주세요.">이미지로 저장</button>
         </div>
 
         <!-- 결과 카드 -->
@@ -1017,9 +1018,27 @@
       });
     }
 
+    function setSaveShareEnabled(enabled) {
+      var tip = enabled ? '' : '계산을 먼저 실행해 주세요.';
+      ['calc-save', 'calc-share', 'calc-image-save'].forEach(function (id) {
+        var b = document.getElementById(id);
+        if (b) { b.disabled = !enabled; b.title = tip; }
+      });
+    }
+    function focusFirstErrorField() {
+      var err = document.querySelector('.field-error.is-visible');
+      if (!err) return;
+      var inputId = err.id.replace(/-err$/, '');
+      if (err.id.indexOf('ratio-sum') === 0) inputId = 'card-ratio' + (inputId !== 'ratio-sum' ? '-' + inputId.split('-')[2] : '');
+      else if (err.id.indexOf('amount-sum') === 0) inputId = 'card-amount' + (inputId !== 'amount-sum' ? '-' + inputId.split('-')[2] : '');
+      var input = document.getElementById(inputId);
+      if (input) input.focus();
+    }
+    setSaveShareEnabled(false);
+
     /* ── 계산 실행 ── */
     calcBtn.addEventListener('click', function () {
-      if (!validate()) return;
+      if (!validate()) { focusFirstErrorField(); return; }
       var isRatio = isRatioMode();
       var compare = isCompare();
 
@@ -1069,6 +1088,7 @@
         document.getElementById('calc-result-single').style.display = 'none';
         document.getElementById('calc-result-compare').style.display = 'block';
         document.getElementById('result-rate-pct').style.display = 'none';
+        setSaveShareEnabled(true);
 
         var summaryEl = document.getElementById('calc-result-summary');
         summaryEl.textContent = nameA + ': 연 ' + toKoreanAmount(totalA) + '  /  ' + nameB + ': 연 ' + toKoreanAmount(totalB);
@@ -1217,6 +1237,7 @@
       document.getElementById('calc-result-single').style.display = 'block';
       document.getElementById('calc-result-compare').style.display = 'none';
       document.getElementById('result-rate-pct').style.display = 'block';
+      setSaveShareEnabled(true);
 
       var summaryEl = document.getElementById('calc-result-summary');
       var cardRate = toNum(document.getElementById('card-rate').value);
@@ -1492,7 +1513,7 @@
     </div>
     <nav class="drawer-nav" aria-label="모바일 메뉴">
       <a href="pg.html"         class="drawer-link">PG 수수료 표</a>
-      <a href="calculator.html" class="drawer-link active">수수료 계산기</a>
+      <a href="calculator.html" class="drawer-link active">PG 수수료 계산기</a>
       <a href="news.html"       class="drawer-link">뉴스</a>
     </nav>
   </aside>
