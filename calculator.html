@@ -202,6 +202,31 @@
       font-weight: 600;
       color: #92400e;
     }
+    /* ── 비교 결과 입력조건 요약 ── */
+    .compare-input-summary {
+      font-size: 0.8rem;
+      color: #475569;
+      background: #f8fafc;
+      border: 1px solid #e2e8f0;
+      border-radius: 7px;
+      padding: 0.55rem 0.75rem;
+      margin-bottom: 0.75rem;
+      line-height: 1.7;
+    }
+    .compare-input-summary .cis-row {
+      display: flex;
+      justify-content: space-between;
+      gap: 0.5rem;
+    }
+    .compare-input-summary .cis-label {
+      color: #94a3b8;
+      flex-shrink: 0;
+    }
+    .compare-input-summary .cis-val {
+      font-weight: 600;
+      color: #0f172a;
+      text-align: right;
+    }
     footer { background: #0f172a; color: #94a3b8; padding: 2rem 1.5rem; margin-top: 2.5rem; font-size: 0.875rem; }
     .footer-inner { max-width: 1200px; margin: 0 auto; text-align: center; }
     .footer-inner a { color: #cbd5e1; }
@@ -523,6 +548,8 @@
             <div class="compare-result-grid">
               <div class="compare-result-col" id="compare-col-a">
                 <div class="compare-result-label" id="compare-label-a">PG A</div>
+                <!-- 입력 조건 요약 -->
+                <div class="compare-input-summary" id="compare-input-summary-a"></div>
                 <dl class="calc-result-list">
                   <dt>연간 카드 수수료</dt>
                   <dd id="result-card-fee-a">0원</dd>
@@ -538,6 +565,8 @@
               </div>
               <div class="compare-result-col" id="compare-col-b">
                 <div class="compare-result-label" id="compare-label-b">PG B</div>
+                <!-- 입력 조건 요약 -->
+                <div class="compare-input-summary" id="compare-input-summary-b"></div>
                 <dl class="calc-result-list">
                   <dt>연간 카드 수수료</dt>
                   <dd id="result-card-fee-b">0원</dd>
@@ -893,6 +922,29 @@
         var labelB = document.getElementById('compare-label-b');
         if (labelA) labelA.textContent = nameA;
         if (labelB) labelB.textContent = nameB;
+
+        /* 입력 조건 요약 */
+        function buildInputSummary(side, total, cardR, cashR, cardRt, cashRt, isRatio) {
+          var el = document.getElementById('compare-input-summary-' + side);
+          if (!el) return;
+          var rows = [];
+          if (isRatio) {
+            rows.push(['연 거래액', toKoreanAmount(total)]);
+            rows.push(['카드/현금 비율', cardR + '% / ' + cashR + '%']);
+          } else {
+            var cardAmt = side === 'a' ? cardAmtA : cardAmtB;
+            var cashAmt = side === 'a' ? cashAmtA : cashAmtB;
+            rows.push(['카드 거래액', toKoreanAmount(cardAmt)]);
+            rows.push(['현금 거래액', toKoreanAmount(cashAmt)]);
+          }
+          rows.push(['카드 수수료율', cardRt + '%']);
+          rows.push(['현금 수수료율', cashRt + '%']);
+          el.innerHTML = rows.map(function(r) {
+            return '<div class="cis-row"><span class="cis-label">' + r[0] + '</span><span class="cis-val">' + r[1] + '</span></div>';
+          }).join('');
+        }
+        buildInputSummary('a', totalA, isRatio ? toNum(document.getElementById('card-ratio-a').value) : 0, isRatio ? toNum(document.getElementById('cash-ratio-a').value) : 0, crA, nrA, isRatio);
+        buildInputSummary('b', totalB, isRatio ? toNum(document.getElementById('card-ratio-b').value) : 0, isRatio ? toNum(document.getElementById('cash-ratio-b').value) : 0, crB, nrB, isRatio);
 
         setResult('result-card-fee-a', cardFeeA);
         setResult('result-cash-fee-a', cashFeeA);
