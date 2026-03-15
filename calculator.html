@@ -109,6 +109,99 @@
     .calc-result-ad { background: #f8fafc; border-radius: 12px; overflow: hidden; }
     /* ── 계산 버튼 비활성 ── */
     #calc-do:disabled { opacity: 0.45; cursor: not-allowed; }
+    /* ── A vs B 비교 입력 레이아웃 ── */
+    .compare-inputs {
+      display: grid;
+      grid-template-columns: 1fr auto 1fr;
+      gap: 1rem;
+      align-items: start;
+    }
+    .compare-vs {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 1rem;
+      font-weight: 800;
+      color: #94a3b8;
+      padding-top: 2.5rem;
+      min-width: 2.5rem;
+    }
+    .compare-col-header {
+      font-size: 0.875rem;
+      font-weight: 700;
+      color: #0f766e;
+      background: #f0fdfa;
+      border: 1px solid #99f6e4;
+      border-radius: 8px;
+      padding: 0.35rem 0.75rem;
+      text-align: center;
+      margin-bottom: 0.75rem;
+    }
+    .compare-col-b .compare-col-header {
+      color: #1d4ed8;
+      background: #eff6ff;
+      border-color: #bfdbfe;
+    }
+    @media (max-width: 600px) {
+      .compare-inputs {
+        grid-template-columns: 1fr;
+      }
+      .compare-vs {
+        padding-top: 0;
+        padding-bottom: 0;
+        border-top: 1px dashed #e2e8f0;
+        border-bottom: 1px dashed #e2e8f0;
+        padding: 0.5rem 0;
+        text-align: center;
+      }
+    }
+    /* ── A vs B 비교 결과 side-by-side ── */
+    .compare-result-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 1rem;
+      margin-top: 0.5rem;
+    }
+    @media (max-width: 600px) {
+      .compare-result-grid {
+        grid-template-columns: 1fr;
+      }
+    }
+    .compare-result-col {
+      border-radius: 10px;
+      border: 2px solid #e2e8f0;
+      padding: 1rem;
+    }
+    .compare-result-col.is-winner {
+      border-color: #0d9488;
+      background: #f0fdfa;
+    }
+    .compare-result-col.is-loser {
+      opacity: 0.7;
+    }
+    .compare-result-label {
+      font-size: 0.9rem;
+      font-weight: 700;
+      margin-bottom: 0.75rem;
+      padding: 0.3rem 0.65rem;
+      border-radius: 6px;
+      display: inline-block;
+    }
+    #compare-col-a .compare-result-label { background: #f0fdfa; color: #0f766e; }
+    #compare-col-b .compare-result-label { background: #eff6ff; color: #1d4ed8; }
+    .compare-result-col.is-winner .compare-result-label::after {
+      content: ' 🏆';
+    }
+    .compare-result-summary {
+      margin-top: 0.85rem;
+      padding: 0.75rem 1rem;
+      border-radius: 8px;
+      background: #fef9c3;
+      border: 1px solid #fde68a;
+      font-size: 0.875rem;
+      font-weight: 600;
+      color: #92400e;
+    }
     footer { background: #0f172a; color: #94a3b8; padding: 2rem 1.5rem; margin-top: 2.5rem; font-size: 0.875rem; }
     .footer-inner { max-width: 1200px; margin: 0 auto; text-align: center; }
     .footer-inner a { color: #cbd5e1; }
@@ -281,25 +374,38 @@
         </div>
         <!-- A vs B 수수료율 -->
         <div id="calc-fee-compare" class="calc-fee-rates" style="display:none;">
-          <p class="calc-desc">PG A와 B의 수수료율을 각각 입력하세요. <a href="pg.html">PG 수수료 참고</a></p>
-          <div class="form-row">
-            <div class="form-group">
-              <label for="card-rate-a">PG A 카드 수수료율 (%)</label>
-              <input type="number" id="card-rate-a" inputmode="decimal" placeholder="예: 3.2" min="0" max="100" step="0.01" value="3.2">
+          <p class="calc-desc">두 PG의 이름과 수수료율을 입력하면 나란히 비교해 드립니다. <a href="pg.html">PG 수수료 참고</a></p>
+          <div class="compare-inputs">
+            <div class="compare-col compare-col-a">
+              <div class="compare-col-header">PG A</div>
+              <div class="form-group">
+                <label for="pg-name-a">PG사 이름 (선택)</label>
+                <input type="text" id="pg-name-a" placeholder="예: 토스페이먼츠" autocomplete="off" maxlength="20">
+              </div>
+              <div class="form-group">
+                <label for="card-rate-a">카드 수수료율 (%)</label>
+                <input type="number" id="card-rate-a" inputmode="decimal" placeholder="예: 3.2" min="0" max="100" step="0.01" value="3.2">
+              </div>
+              <div class="form-group">
+                <label for="cash-rate-a">현금 수수료율 (%)</label>
+                <input type="number" id="cash-rate-a" inputmode="decimal" placeholder="예: 2" min="0" max="100" step="0.01" value="2">
+              </div>
             </div>
-            <div class="form-group">
-              <label for="cash-rate-a">PG A 현금 수수료율 (%)</label>
-              <input type="number" id="cash-rate-a" inputmode="decimal" placeholder="예: 2" min="0" max="100" step="0.01" value="2">
-            </div>
-          </div>
-          <div class="form-row">
-            <div class="form-group">
-              <label for="card-rate-b">PG B 카드 수수료율 (%)</label>
-              <input type="number" id="card-rate-b" inputmode="decimal" placeholder="예: 2.8" min="0" max="100" step="0.01" value="2.8">
-            </div>
-            <div class="form-group">
-              <label for="cash-rate-b">PG B 현금 수수료율 (%)</label>
-              <input type="number" id="cash-rate-b" inputmode="decimal" placeholder="예: 1.5" min="0" max="100" step="0.01" value="1.5">
+            <div class="compare-vs">VS</div>
+            <div class="compare-col compare-col-b">
+              <div class="compare-col-header">PG B</div>
+              <div class="form-group">
+                <label for="pg-name-b">PG사 이름 (선택)</label>
+                <input type="text" id="pg-name-b" placeholder="예: KG이니시스" autocomplete="off" maxlength="20">
+              </div>
+              <div class="form-group">
+                <label for="card-rate-b">카드 수수료율 (%)</label>
+                <input type="number" id="card-rate-b" inputmode="decimal" placeholder="예: 2.8" min="0" max="100" step="0.01" value="2.8">
+              </div>
+              <div class="form-group">
+                <label for="cash-rate-b">현금 수수료율 (%)</label>
+                <input type="number" id="cash-rate-b" inputmode="decimal" placeholder="예: 1.5" min="0" max="100" step="0.01" value="1.5">
+              </div>
             </div>
           </div>
         </div>
@@ -335,16 +441,43 @@
           </dl>
           <p class="calc-result-rate" id="result-rate-pct" style="display:none;"></p>
 
-          <dl class="calc-result-list" id="calc-result-compare" style="display:none;">
-            <dt>총 거래액</dt>
-            <dd id="result-comp-total">0원</dd>
-            <dt>PG A 총 수수료</dt>
-            <dd id="result-fee-a">0원</dd>
-            <dt>PG B 총 수수료</dt>
-            <dd id="result-fee-b">0원</dd>
-            <dt class="calc-result-total">절감액 (A→B 전환 시)</dt>
-            <dd class="calc-result-total" id="result-save-amount">0원</dd>
-          </dl>
+          <div id="calc-result-compare" style="display:none;">
+            <div class="compare-result-grid">
+              <div class="compare-result-col" id="compare-col-a">
+                <div class="compare-result-label" id="compare-label-a">PG A</div>
+                <dl class="calc-result-list">
+                  <dt>카드 수수료</dt>
+                  <dd id="result-card-fee-a">0원</dd>
+                  <dt>현금 수수료</dt>
+                  <dd id="result-cash-fee-a">0원</dd>
+                  <dt class="calc-result-total">총 수수료</dt>
+                  <dd class="calc-result-total" id="result-fee-a">0원</dd>
+                  <dt>실 수령 예상</dt>
+                  <dd id="result-net-a">0원</dd>
+                  <dt>수수료율</dt>
+                  <dd id="result-rate-a">0%</dd>
+                </dl>
+              </div>
+              <div class="compare-result-col" id="compare-col-b">
+                <div class="compare-result-label" id="compare-label-b">PG B</div>
+                <dl class="calc-result-list">
+                  <dt>카드 수수료</dt>
+                  <dd id="result-card-fee-b">0원</dd>
+                  <dt>현금 수수료</dt>
+                  <dd id="result-cash-fee-b">0원</dd>
+                  <dt class="calc-result-total">총 수수료</dt>
+                  <dd class="calc-result-total" id="result-fee-b">0원</dd>
+                  <dt>실 수령 예상</dt>
+                  <dd id="result-net-b">0원</dd>
+                  <dt>수수료율</dt>
+                  <dd id="result-rate-b">0%</dd>
+                </dl>
+              </div>
+            </div>
+            <div class="compare-result-summary" id="compare-summary-box" style="display:none;">
+              <span id="compare-summary-text"></span>
+            </div>
+          </div>
           <div id="calc-cta-community" class="calc-cta-community" style="display:none; margin-top:1rem; padding-top:1rem; border-top:1px solid #99f6e4;">
             <a id="calc-cta-link" href="news.html?q=수수료" class="btn btn-primary">뉴스에서 수수료 정보 보기</a>
           </div>
@@ -605,17 +738,75 @@
         var nrA = toNum(document.getElementById('cash-rate-a').value);
         var crB = toNum(document.getElementById('card-rate-b').value);
         var nrB = toNum(document.getElementById('cash-rate-b').value);
-        summaryEl.textContent = '총 ' + toKoreanAmount(totalAmount) + ' | 카드 ' + cardRatioPct + '% / 현금 ' + cashRatioPct + '% | PG A(카드 ' + crA + '% / 현금 ' + nrA + '%) vs PG B(카드 ' + crB + '% / 현금 ' + nrB + '%)';
-        var feeA = Math.round(cardAmount * crA / 100 + cashAmount * nrA / 100);
-        var feeB = Math.round(cardAmount * crB / 100 + cashAmount * nrB / 100);
-        var saveAmount = feeA - feeB;
-        setResult('result-comp-total', totalAmount);
+        var nameA = (document.getElementById('pg-name-a').value.trim()) || 'PG A';
+        var nameB = (document.getElementById('pg-name-b').value.trim()) || 'PG B';
+
+        summaryEl.textContent = '총 ' + toKoreanAmount(totalAmount) + ' | 카드 ' + cardRatioPct + '% / 현금 ' + cashRatioPct + '%';
+
+        var cardFeeA = Math.round(cardAmount * crA / 100);
+        var cashFeeA = Math.round(cashAmount * nrA / 100);
+        var feeA = cardFeeA + cashFeeA;
+        var netA = totalAmount - feeA;
+        var ratePctA = totalAmount > 0 ? (feeA / totalAmount * 100).toFixed(2) : '0';
+
+        var cardFeeB = Math.round(cardAmount * crB / 100);
+        var cashFeeB = Math.round(cashAmount * nrB / 100);
+        var feeB = cardFeeB + cashFeeB;
+        var netB = totalAmount - feeB;
+        var ratePctB = totalAmount > 0 ? (feeB / totalAmount * 100).toFixed(2) : '0';
+
+        /* 레이블 업데이트 */
+        var labelA = document.getElementById('compare-label-a');
+        var labelB = document.getElementById('compare-label-b');
+        if (labelA) labelA.textContent = nameA;
+        if (labelB) labelB.textContent = nameB;
+
+        setResult('result-card-fee-a', cardFeeA);
+        setResult('result-cash-fee-a', cashFeeA);
         setResult('result-fee-a', feeA);
+        setResult('result-net-a', netA);
+        var rateElA = document.getElementById('result-rate-a');
+        if (rateElA) rateElA.textContent = ratePctA + '%';
+
+        setResult('result-card-fee-b', cardFeeB);
+        setResult('result-cash-fee-b', cashFeeB);
         setResult('result-fee-b', feeB);
-        setResult('result-save-amount', saveAmount);
+        setResult('result-net-b', netB);
+        var rateElB = document.getElementById('result-rate-b');
+        if (rateElB) rateElB.textContent = ratePctB + '%';
+
+        /* winner 하이라이트 */
+        var colA = document.getElementById('compare-col-a');
+        var colB = document.getElementById('compare-col-b');
+        if (colA && colB) {
+          colA.classList.remove('is-winner', 'is-loser');
+          colB.classList.remove('is-winner', 'is-loser');
+          if (feeA < feeB) {
+            colA.classList.add('is-winner');
+            colB.classList.add('is-loser');
+          } else if (feeB < feeA) {
+            colB.classList.add('is-winner');
+            colA.classList.add('is-loser');
+          }
+        }
+
+        /* 절감액 요약 */
+        var summaryBox = document.getElementById('compare-summary-box');
+        var summaryText = document.getElementById('compare-summary-text');
+        if (summaryBox && summaryText) {
+          var diff = Math.abs(feeA - feeB);
+          if (diff === 0) {
+            summaryText.textContent = nameA + '와 ' + nameB + '의 수수료가 동일합니다.';
+          } else {
+            var cheaper = feeA < feeB ? nameA : nameB;
+            summaryText.textContent = cheaper + '가 더 저렴 — 월 ' + fmt(diff) + ' (' + toKoreanAmount(diff) + ') 절감 가능';
+          }
+          summaryBox.style.display = 'block';
+        }
+
         var ctaBox = document.getElementById('calc-cta-community');
         var ctaLink = document.getElementById('calc-cta-link');
-        if (ctaBox && ctaLink && saveAmount >= 100000) {
+        if (ctaBox && ctaLink && Math.abs(feeA - feeB) >= 100000) {
           ctaLink.href = 'news.html?q=수수료';
           ctaBox.style.display = 'block';
         } else if (ctaBox) {
@@ -668,7 +859,9 @@
         cardRateA:   toNum(document.getElementById('card-rate-a').value),
         cashRateA:   toNum(document.getElementById('cash-rate-a').value),
         cardRateB:   toNum(document.getElementById('card-rate-b').value),
-        cashRateB:   toNum(document.getElementById('cash-rate-b').value)
+        cashRateB:   toNum(document.getElementById('cash-rate-b').value),
+        pgNameA:     document.getElementById('pg-name-a').value.trim(),
+        pgNameB:     document.getElementById('pg-name-b').value.trim()
       };
     }
     function setFormState(s) {
@@ -688,6 +881,8 @@
       document.getElementById('cash-rate-a').value  = s.cashRateA  != null ? s.cashRateA  : 2;
       document.getElementById('card-rate-b').value  = s.cardRateB  != null ? s.cardRateB  : 2.8;
       document.getElementById('cash-rate-b').value  = s.cashRateB  != null ? s.cashRateB  : 1.5;
+      if (s.pgNameA) document.getElementById('pg-name-a').value = s.pgNameA;
+      if (s.pgNameB) document.getElementById('pg-name-b').value = s.pgNameB;
       amountInputIds.forEach(updateAmountKr);
       validate();
     }
@@ -719,7 +914,9 @@
         'cardRatio=' + s.cardRatio, 'cashRatio=' + s.cashRatio,
         'cardRate=' + s.cardRate,   'cashRate=' + s.cashRate,
         'cardRateA=' + s.cardRateA, 'cashRateA=' + s.cashRateA,
-        'cardRateB=' + s.cardRateB, 'cashRateB=' + s.cashRateB
+        'cardRateB=' + s.cardRateB, 'cashRateB=' + s.cashRateB,
+        'pgNameA=' + encodeURIComponent(s.pgNameA || ''),
+        'pgNameB=' + encodeURIComponent(s.pgNameB || '')
       ];
       var url = location.origin + location.pathname + '?' + q.join('&');
       var btn = this;
@@ -802,7 +999,9 @@
         cardRateA: toNum(params.get('cardRateA')) || 3.2,
         cashRateA: toNum(params.get('cashRateA')) || 2,
         cardRateB: toNum(params.get('cardRateB')) || 2.8,
-        cashRateB: toNum(params.get('cashRateB')) || 1.5
+        cashRateB: toNum(params.get('cashRateB')) || 1.5,
+        pgNameA: decodeURIComponent(params.get('pgNameA') || ''),
+        pgNameB: decodeURIComponent(params.get('pgNameB') || '')
       });
     }
 
