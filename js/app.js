@@ -931,4 +931,20 @@
     window.app = app;
   }
 
+  /* Scroll-reveal: add .reveal to sections, observer toggles .visible */
+  if ('IntersectionObserver' in window) {
+    var io = new IntersectionObserver(function (entries) {
+      entries.forEach(function (e) {
+        if (e.isIntersecting) {
+          e.target.classList.add('visible');
+          io.unobserve(e.target);
+        }
+      });
+    }, { threshold: 0.12 });
+    document.addEventListener('DOMContentLoaded', function () {
+      var els = document.querySelectorAll('.reveal');
+      for (var i = 0; i < els.length; i++) io.observe(els[i]);
+    });
+  }
+
 })();
