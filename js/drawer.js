@@ -27,7 +27,6 @@
     if (!nav) return;
     var required = [
       { href: 'must-know.html', label: '꼭 알아야 할 것' },
-      { href: 'bookmarks.html', label: '북마크' },
       { href: 'about.html', label: '가맹점숲이란?' },
       { href: 'contact.html', label: '문의하기' }
     ];
