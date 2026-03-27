@@ -930,4 +930,39 @@
   if (typeof window !== 'undefined') {
     window.app = app;
   }
+
+  function hideEmptyAdSlots() {
+    var slots = document.querySelectorAll('.ad-slot');
+    if (!slots || !slots.length) return;
+    slots.forEach(function (slot) {
+      var hasAdElement = !!slot.querySelector('ins.adsbygoogle, iframe');
+      var hasMeaningfulText = (slot.textContent || '').trim().length > 0;
+      var forceKeep = slot.hasAttribute('data-keep-placeholder');
+      if (!hasAdElement && !hasMeaningfulText && !forceKeep) {
+        slot.classList.add('ad-slot-hidden');
+      } else {
+        slot.classList.remove('ad-slot-hidden');
+      }
+    });
+  }
+
+  function toggleNewsAdminControls() {
+    var isAdmin = app.isOperator && app.isOperator();
+    var writeBtns = document.querySelectorAll('#news-write-btn, #news-seed-btn, [data-admin-only="news"]');
+    if (!writeBtns.length) return;
+    writeBtns.forEach(function (el) {
+      el.style.display = isAdmin ? '' : 'none';
+    });
+  }
+
+  if (document.readyState === 'loading') {
+    document.addEventListener('DOMContentLoaded', function () {
+      hideEmptyAdSlots();
+      toggleNewsAdminControls();
+    });
+  } else {
+    hideEmptyAdSlots();
+    toggleNewsAdminControls();
+  }
+  window.addEventListener('authStateChanged', toggleNewsAdminControls);
 })();

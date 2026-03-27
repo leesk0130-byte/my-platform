@@ -1,63 +1,58 @@
-/**
- * 전역 레이아웃·타이포·여백 토큰
- * 모든 페이지에서 일관된 spacing/타이포 적용 (임의 px 금지)
- */
+/* Global design tokens (mobile-first) */
 :root {
-  /* 레이아웃 */
-  --container-max: 1040px;
-  --px: 20px;
-  --px-m: 16px;
-  --px-d: 20px;
-  --radius: 16px;
-  --card-pad: 24px;
-  /* 모바일 퍼스트 토큰 */
-  --px-mobile: 16px;
-  --px-desktop: 24px;
-  --card-pad-mobile: 16px;
-  --card-pad-desktop: 24px;
-  --fs-body-mobile: 0.9375rem;  /* 15px */
-  --fs-body-desktop: 1rem;      /* 16px */
-  --tap: 44px;
+  /* Color */
+  --color-primary: #10b981;
+  --color-primary-hover: #059669;
+  --color-primary-soft: #d1fae5;
+  --color-bg: #f8fafc;
+  --color-surface: #ffffff;
+  --color-border: #e2e8f0;
+  --color-text: #0f172a;
+  --color-text-muted: #475569;
+  --color-text-subtle: #64748b;
+  --color-header-bg: #0f172a;
+  --color-header-bg-2: #1e293b;
+  --color-header-text: #f8fafc;
+  --color-danger: #dc2626;
 
-  /* 갭 스케일 (문단·섹션·카드 내부 여백) */
-  --gap-1: 8px;
-  --gap-2: 12px;
-  --gap-3: 16px;
-  --gap-4: 24px;
-  --gap-5: 32px;
-  --gap-6: 48px;
+  /* Typography */
+  --font-main: "Pretendard", "Noto Sans KR", -apple-system, BlinkMacSystemFont, "Malgun Gothic", sans-serif;
+  --fs-0: 0.8125rem; /* 13 */
+  --fs-1: 0.9375rem; /* 15 */
+  --fs-2: 1rem; /* 16 */
+  --fs-3: 1.125rem; /* 18 */
+  --fs-4: 1.375rem; /* 22 */
+  --fs-5: 1.875rem; /* 30 */
+  --lh-tight: 1.35;
+  --lh-normal: 1.75;
+  --ls-tight: -0.01em;
 
-  /* 초록 히어로 박스 패딩 (전 페이지 동일) */
-  --hero-pad-m: 16px;
-  --hero-pad-d: 24px;
+  /* Spacing */
+  --sp-1: 4px;
+  --sp-2: 8px;
+  --sp-3: 12px;
+  --sp-4: 16px;
+  --sp-5: 20px;
+  --sp-6: 24px;
+  --sp-8: 32px;
+  --sp-10: 40px;
+  --sp-12: 48px;
 
-  /* 폰트 스케일 */
-  --fs-1: 13px;   /* meta */
-  --fs-2: 15px;   /* body-small */
-  --fs-3: 16px;   /* body */
-  --fs-4: 18px;   /* lead */
-  --fs-5: 20px;   /* h3 */
-  --fs-6: 24px;   /* h2 */
-  --fs-7: 32px;   /* h1 */
-  /* 페이지 헤더·히어로 통일용 */
-  --fs-h1: 28px;
-  --fs-h2: 22px;
-  --fs-body: 16px;
-
-  /* 줄간격 */
-  --lh-body: 1.7;
-  --lh-title: 1.3;
+  /* Radius / shadow / layout */
+  --radius-sm: 8px;
+  --radius-md: 12px;
+  --radius-lg: 16px;
+  --shadow-sm: 0 2px 8px rgba(15, 23, 42, 0.06);
+  --shadow-md: 0 8px 24px rgba(15, 23, 42, 0.12);
+  --container-max: 1200px;
+  --page-x: 16px;
+  --tap-size: 44px;
 }
 
-@media (max-width: 768px) {
+@media (min-width: 768px) {
   :root {
-    --px: 16px;
-    --card-pad: 20px;
-  }
-}
-
-@media (max-width: 480px) {
-  :root {
-    --card-pad: 16px;
+    --page-x: 24px;
+    --fs-4: 1.5rem;
+    --fs-5: 2.25rem;
   }
 }

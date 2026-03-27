@@ -1,4 +1,4 @@
-﻿(function () {
+(function () {
   var overlay = null, drawer = null, triggerBtn = null;
   function init() {
     overlay = document.getElementById('drawerOverlay');
@@ -17,6 +17,28 @@
       var first = all[0], last = all[all.length - 1];
       if (e.shiftKey) { if (document.activeElement === first) { e.preventDefault(); last.focus(); } }
       else            { if (document.activeElement === last)  { e.preventDefault(); first.focus(); } }
+    });
+    enrichDrawerLinks();
+  }
+
+  function enrichDrawerLinks() {
+    if (!drawer) return;
+    var nav = drawer.querySelector('.drawer-nav');
+    if (!nav) return;
+    var required = [
+      { href: 'must-know.html', label: '꼭 알아야 할 것' },
+      { href: 'bookmarks.html', label: '북마크' },
+      { href: 'about.html', label: '가맹점숲이란?' },
+      { href: 'contact.html', label: '문의하기' }
+    ];
+    required.forEach(function (item) {
+      var exists = nav.querySelector('a[href="' + item.href + '"]');
+      if (exists) return;
+      var a = document.createElement('a');
+      a.href = item.href;
+      a.className = 'drawer-link';
+      a.textContent = item.label;
+      nav.appendChild(a);
     });
   }
   function openDrawer() {
