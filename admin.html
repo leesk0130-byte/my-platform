@@ -1,0 +1,275 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="robots" content="noindex, nofollow">
+  <title>관리자 대시보드 | 가맹점숲</title>
+  <link rel="stylesheet" href="css/common.css">
+  <link href="https://cdn.quilljs.com/1.3.6/quill.snow.css" rel="stylesheet">
+</head>
+<body>
+  <a href="#main" class="skip-link">본문으로 건너뛰기</a>
+  <header>
+    <h1><a href="index.html">가맹점숲</a></h1>
+    <button type="button" class="nav-toggle" aria-label="메뉴 열기" aria-expanded="false" data-toggle-nav><span></span><span></span><span></span></button>
+    <nav class="header-nav" id="headerNav" aria-label="메인 메뉴">
+      <a href="index.html">홈</a>
+      <a href="news.html">뉴스</a>
+      <a href="/calculator">PG 수수료 계산기</a>
+      <a href="admin.html" class="active">관리자</a>
+    </nav>
+    <div class="header-auth" id="headerAuth"><div id="auth-actions"></div></div>
+  </header>
+
+  <main id="main" class="page">
+    <div class="container">
+      <div class="page-head">
+        <nav class="breadcrumb" aria-label="breadcrumb"><a href="index.html">홈</a> <span class="bc-sep">/</span> <strong>관리자 대시보드</strong></nav>
+      </div>
+      <section class="hero-green">
+        <h2>콘텐츠 CMS</h2>
+        <p>관리자 계정으로만 글 작성/수정/삭제 및 데이터 정리가 가능합니다.</p>
+      </section>
+
+      <section class="section">
+        <div class="card">
+          <h3 class="section-title"><span>대시보드 통계</span></h3>
+          <div class="info-grid" id="admin-stats">
+            <article class="info-card"><h3>총 글 수</h3><p id="stat-total">-</p></article>
+            <article class="info-card"><h3>공개 글 수</h3><p id="stat-published">-</p></article>
+            <article class="info-card"><h3>총 조회수</h3><p id="stat-views">-</p></article>
+            <article class="info-card"><h3>인기글 TOP 5</h3><p id="stat-top">-</p></article>
+          </div>
+        </div>
+      </section>
+
+      <section class="section">
+        <div class="card">
+          <h3 class="section-title"><span>글 작성 / 수정</span></h3>
+          <form id="article-form" class="prose">
+            <div class="form-row">
+              <div class="form-group">
+                <label for="article-title">제목</label>
+                <input id="article-title" type="text" required>
+              </div>
+              <div class="form-group">
+                <label for="article-category">카테고리</label>
+                <select id="article-category">
+                  <option>PG 수수료</option><option>정산</option><option>환불</option><option>심사</option>
+                  <option>법규</option><option>운영팁</option><option>결제오류</option><option>기타</option>
+                </select>
+              </div>
+            </div>
+            <div class="form-row">
+              <div class="form-group">
+                <label for="article-slug">슬러그</label>
+                <input id="article-slug" type="text" placeholder="자동 생성 가능">
+              </div>
+              <div class="form-group">
+                <label for="article-tags">태그 (쉼표 구분)</label>
+                <input id="article-tags" type="text" placeholder="예: pg,정산,쇼핑몰">
+              </div>
+            </div>
+            <div class="form-group">
+              <label for="article-editor">본문</label>
+              <div id="article-editor" style="height:320px;"></div>
+            </div>
+            <div class="form-group">
+              <label><input id="article-published" type="checkbox"> 공개 상태로 저장</label>
+            </div>
+            <div class="form-actions">
+              <button type="submit" class="btn btn-primary">저장</button>
+              <button type="button" class="btn btn-outline" id="article-reset">초기화</button>
+            </div>
+            <p id="admin-msg" class="form-hint"></p>
+          </form>
+        </div>
+      </section>
+
+      <section class="section">
+        <div class="card">
+          <h3 class="section-title"><span>글 목록 관리</span></h3>
+          <ul class="feed-list" id="admin-article-list"></ul>
+        </div>
+      </section>
+
+      <section class="section">
+        <div class="card">
+          <h3 class="section-title"><span>데이터 정리 (위험)</span></h3>
+          <p class="section-desc">기존 news/articles 데이터를 일괄 삭제합니다.</p>
+          <div class="form-actions">
+            <button type="button" class="btn btn-outline" id="btn-clear-news">기존 News 전체 삭제</button>
+            <button type="button" class="btn btn-outline" id="btn-clear-articles">Articles 전체 삭제</button>
+          </div>
+        </div>
+      </section>
+    </div>
+  </main>
+
+  <script src="https://www.gstatic.com/firebasejs/10.7.0/firebase-app-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/10.7.0/firebase-auth-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/10.7.0/firebase-firestore-compat.js"></script>
+  <script src="https://cdn.quilljs.com/1.3.6/quill.min.js"></script>
+  <script src="js/config.js"></script>
+  <script src="js/app.js"></script>
+  <script src="js/auth.js"></script>
+  <script src="js/articles.js"></script>
+  <script>
+  (function () {
+    var form = document.getElementById("article-form");
+    var listEl = document.getElementById("admin-article-list");
+    var msgEl = document.getElementById("admin-msg");
+    var currentId = null;
+    var currentWasPublished = false;
+    var quill = new Quill("#article-editor", {
+      theme: "snow",
+      modules: { toolbar: [["bold","italic","underline"],[{header:[2,3,false]}],["link","blockquote","code-block"],[{list:"ordered"},{list:"bullet"}],["clean"]] }
+    });
+
+    function setMsg(t, isErr) {
+      msgEl.textContent = t || "";
+      msgEl.style.color = isErr ? "#dc2626" : "#047857";
+    }
+
+    function requireAdmin() {
+      var u = window.app && window.app.getUser && window.app.getUser();
+      if (!window.articlesApi || !window.articlesApi.isAdminUser(u)) {
+        document.body.innerHTML = '<main class="container"><section class="section"><div class="card"><h2>권한 없음</h2><p>관리자 계정으로 로그인해 주세요.</p></div></section></main>';
+        return false;
+      }
+      return true;
+    }
+
+    function fillStats(rows) {
+      var total = rows.length;
+      var pub = rows.filter(function (r) { return r.isPublished; }).length;
+      var views = rows.reduce(function (a, r) { return a + (r.viewCount || 0); }, 0);
+      var top = rows.slice().sort(function (a, b) { return (b.viewCount || 0) - (a.viewCount || 0); }).slice(0, 5);
+      document.getElementById("stat-total").textContent = total + "개";
+      document.getElementById("stat-published").textContent = pub + "개";
+      document.getElementById("stat-views").textContent = views.toLocaleString("ko-KR");
+      document.getElementById("stat-top").innerHTML = top.length ? top.map(function (t) { return t.title; }).join("<br>") : "데이터 없음";
+    }
+
+    function renderList(rows) {
+      fillStats(rows);
+      if (!rows.length) {
+        listEl.innerHTML = '<li class="feed-item"><span class="feed-title">등록된 글이 없습니다.</span></li>';
+        return;
+      }
+      listEl.innerHTML = rows.map(function (r) {
+        var date = r.updatedAt ? new Date(r.updatedAt).toLocaleDateString("ko-KR") : "-";
+        return '<li class="feed-item">' +
+          '<span class="feed-title">' + (r.isPublished ? "공개" : "비공개") + ' · ' + r.title + '</span>' +
+          '<span class="feed-meta">' + r.category + " · " + date + " · 조회 " + (r.viewCount || 0) + '</span>' +
+          '<div class="form-actions">' +
+          '<button class="btn btn-outline btn-sm" data-edit="' + r.id + '">수정</button>' +
+          '<button class="btn btn-outline btn-sm" data-del="' + r.id + '">삭제</button>' +
+          '</div>' +
+          '</li>';
+      }).join("");
+    }
+
+    function loadList() {
+      window.articlesApi.listArticles({ limit: 200 }, function (err, rows) {
+        if (err) return setMsg(err, true);
+        renderList(rows || []);
+      });
+    }
+
+    function resetForm() {
+      currentId = null;
+      currentWasPublished = false;
+      form.reset();
+      quill.setContents([]);
+      setMsg("");
+    }
+
+    form.addEventListener("submit", function (e) {
+      e.preventDefault();
+      var title = document.getElementById("article-title").value.trim();
+      var slug = document.getElementById("article-slug").value.trim();
+      var category = document.getElementById("article-category").value;
+      var tags = document.getElementById("article-tags").value.split(",").map(function (t) { return t.trim(); }).filter(Boolean);
+      var content = quill.root.innerHTML.trim();
+      var isPublished = document.getElementById("article-published").checked;
+      var u = window.app.getUser && window.app.getUser();
+      var payload = { title: title, slug: slug, category: category, tags: tags, content: content, isPublished: isPublished, author: (u && (u.name || u.email)) || "관리자", wasPublished: currentWasPublished };
+      if (!currentId) {
+        window.articlesApi.createArticle(payload, function (err) {
+          if (err) return setMsg(err, true);
+          setMsg("글이 저장되었습니다.");
+          resetForm();
+          loadList();
+        });
+      } else {
+        window.articlesApi.updateArticle(currentId, payload, function (err) {
+          if (err) return setMsg(err, true);
+          setMsg("글이 수정되었습니다.");
+          resetForm();
+          loadList();
+        });
+      }
+    });
+
+    document.getElementById("article-reset").addEventListener("click", resetForm);
+
+    listEl.addEventListener("click", function (e) {
+      var editId = e.target.getAttribute("data-edit");
+      var delId = e.target.getAttribute("data-del");
+      if (editId) {
+        window.articlesApi.getArticleById(editId, function (err, row) {
+          if (err || !row) return setMsg("글 조회 실패", true);
+          currentId = row.id;
+          currentWasPublished = !!row.isPublished;
+          document.getElementById("article-title").value = row.title;
+          document.getElementById("article-slug").value = row.slug;
+          document.getElementById("article-category").value = row.category;
+          document.getElementById("article-tags").value = (row.tags || []).join(",");
+          document.getElementById("article-published").checked = !!row.isPublished;
+          quill.root.innerHTML = row.content || "";
+          setMsg("수정 모드");
+        });
+      }
+      if (delId) {
+        if (!confirm("정말 삭제할까요?")) return;
+        window.articlesApi.deleteArticle(delId, function (err) {
+          if (err) return setMsg(err, true);
+          setMsg("삭제 완료");
+          if (currentId === delId) resetForm();
+          loadList();
+        });
+      }
+    });
+
+    document.getElementById("btn-clear-news").addEventListener("click", function () {
+      if (!confirm("기존 news 컬렉션을 전부 삭제합니다. 진행할까요?")) return;
+      window.articlesApi.deleteAllLegacyNews(function (err) {
+        setMsg(err ? err : "news 컬렉션 삭제 완료", !!err);
+      });
+    });
+
+    document.getElementById("btn-clear-articles").addEventListener("click", function () {
+      if (!confirm("articles 컬렉션을 전부 삭제합니다. 진행할까요?")) return;
+      window.articlesApi.deleteAllArticles(function (err) {
+        setMsg(err ? err : "articles 컬렉션 삭제 완료", !!err);
+        loadList();
+      });
+    });
+
+    if (document.readyState === "loading") {
+      document.addEventListener("DOMContentLoaded", function () {
+        if (requireAdmin()) loadList();
+      });
+    } else {
+      if (requireAdmin()) loadList();
+    }
+    window.addEventListener("authStateChanged", function () {
+      if (requireAdmin()) loadList();
+    });
+  })();
+  </script>
+</body>
+</html>
