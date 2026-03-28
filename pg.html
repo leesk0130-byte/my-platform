@@ -36,59 +36,52 @@
     .pg-table-wrap tbody tr.pg-row-advantage td { font-weight: 600; color: #065f46; }
     .pg-table-wrap .pg-cell-highlight { background: #d1fae5 !important; font-weight: 700; }
     .pg-source { font-size: 0.8125rem; color: #64748b; margin-top: 0.5rem; }
-    /* ── 계산기 CTA 배너 ── */
-    .calc-cta-banner {
-      background: linear-gradient(135deg, #0f172a 0%, #1e293b 100%);
+    /* PG 페이지 인트로: 단일 카드 (텍스트 겹침 방지) */
+    .pg-intro-card {
+      background: var(--color-surface);
+      border: 1px solid var(--color-border);
       border-radius: 16px;
-      padding: 1.75rem 2rem;
-      margin-bottom: 1.75rem;
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
-      gap: 1.5rem;
-      flex-wrap: wrap;
+      padding: 1.5rem 1.5rem 1.75rem;
+      margin-bottom: 1.5rem;
+      box-shadow: 0 4px 24px rgba(15, 23, 42, 0.06);
     }
-    .calc-cta-banner-text h1 {
-      font-size: 1.3rem;
+    .pg-intro-card .pg-badge { margin-bottom: 0.75rem; }
+    .pg-intro-title {
+      font-size: clamp(1.25rem, 3vw, 1.65rem);
       font-weight: 800;
-      color: #fff;
-      margin: 0 0 0.4rem;
-      line-height: 1.3;
+      letter-spacing: -0.02em;
+      color: var(--color-text);
+      margin: 0 0 0.75rem;
+      line-height: 1.35;
     }
-    .calc-cta-banner-text p {
-      font-size: 0.9rem;
-      color: #94a3b8;
-      margin: 0;
-      line-height: 1.6;
+    .pg-intro-lead {
+      font-size: 1rem;
+      line-height: 1.8;
+      color: var(--color-text-muted);
+      margin: 0 0 1.25rem;
+      max-width: 65ch;
+      word-break: keep-all;
     }
-    .calculator-button {
-      display: inline-flex;
-      align-items: center;
-      gap: 0.4rem;
-      background: linear-gradient(135deg, #0d9488, #0f766e);
-      color: #fff;
-      font-size: 0.95rem;
+    .pg-intro-lead strong { color: var(--color-text); }
+    .pg-intro-lead a {
       font-weight: 700;
-      padding: 0.75rem 1.5rem;
-      border-radius: 12px;
-      text-decoration: none;
-      white-space: nowrap;
-      transition: opacity 0.15s;
-      flex-shrink: 0;
+      color: var(--color-primary);
+      text-decoration: underline;
+      text-underline-offset: 3px;
     }
-    .calculator-button:hover { opacity: 0.9; }
-    .calculator-button::after { content: ' →'; }
-    @media (max-width: 600px) {
-      .calc-cta-banner { padding: 1.25rem; }
-      .calc-cta-banner-text h1 { font-size: 1.1rem; }
-      .calculator-button { width: 100%; justify-content: center; }
+    .pg-intro-lead a:hover { color: var(--color-primary-hover); }
+    .pg-intro-actions {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 0.75rem;
+      align-items: center;
     }
   </style>
   </head>
 <body>
   <a href="#main" class="skip-link">본문으로 건너뛰기</a>
   <header>
-    <h1><a href="index.html">가맹점숲</a></h1>
+    <div class="site-logo"><a href="index.html" title="홈으로">가맹점숲</a></div>
     <button type="button" class="nav-toggle" aria-label="메뉴 열기" aria-expanded="false" data-toggle-nav><span></span><span></span><span></span></button>
     <nav class="header-nav" id="headerNav" aria-label="메인 메뉴">
       <a href="pg.html" class="active">PG 수수료</a>
@@ -111,19 +104,13 @@
         <nav class="breadcrumb" aria-label="breadcrumb"><a href="index.html">홈</a> <span class="bc-sep">/</span> <strong>PG 수수료</strong></nav>
       </div>
 
-      <!-- 계산기 CTA 배너 -->
-      <div class="calc-cta-banner">
-        <div class="calc-cta-banner-text">
-          <h2 style="font-size:1.3rem;font-weight:800;color:#fff;margin:0 0 0.4rem;line-height:1.3;">PG 수수료 계산기</h2>
-          <p>PG 수수료를 직접 계산하려면 아래 계산기를 이용하세요.</p>
-        </div>
-        <a href="/calculator" class="calculator-button">PG 수수료 계산기 바로가기</a>
-      </div>
-
-      <section class="hero-green" aria-label="안내">
+      <section class="pg-intro-card" aria-labelledby="pg-intro-heading">
         <span class="pg-badge" aria-label="최신 업데이트">2025년 2월 최신 업데이트 완료</span>
-        <h2>2025년 PG 수수료 비교</h2>
-        <p><strong>PG란?</strong> 결제 대행(Payment Gateway) 서비스예요. 쇼핑몰에서 카드·계좌이체·간편결제 등을 받을 수 있게 해 주는 업체입니다. 아래 표는 <strong>2025년 2월 금융위원회 발표 기준</strong> 인하된 수수료율을 반영한 참고용 안내입니다. 수수료를 직접 계산해 보고 싶다면 <a href="/calculator" style="font-weight:700;color:#fff;text-decoration:underline;">PG 수수료 계산기</a>를 이용하세요.</p>
+        <h2 id="pg-intro-heading" class="pg-intro-title">2025년 PG 수수료 비교</h2>
+        <p class="pg-intro-lead"><strong>PG란?</strong> 결제 대행(Payment Gateway) 서비스입니다. 쇼핑몰에서 카드·계좌이체·간편결제 등을 받을 수 있게 해 주는 업체입니다. 아래 표는 <strong>2025년 2월 금융위원회 발표 기준</strong>으로 인하된 수수료율을 반영한 참고용 안내입니다. 연간 비용을 직접 계산해 보시려면 <a href="/calculator">PG 수수료 계산기</a>를 이용하세요.</p>
+        <div class="pg-intro-actions">
+          <a href="/calculator" class="btn btn-primary">PG 수수료 계산기</a>
+        </div>
       </section>
       <div class="card card--soft pg-disclaimer" role="alert">
       <strong>⚠️ 수수료는 확정이 아닙니다.</strong> 아래 금액은 공개·일반 등급 기준 <strong>참고용</strong>이며, PG사·가맹점 조건·연매출·시점에 따라 달라집니다. 신규 사업자는 매출 데이터가 없어 ‘일반’ 등급이 적용되며, 매년 1월·7월 국세청 연매출 기준으로 영세·중소 가맹점에 해당하면 우대 수수료 적용 및 차액 환급을 받을 수 있습니다. <strong>계약 전 반드시 각 PG사 공식 홈페이지 또는 상담으로 최신 수수료를 확인</strong>하세요.
@@ -353,7 +340,7 @@
     <nav class="drawer-nav" aria-label="모바일 메뉴">
       <a href="pg.html"         class="drawer-link active">PG 수수료 표</a>
       <a href="/calculator" class="drawer-link">PG 수수료 계산기</a>
-      <a href="news.html"       class="drawer-link">뉴스</a>
+      <a href="news.html"       class="drawer-link">가맹점 정보</a>
       <a href="must-know.html" class="drawer-link">꼭 알아야 할 것</a>
       <a href="contact.html" class="drawer-link">문의하기</a>
     </nav>

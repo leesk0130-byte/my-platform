@@ -19,6 +19,16 @@
       else            { if (document.activeElement === last)  { e.preventDefault(); first.focus(); } }
     });
     enrichDrawerLinks();
+    bindNavToggle();
+  }
+
+  function bindNavToggle() {
+    document.querySelectorAll('[data-toggle-nav]').forEach(function (btn) {
+      btn.addEventListener('click', function (e) {
+        e.preventDefault();
+        if (typeof window.openDrawer === 'function') window.openDrawer();
+      });
+    });
   }
 
   function enrichDrawerLinks() {

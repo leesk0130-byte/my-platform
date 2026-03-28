@@ -125,7 +125,8 @@
 /* ---- 타이포 기본 ---- */
 body {
   font-size: var(--fs-3);
-  line-height: var(--lh-body);
+  line-height: var(--lh-body, 1.8);
+  word-break: keep-all;
 }
 
 h1 {
@@ -154,6 +155,8 @@ h3:first-child {
 
 p {
   margin: 0;
+  line-height: var(--lh-body, 1.8);
+  color: var(--color-text-muted);
 }
 
 .meta {
