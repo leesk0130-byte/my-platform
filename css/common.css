@@ -361,9 +361,11 @@ footer {
 }
 .pg-disclaimer {
   background: var(--c-warning-soft); border: 1px solid #fde68a; border-radius: var(--r-lg);
-  padding: var(--s-4) var(--s-5); font-size: var(--fs-sm); color: #92400e;
-  margin-bottom: var(--s-6);
+  padding: var(--s-5) var(--s-6); font-size: var(--fs-sm); color: #92400e;
+  margin: var(--s-6) 0 var(--s-8);
   border-left: 4px solid var(--c-warning);
+  line-height: var(--lh);
+  max-width: var(--max-w-article);
 }
 .pg-cta-box {
   background: linear-gradient(135deg, var(--c-primary-soft) 0%, #d1fae5 100%);
@@ -405,23 +407,32 @@ footer {
    INTRO BLOCK
    ═══════════════════════════════════════ */
 .intro-block {
-  background: linear-gradient(135deg, var(--c-primary-soft), #d1fae5);
+  background: linear-gradient(135deg, var(--c-primary-soft) 0%, #d1fae5 50%, #ecfdf5 100%);
   border: 1px solid var(--c-primary-border);
   border-radius: var(--r-xl);
-  padding: var(--s-6);
-  margin-bottom: var(--s-8);
+  padding: var(--s-8);
+  margin-bottom: var(--s-10);
   position: relative;
   overflow: hidden;
 }
 .intro-block::before {
   content: '';
-  position: absolute; top: 0; right: 0;
-  width: 120px; height: 120px;
-  background: radial-gradient(circle, rgba(5,150,105,.08) 0%, transparent 70%);
+  position: absolute; top: -20px; right: -20px;
+  width: 160px; height: 160px;
+  background: radial-gradient(circle, rgba(5,150,105,.1) 0%, transparent 70%);
   pointer-events: none;
 }
-.intro-title { font-size: var(--fs-lg); font-weight: 800; color: var(--c-primary-dark); margin-bottom: var(--s-3); letter-spacing: -.02em; position: relative; }
-.intro-desc { font-size: var(--fs-base); color: var(--c-text-sub); line-height: var(--lh); position: relative; }
+.intro-title {
+  font-size: clamp(1.3rem, 3.5vw, var(--fs-xl));
+  font-weight: 900; color: var(--c-primary-dark);
+  margin-bottom: var(--s-4); letter-spacing: -.03em;
+  line-height: var(--lh-snug); position: relative;
+}
+.intro-desc {
+  font-size: var(--fs-base); color: var(--c-text-sub);
+  line-height: 1.85; position: relative;
+  max-width: 65ch;
+}
 .intro-desc strong { color: var(--c-text); }
 
 /* ═══════════════════════════════════════
