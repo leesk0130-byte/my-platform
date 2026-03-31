@@ -2,58 +2,44 @@
 <html lang="ko">
 <head>
   <meta charset="UTF-8">
-  <meta http-equiv="X-UA-Compatible" content="IE=edge">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <meta name="theme-color" content="#0f172a">
-  <title>가맹점 정보 아카이브 | 가맹점숲</title>
-  <meta name="description" content="온라인 쇼핑몰 가맹점주를 위한 심층 가이드 아카이브. PG 수수료, 정산, 환불, 심사, 법규를 실무 중심으로 제공합니다.">
+  <title>가맹점 정보 | 가맹점숲</title>
+  <meta name="description" content="온라인 쇼핑몰 가맹점주를 위한 심층 가이드. PG 수수료, 정산, 환불, 심사, 법규를 실무 중심으로 제공합니다.">
   <meta name="robots" content="index, follow">
   <link rel="canonical" href="https://bizimshop.co.kr/news.html">
-  <meta property="og:type" content="website">
-  <meta property="og:title" content="가맹점 정보 아카이브 | 가맹점숲">
-  <meta property="og:description" content="PG 수수료, 정산, 환불, 심사, 법규를 다루는 가맹점 실무 콘텐츠 모음.">
+  <meta property="og:title" content="가맹점 정보 | 가맹점숲">
+  <meta property="og:description" content="PG 수수료, 정산, 환불, 심사, 법규를 다루는 가맹점 실무 콘텐츠.">
   <meta property="og:url" content="https://bizimshop.co.kr/news.html">
   <meta property="og:image" content="https://bizimshop.co.kr/og-image.svg">
-  <meta name="twitter:card" content="summary_large_image">
-  <meta name="twitter:title" content="가맹점 정보 아카이브 | 가맹점숲">
-  <meta name="twitter:description" content="PG 수수료, 정산, 환불, 심사, 법규를 다루는 가맹점 실무 콘텐츠 모음.">
-  <meta name="twitter:image" content="https://bizimshop.co.kr/og-image.svg">
-  <script type="application/ld+json">
-  {"@context":"https://schema.org","@type":"CollectionPage","name":"가맹점 정보 아카이브","url":"https://bizimshop.co.kr/news.html","isPartOf":{"@type":"WebSite","name":"가맹점숲","url":"https://bizimshop.co.kr/"}}
-  </script>
+  <link rel="icon" type="image/svg+xml" href="og-image.svg">
   <link rel="stylesheet" href="css/common.css">
 </head>
 <body>
   <a href="#main" class="skip-link">본문으로 건너뛰기</a>
   <header>
-    <div class="site-logo"><a href="index.html" title="홈으로">가맹점숲</a></div>
+    <div class="site-logo"><a href="index.html">가맹점숲</a></div>
     <button type="button" class="nav-toggle" aria-label="메뉴 열기" aria-expanded="false" data-toggle-nav><span></span><span></span><span></span></button>
     <nav class="header-nav" id="headerNav" aria-label="메인 메뉴">
       <a href="pg.html">PG 수수료</a>
-      <a href="/calculator">PG 수수료 계산기</a>
+      <a href="/calculator">수수료 계산기</a>
       <a href="news.html" class="active">가맹점 정보</a>
+      <a href="must-know.html">필수 가이드</a>
     </nav>
-    <form class="header-search" action="news.html" method="get" role="search" aria-label="사이트 검색">
-      <label for="header-search-q" class="sr-only">가맹점 정보 검색</label>
-      <input type="search" id="header-search-q" name="q" placeholder="가맹점 정보 검색" autocomplete="off">
-      <button type="submit" class="btn btn-outline btn-sm">검색</button>
-    </form>
     <div class="header-auth" id="headerAuth"><div id="auth-actions"></div></div>
   </header>
 
   <main id="main" class="page">
     <div class="container">
-      <div class="page-head">
-        <nav class="breadcrumb" aria-label="breadcrumb"><a href="index.html">홈</a> <span class="bc-sep">/</span> <strong>가맹점 정보</strong></nav>
-      </div>
+      <nav class="breadcrumb" aria-label="breadcrumb"><a href="index.html">홈</a> <span class="bc-sep">/</span> <strong>가맹점 정보</strong></nav>
       <section class="hero-green">
-        <h2>가맹점 운영 실무 콘텐츠</h2>
-        <p>운영자가 직접 작성한 깊이 있는 콘텐츠를 카테고리별로 탐색하세요.</p>
+        <h1>가맹점 운영 실무 콘텐츠</h1>
+        <p>PG 수수료, 정산, 환불, 심사 등 가맹점 운영에 필요한 깊이 있는 콘텐츠를 제공합니다.</p>
       </section>
       <section class="section">
         <div class="card">
-          <h3 class="section-title"><span>최신 글</span></h3>
-          <p id="news-search-result" class="section-desc" style="display:none;" aria-live="polite"></p>
+          <h2 class="section-title">최신 글</h2>
+          <p id="news-search-result" class="section-desc" style="display:none" aria-live="polite"></p>
           <div id="page-root"></div>
         </div>
       </section>
@@ -70,19 +56,17 @@
         <p class="footer-title">바로가기</p>
         <div class="footer-links">
           <a href="about.html">가맹점숲이란?</a>
-          <a href="news.html">가맹점 정보</a>
-          <a href="/calculator">PG 수수료 계산기</a>
-          <a href="pg.html">PG 수수료 표</a>
-          <a href="terms.html">이용약관</a>
-          <a href="privacy.html">개인정보처리방침</a>
+          <a href="pg.html">PG 수수료 비교</a>
+          <a href="/calculator">수수료 계산기</a>
         </div>
       </div>
       <div class="footer-contact">
         <p class="footer-title">문의</p>
-        <p>이메일: <a href="mailto:leesk0130@naver.com?subject=가맹점숲 문의">leesk0130@naver.com</a></p>
-        <p class="footer-hours">운영 시간: 평일 09:00–18:00 (답변은 1–2 영업일 내)</p>
+        <p><a href="contact.html">문의하기</a></p>
+        <p class="footer-hours">평일 09:00-18:00</p>
+        <div class="footer-links" style="margin-top:12px"><a href="terms.html">이용약관</a><a href="privacy.html">개인정보처리방침</a></div>
       </div>
-      <p class="footer-copy">© 2025–2026 가맹점숲. 온라인 가맹점 정보. All rights reserved.</p>
+      <p class="footer-copy">&copy; 2025 가맹점숲. All rights reserved.</p>
     </div>
   </footer>
 
@@ -90,18 +74,16 @@
   <aside id="mobileDrawer" hidden aria-hidden="true" role="dialog" aria-modal="true" aria-label="메뉴">
     <div class="drawer-header">
       <span class="drawer-logo">가맹점숲</span>
-      <button type="button" class="drawer-close" aria-label="메뉴 닫기">
-        <svg width="20" height="20" viewBox="0 0 20 20" fill="none" aria-hidden="true"><path d="M4 4L16 16M16 4L4 16" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg>
-      </button>
+      <button type="button" class="drawer-close" aria-label="메뉴 닫기"><svg width="20" height="20" viewBox="0 0 20 20" fill="none"><path d="M4 4L16 16M16 4L4 16" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg></button>
     </div>
     <nav class="drawer-nav" aria-label="모바일 메뉴">
-      <a href="index.html" class="drawer-link">홈</a>
-      <a href="pg.html" class="drawer-link">PG 수수료 표</a>
-      <a href="/calculator" class="drawer-link">PG 수수료 계산기</a>
+      <a href="pg.html" class="drawer-link">PG 수수료</a>
+      <a href="/calculator" class="drawer-link">수수료 계산기</a>
       <a href="news.html" class="drawer-link active">가맹점 정보</a>
-      <a href="must-know.html" class="drawer-link">꼭 알아야 할 것</a>
+      <a href="must-know.html" class="drawer-link">필수 가이드</a>
       <a href="contact.html" class="drawer-link">문의하기</a>
     </nav>
+    <div id="drawerAuth"></div>
   </aside>
 
   <script src="https://www.gstatic.com/firebasejs/10.7.0/firebase-app-compat.js"></script>
@@ -111,40 +93,7 @@
   <script src="js/app.js"></script>
   <script src="js/auth.js"></script>
   <script src="js/articles.js"></script>
+  <script src="js/news-render.js"></script>
   <script src="js/drawer.js"></script>
-  <script>
-  (function () {
-    var root = document.getElementById("page-root");
-    var q = (new URLSearchParams(location.search).get("q") || "").trim().toLowerCase();
-    var qEl = document.getElementById("news-search-result");
-    function render(rows) {
-      if (q) {
-        rows = rows.filter(function (r) {
-          var t = (r.title || "").toLowerCase();
-          var c = (r.category || "").toLowerCase();
-          var tags = (r.tags || []).join(" ").toLowerCase();
-          return t.indexOf(q) !== -1 || c.indexOf(q) !== -1 || tags.indexOf(q) !== -1;
-        });
-        qEl.style.display = "block";
-        qEl.textContent = '검색: "' + q + '" (' + rows.length + "건)";
-      }
-      if (!rows.length) {
-        root.innerHTML = '<div class="empty-state"><p class="empty-state-title">아직 공개된 글이 없습니다</p><p class="empty-state-desc">곧 심층 콘텐츠가 등록될 예정입니다.</p></div>';
-        return;
-      }
-      root.innerHTML = '<ul class="feed-list">' + rows.map(function (r) {
-        var d = r.publishedAt ? new Date(r.publishedAt).toLocaleDateString("ko-KR") : "-";
-        return '<li class="feed-item"><a class="feed-title-wrapper" href="article.html?id=' + encodeURIComponent(r.id) + '"><span class="feed-title-content"><span class="feed-title-text">' + r.title + '</span></span></a><span class="feed-meta">' + r.category + " · " + d + " · " + (r.readTime || 1) + '분 읽기</span></li>';
-      }).join("") + "</ul>";
-    }
-    window.articlesApi.listArticles({ onlyPublished: true, limit: 200 }, function (err, rows) {
-      if (err) {
-        root.innerHTML = '<div class="empty-state"><p class="empty-state-title">콘텐츠를 불러오지 못했습니다</p></div>';
-        return;
-      }
-      render(rows || []);
-    });
-  })();
-  </script>
 </body>
 </html>

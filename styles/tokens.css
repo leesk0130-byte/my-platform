@@ -1,59 +1,59 @@
-/* Global design tokens (mobile-first) */
+/* ===== Design Tokens (mobile-first) ===== */
 :root {
   /* Color */
-  --color-primary: #10b981;
-  --color-primary-hover: #059669;
-  --color-primary-soft: #d1fae5;
-  --color-bg: #f8fafc;
-  --color-surface: #ffffff;
-  --color-border: #e2e8f0;
-  --color-text: #0f172a;
-  --color-text-muted: #475569;
-  --color-text-subtle: #64748b;
-  --color-header-bg: #0f172a;
-  --color-header-bg-2: #1e293b;
-  --color-header-text: #f8fafc;
-  --color-danger: #dc2626;
+  --c-primary: #059669;
+  --c-primary-hover: #047857;
+  --c-primary-soft: #ecfdf5;
+  --c-primary-border: #a7f3d0;
+  --c-bg: #f8fafc;
+  --c-surface: #ffffff;
+  --c-border: #e2e8f0;
+  --c-border-soft: #f1f5f9;
+  --c-text: #0f172a;
+  --c-text-sub: #475569;
+  --c-text-muted: #94a3b8;
+  --c-danger: #dc2626;
+  --c-warning: #f59e0b;
+  --c-header: #0f172a;
 
   /* Typography */
-  --font-main: "Pretendard", "Noto Sans KR", -apple-system, BlinkMacSystemFont, "Malgun Gothic", sans-serif;
-  --fs-0: 0.8125rem; /* 13 */
-  --fs-1: 0.9375rem; /* 15 */
-  --fs-2: 1rem; /* 16 */
-  --fs-3: 1.125rem; /* 18 */
-  --fs-4: 1.375rem; /* 22 */
-  --fs-5: 1.875rem; /* 30 */
-  --lh-tight: 1.35;
-  --lh-normal: 1.75;
-  --lh-body: 1.8;
-  --ls-tight: -0.01em;
+  --font: "Pretendard", -apple-system, BlinkMacSystemFont, "Malgun Gothic", sans-serif;
+  --fs-xs: 0.75rem;
+  --fs-sm: 0.8125rem;
+  --fs-base: 0.875rem;
+  --fs-md: 1rem;
+  --fs-lg: 1.125rem;
+  --fs-xl: 1.25rem;
+  --fs-2xl: 1.5rem;
+  --fs-3xl: 2rem;
+  --lh: 1.6;
+  --lh-tight: 1.3;
 
   /* Spacing */
-  --sp-1: 4px;
-  --sp-2: 8px;
-  --sp-3: 12px;
-  --sp-4: 16px;
-  --sp-5: 20px;
-  --sp-6: 24px;
-  --sp-8: 32px;
-  --sp-10: 40px;
-  --sp-12: 48px;
+  --s-1: 4px; --s-2: 8px; --s-3: 12px; --s-4: 16px;
+  --s-5: 20px; --s-6: 24px; --s-8: 32px; --s-10: 40px;
+  --s-12: 48px; --s-16: 64px;
 
-  /* Radius / shadow / layout */
-  --radius-sm: 8px;
-  --radius-md: 12px;
-  --radius-lg: 16px;
-  --shadow-sm: 0 2px 8px rgba(15, 23, 42, 0.06);
-  --shadow-md: 0 8px 24px rgba(15, 23, 42, 0.12);
-  --container-max: 1200px;
-  --page-x: 16px;
-  --tap-size: 44px;
+  /* Radius / Shadow */
+  --r-sm: 6px;
+  --r-md: 10px;
+  --r-lg: 14px;
+  --r-xl: 20px;
+  --sh-sm: 0 1px 3px rgba(0,0,0,.04);
+  --sh-md: 0 4px 16px rgba(0,0,0,.06);
+  --sh-lg: 0 8px 32px rgba(0,0,0,.08);
+
+  /* Layout */
+  --max-w: 1120px;
+  --px: 16px;
 }
 
 @media (min-width: 768px) {
   :root {
-    --page-x: 24px;
-    --fs-4: 1.5rem;
-    --fs-5: 2.25rem;
+    --px: 24px;
+    --fs-3xl: 2.25rem;
   }
+}
+@media (min-width: 1024px) {
+  :root { --px: 32px; }
 }
