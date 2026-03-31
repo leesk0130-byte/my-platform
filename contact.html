@@ -61,21 +61,79 @@
       </section>
     </div>
   </main>
+  <script src="https://www.gstatic.com/firebasejs/10.7.0/firebase-app-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/10.7.0/firebase-firestore-compat.js"></script>
+  <script src="js/config.js"></script>
   <script>
     (function () {
       var form = document.getElementById("contact-form");
       var msg = document.getElementById("contact-msg");
+      var submitBtn = form.querySelector('button[type="submit"]');
+
+      // Firestore 초기화
+      var db = null;
+      try {
+        if (window.FIREBASE_CONFIG && window.firebase) {
+          if (!firebase.apps.length) firebase.initializeApp(window.FIREBASE_CONFIG);
+          if (typeof firebase.firestore === 'function') db = firebase.firestore();
+        }
+      } catch (e) { db = null; }
+
       form.addEventListener("submit", function (e) {
         e.preventDefault();
         var name = document.getElementById("contact-name").value.trim();
         var email = document.getElementById("contact-email").value.trim();
         var subject = document.getElementById("contact-subject").value.trim();
         var body = document.getElementById("contact-message").value.trim();
+
+        if (!name || !email || !body) {
+          msg.textContent = "모든 항목을 입력해 주세요.";
+          msg.style.color = "#dc2626";
+          return;
+        }
+
+        submitBtn.disabled = true;
+        submitBtn.textContent = "전송 중...";
+        msg.textContent = "";
+
+        var inquiry = {
+          name: name,
+          email: email,
+          subject: subject,
+          message: body,
+          createdAt: new Date().toISOString(),
+          status: "new"
+        };
+
+        if (db) {
+          db.collection("inquiries").add(inquiry)
+            .then(function () {
+              msg.textContent = "문의가 접수되었습니다. 1-2 영업일 내 답변드리겠습니다.";
+              msg.style.color = "#047857";
+              form.reset();
+            })
+            .catch(function () {
+              // Firestore 실패 시 mailto 폴백
+              fallbackMailto(name, email, subject, body);
+            })
+            .finally(function () {
+              submitBtn.disabled = false;
+              submitBtn.textContent = "문의 보내기";
+            });
+        } else {
+          fallbackMailto(name, email, subject, body);
+          submitBtn.disabled = false;
+          submitBtn.textContent = "문의 보내기";
+        }
+      });
+
+      function fallbackMailto(name, email, subject, body) {
         var mailSubject = "[가맹점숲] " + subject + " - " + name;
         var mailBody = "이름: " + name + "\n이메일: " + email + "\n\n문의 내용:\n" + body;
         window.location.href = "mailto:leesk0130@naver.com?subject=" + encodeURIComponent(mailSubject) + "&body=" + encodeURIComponent(mailBody);
         msg.textContent = "메일 앱으로 문의 양식을 전달했습니다. 발송을 완료해 주세요.";
-      });
+        msg.style.color = "#047857";
+      }
     })();
   </script>
 </body>

@@ -2,7 +2,9 @@
   "use strict";
 
   var ADMIN_EMAIL = "leesk0130@naver.com";
-  var ADMIN_UIDS = ["_put_real_admin_uid_here_"];
+  var ADMIN_UIDS = [];
+
+  // UID 없어도 이메일 기반으로 관리자 판별 (isAdminUser 참조)
 
   function getDb() {
     if (!window.firebase || !window.firebase.apps || !window.firebase.apps.length) return null;

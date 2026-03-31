@@ -13,11 +13,11 @@ function json(body, status = 200, headers = {}) {
 export async function onRequestPost({ env, request }) {
   try {
     const { email, password } = await request.json();
-    const adminEmail = env.ADMIN_EMAIL || '';
+    const adminEmail = env.ADMIN_EMAIL || 'leesk0130@naver.com';
     const adminPassword = env.ADMIN_PASSWORD || '';
     const adminSecret = env.ADMIN_SECRET || '';
-    if (!adminEmail || !adminPassword || !adminSecret) {
-      return json({ error: 'Admin not configured' }, 503);
+    if (!adminPassword || !adminSecret) {
+      return json({ error: 'Admin credentials not configured. Set ADMIN_PASSWORD and ADMIN_SECRET in Cloudflare environment variables.' }, 503);
     }
     if (email !== adminEmail || password !== adminPassword) {
       return json({ error: 'Invalid credentials' }, 401);

@@ -39,7 +39,7 @@ async function verifyOperator(request, env) {
   var token = auth.startsWith('Bearer ') ? auth.slice(7) : '';
   if (!token) return false;
   var email = getEmailFromToken(token);
-  var operatorEmail = (env.OPERATOR_EMAIL || 'leesk0130@point3.team').toLowerCase();
+  var operatorEmail = (env.OPERATOR_EMAIL || 'leesk0130@naver.com').toLowerCase();
   return email && email === operatorEmail;
 }
 

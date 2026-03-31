@@ -140,27 +140,73 @@
     } catch (e) {}
   }
 
-  // Firestore news 컬렉션에서 목록 조회
+  // Firestore articles 컬렉션 문서를 뉴스 아이템으로 변환
+  function articleDocToNewsItem(doc) {
+    var d = doc.data ? doc.data() : doc;
+    var ms = tsToMs(d.publishedAt) || tsToMs(d.updatedAt) || tsToMs(d.createdAt);
+    return {
+      id: doc.id,
+      title: d.title || '',
+      content: d.content || d.body || '',
+      category: d.category || '',
+      date: ms ? new Date(ms).toLocaleDateString('ko-KR', { year: 'numeric', month: 'short', day: 'numeric' }) : '',
+      created_at: ms || 0,
+      updated_at: tsToMs(d.updatedAt) || ms || 0
+    };
+  }
+
+  // Firestore에서 목록 조회 (articles + news 컬렉션 병합)
   function fetchNewsFromFirestore(callback) {
     var db = getDb();
     if (!db) { callback(null, []); return; }
-    db.collection('news').orderBy('createdAt', 'desc').limit(50).get()
+    var allItems = [];
+    // articles 컬렉션 (admin CMS에서 작성한 글)
+    db.collection('articles').where('isPublished', '==', true).orderBy('updatedAt', 'desc').limit(50).get()
       .then(function (snap) {
-        var items = [];
-        snap.forEach(function (doc) { items.push(docToNewsItem(doc)); });
-        callback(null, items);
+        snap.forEach(function (doc) { allItems.push(articleDocToNewsItem(doc)); });
       })
-      .catch(function () { callback(null, []); });
+      .catch(function () {
+        // index 없을 경우 fallback
+        return db.collection('articles').limit(50).get().then(function (snap2) {
+          snap2.forEach(function (doc) {
+            var d = doc.data ? doc.data() : doc;
+            if (d.isPublished) allItems.push(articleDocToNewsItem(doc));
+          });
+        }).catch(function () {});
+      })
+      .then(function () {
+        // news 컬렉션 (레거시)
+        return db.collection('news').orderBy('createdAt', 'desc').limit(50).get()
+          .then(function (snap) {
+            snap.forEach(function (doc) { allItems.push(docToNewsItem(doc)); });
+          })
+          .catch(function () {});
+      })
+      .then(function () {
+        // 중복 제거 후 날짜순 정렬
+        var seen = {};
+        var unique = [];
+        allItems.forEach(function (item) {
+          if (!seen[item.id]) { seen[item.id] = true; unique.push(item); }
+        });
+        unique.sort(function (a, b) { return (b.created_at || 0) - (a.created_at || 0); });
+        callback(null, unique);
+      });
   }
 
-  // Firestore news 컬렉션에서 단건 조회
+  // Firestore에서 단건 조회 (articles 우선, news 폴백)
   function fetchNewsDetailFromFirestore(id, callback) {
     var db = getDb();
     if (!db) { callback(null, null); return; }
-    db.collection('news').doc(id).get()
+    // articles 컬렉션 먼저 조회
+    db.collection('articles').doc(id).get()
       .then(function (doc) {
-        if (!doc || !doc.exists) { callback(null, null); return; }
-        callback(null, docToNewsItem(doc));
+        if (doc && doc.exists) { callback(null, articleDocToNewsItem(doc)); return; }
+        // news 컬렉션 폴백
+        return db.collection('news').doc(id).get().then(function (doc2) {
+          if (!doc2 || !doc2.exists) { callback(null, null); return; }
+          callback(null, docToNewsItem(doc2));
+        });
       })
       .catch(function () { callback(null, null); });
   }

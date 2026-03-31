@@ -100,7 +100,7 @@
   var MOCK_COMMENTS = {};
   var COMMENTS_STORAGE_PREFIX = 'merchant_plus_comments_';
   var VERIFIED_AUTHORS = { '운영자': true };
-  var OPERATOR_EMAIL = 'leesk0130@point3.team';
+  var OPERATOR_EMAIL = 'leesk0130@naver.com';
 
   function canEditPost(post) {
     if (!post) return false;
