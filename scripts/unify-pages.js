@@ -16,7 +16,7 @@ function makeHeader(activeNav, depth) {
     <nav class="header-nav" id="headerNav" aria-label="메인 메뉴">
       <a href="${p}pg.html"${active('pg')}>PG 수수료</a>
       <a href="/calculator"${active('calc')}>수수료 계산기</a>
-      <a href="${p}news.html"${active('news')}>가맹점 정보</a>
+      <a href="${p}news.html"${active('news')}>쇼핑몰 뉴스</a>
       <a href="${p}must-know.html"${active('must')}>필수 가이드</a>
     </nav>
     <div class="header-auth" id="headerAuth"><div id="auth-actions"></div></div>
@@ -37,7 +37,7 @@ function makeFooter(depth) {
           <a href="${p}about.html">가맹점숲이란?</a>
           <a href="${p}pg.html">PG 수수료 비교</a>
           <a href="/calculator">수수료 계산기</a>
-          <a href="${p}news.html">가맹점 정보</a>
+          <a href="${p}news.html">쇼핑몰 뉴스</a>
         </div>
       </div>
       <div class="footer-contact">
@@ -63,7 +63,7 @@ function makeDrawer(activeNav, depth) {
     <nav class="drawer-nav" aria-label="모바일 메뉴">
       <a href="${p}pg.html" class="drawer-link${active('pg')}">PG 수수료</a>
       <a href="/calculator" class="drawer-link${active('calc')}">수수료 계산기</a>
-      <a href="${p}news.html" class="drawer-link${active('news')}">가맹점 정보</a>
+      <a href="${p}news.html" class="drawer-link${active('news')}">쇼핑몰 뉴스</a>
       <a href="${p}must-know.html" class="drawer-link${active('must')}">필수 가이드</a>
       <a href="${p}contact.html" class="drawer-link${active('contact')}">문의하기</a>
     </nav>
