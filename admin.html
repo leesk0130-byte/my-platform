@@ -121,8 +121,9 @@
           <h3 class="section-title"><span>데이터 정리 (위험)</span></h3>
           <p class="section-desc">기존 news/articles 데이터를 일괄 삭제합니다.</p>
           <div class="form-actions">
-            <button type="button" class="btn btn-outline" id="btn-clear-news">기존 News 전체 삭제</button>
-            <button type="button" class="btn btn-outline" id="btn-clear-articles">Articles 전체 삭제</button>
+            <button type="button" class="btn btn-outline" id="btn-clear-news">Firestore News 삭제</button>
+            <button type="button" class="btn btn-outline" id="btn-clear-articles">Firestore Articles 삭제</button>
+            <button type="button" class="btn btn-outline" style="color:#EF4444;border-color:#FCA5A5;" id="btn-clear-d1-news">D1 뉴스 전체 삭제</button>
           </div>
         </div>
       </section>
@@ -313,6 +314,25 @@
         setMsg(err ? err : "articles 컬렉션 삭제 완료", !!err);
         loadList();
       });
+    });
+
+    document.getElementById("btn-clear-d1-news").addEventListener("click", function () {
+      if (!confirm("D1 데이터베이스의 뉴스를 전부 삭제합니다. 진행할까요?")) return;
+      var u = window.app && window.app.getUser && window.app.getUser();
+      var token = u && u.getIdToken ? u.getIdToken() : Promise.resolve("");
+      Promise.resolve(token).then(function(t) {
+        if (typeof t === "object" && typeof t.then === "function") return t;
+        return t;
+      }).then(function(tk) {
+        return fetch("/api/news", {
+          method: "DELETE",
+          headers: tk ? { "Authorization": "Bearer " + tk } : {}
+        });
+      }).then(function(res) { return res.json(); })
+        .then(function(data) {
+          setMsg(data.error ? data.error : "D1 뉴스 전체 삭제 완료", !!data.error);
+        })
+        .catch(function(e) { setMsg("D1 삭제 실패: " + e.message, true); });
     });
 
     if (document.readyState === "loading") {

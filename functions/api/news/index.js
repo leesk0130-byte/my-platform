@@ -39,7 +39,7 @@ async function verifyOperator(request, env) {
   var token = auth.startsWith('Bearer ') ? auth.slice(7) : '';
   if (!token) return false;
   var email = getEmailFromToken(token);
-  var operatorEmail = (env.OPERATOR_EMAIL || 'leesk0130@naver.com').toLowerCase();
+  var operatorEmail = (env.OPERATOR_EMAIL || 'leesk0130@point3.team').toLowerCase();
   return email && email === operatorEmail;
 }
 
@@ -47,7 +47,7 @@ export async function onRequestOptions() {
   return new Response(null, {
     headers: {
       'Access-Control-Allow-Origin': '*',
-      'Access-Control-Allow-Methods': 'GET, POST, OPTIONS',
+      'Access-Control-Allow-Methods': 'GET, POST, DELETE, OPTIONS',
       'Access-Control-Allow-Headers': 'Content-Type, Authorization',
     },
   });
@@ -68,6 +68,19 @@ export async function onRequestGet(context) {
       return { id: r.id, title: r.title, category: r.category, content: r.content, date: formatDate(r.created_at), created_at: r.created_at, updated_at: r.updated_at };
     });
     return json({ items: items, total: (countRow && countRow.total) || 0 });
+  } catch (e) {
+    return json({ error: e.message }, 500);
+  }
+}
+
+export async function onRequestDelete(context) {
+  var env = context.env;
+  var request = context.request;
+  var ok = await verifyOperator(request, env);
+  if (!ok) return json({ error: 'Unauthorized' }, 401);
+  try {
+    await env.DB.prepare('DELETE FROM news').run();
+    return json({ success: true, message: 'All news deleted' });
   } catch (e) {
     return json({ error: e.message }, 500);
   }
