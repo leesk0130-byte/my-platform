@@ -312,6 +312,22 @@ footer {
 }
 .pg-cta-box strong { color: var(--c-primary-hover); }
 .pg-cell-highlight { font-weight: 700; color: var(--c-primary-hover); }
+.pg-logo-cell { width: 80px; text-align: center; vertical-align: middle; }
+.pg-logo-placeholder { width: 48px; height: 48px; margin: 0 auto; background: var(--c-bg); border: 1px dashed var(--c-border); border-radius: var(--r-md); display: flex; align-items: center; justify-content: center; font-size: var(--fs-xs); color: var(--c-text-muted); }
+.pg-row-advantage { background: var(--c-primary-soft); }
+.pg-row-advantage td { font-weight: 600; color: #065f46; }
+.pg-source { font-size: var(--fs-xs); color: var(--c-text-muted); margin-top: var(--s-2); }
+.pg-note { font-size: var(--fs-sm); color: var(--c-text-sub); margin-top: var(--s-3); line-height: var(--lh); }
+.pg-list { list-style: none; padding: 0; }
+.pg-list li { padding: var(--s-2) 0; border-bottom: 1px solid var(--c-border-soft); font-size: var(--fs-sm); line-height: var(--lh); }
+.pg-list li:last-child { border-bottom: none; }
+.pg-intro-card { background: var(--c-surface); border: 1px solid var(--c-border); border-radius: var(--r-lg); padding: var(--s-6); margin-bottom: var(--s-6); box-shadow: var(--sh-sm); }
+.pg-intro-title { font-size: clamp(1.25rem, 3vw, 1.65rem); font-weight: 800; letter-spacing: -.02em; color: var(--c-text); margin: 0 0 var(--s-3); line-height: var(--lh-tight); }
+.pg-intro-lead { font-size: var(--fs-base); line-height: var(--lh); color: var(--c-text-sub); margin: 0 0 var(--s-5); max-width: 65ch; word-break: keep-all; }
+.pg-intro-lead strong { color: var(--c-text); }
+.pg-intro-lead a { font-weight: 700; color: var(--c-primary); text-decoration: underline; text-underline-offset: 3px; }
+.pg-intro-actions { display: flex; flex-wrap: wrap; gap: var(--s-3); }
+.pg-lead { font-size: var(--fs-sm); line-height: var(--lh); color: var(--c-text-sub); margin-bottom: var(--s-4); }
 
 .pg-table-wrap { overflow-x: auto; -webkit-overflow-scrolling: touch; margin-bottom: var(--s-6); }
 .pg-table-wrap table { width: 100%; min-width: 600px; border-collapse: collapse; }

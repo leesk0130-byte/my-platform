@@ -2,7 +2,6 @@
 <html lang="ko">
 <head>
   <meta charset="UTF-8">
-  <meta http-equiv="X-UA-Compatible" content="IE=edge">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <meta name="theme-color" content="#0f172a">
   <title>2025 PG 수수료 비교 | 가맹점숲 - 영세/중소 우대 수수료 정리</title>
@@ -27,75 +26,19 @@
   {"@context":"https://schema.org","@type":"BreadcrumbList","itemListElement":[{"@type":"ListItem","position":1,"name":"가맹점숲 홈","item":"https://bizimshop.co.kr/"},{"@type":"ListItem","position":2,"name":"PG 수수료 비교","item":"https://bizimshop.co.kr/pg.html"}]}
   </script>
   <link rel="stylesheet" href="css/common.css">
-  <style>
-    .pg-badge { display: inline-block; background: linear-gradient(135deg, #059669, #0d9488); color: #fff; font-size: 0.8125rem; font-weight: 700; padding: 0.4rem 0.75rem; border-radius: 999px; margin-bottom: 1rem; }
-    .pg-cta-box { background: linear-gradient(135deg, #ecfdf5, #d1fae5); border: 1px solid #10b981; border-radius: 12px; padding: 1rem 1.25rem; margin: 1.25rem 0; font-weight: 600; color: #065f46; }
-    .pg-logo-cell { width: 80px; text-align: center; vertical-align: middle; }
-    .pg-logo-placeholder { width: 56px; height: 56px; margin: 0 auto; background: #f1f5f9; border: 1px dashed #cbd5e1; border-radius: 12px; display: flex; align-items: center; justify-content: center; font-size: 0.7rem; color: #94a3b8; }
-    .pg-table-wrap tbody tr.pg-row-advantage { background: #ecfdf5 !important; }
-    .pg-table-wrap tbody tr.pg-row-advantage td { font-weight: 600; color: #065f46; }
-    .pg-table-wrap .pg-cell-highlight { background: #d1fae5 !important; font-weight: 700; }
-    .pg-source { font-size: 0.8125rem; color: #64748b; margin-top: 0.5rem; }
-    /* PG 페이지 인트로: 단일 카드 (텍스트 겹침 방지) */
-    .pg-intro-card {
-      background: var(--color-surface);
-      border: 1px solid var(--color-border);
-      border-radius: 16px;
-      padding: 1.5rem 1.5rem 1.75rem;
-      margin-bottom: 1.5rem;
-      box-shadow: 0 4px 24px rgba(15, 23, 42, 0.06);
-    }
-    .pg-intro-card .pg-badge { margin-bottom: 0.75rem; }
-    .pg-intro-title {
-      font-size: clamp(1.25rem, 3vw, 1.65rem);
-      font-weight: 800;
-      letter-spacing: -0.02em;
-      color: var(--color-text);
-      margin: 0 0 0.75rem;
-      line-height: 1.35;
-    }
-    .pg-intro-lead {
-      font-size: 1rem;
-      line-height: 1.8;
-      color: var(--color-text-muted);
-      margin: 0 0 1.25rem;
-      max-width: 65ch;
-      word-break: keep-all;
-    }
-    .pg-intro-lead strong { color: var(--color-text); }
-    .pg-intro-lead a {
-      font-weight: 700;
-      color: var(--color-primary);
-      text-decoration: underline;
-      text-underline-offset: 3px;
-    }
-    .pg-intro-lead a:hover { color: var(--color-primary-hover); }
-    .pg-intro-actions {
-      display: flex;
-      flex-wrap: wrap;
-      gap: 0.75rem;
-      align-items: center;
-    }
-  </style>
   </head>
 <body>
   <a href="#main" class="skip-link">본문으로 건너뛰기</a>
-  <header>
-    <div class="site-logo"><a href="index.html" title="홈으로">가맹점숲</a></div>
+    <header>
+    <div class="site-logo"><a href="index.html">가맹점숲</a></div>
     <button type="button" class="nav-toggle" aria-label="메뉴 열기" aria-expanded="false" data-toggle-nav><span></span><span></span><span></span></button>
     <nav class="header-nav" id="headerNav" aria-label="메인 메뉴">
       <a href="pg.html" class="active">PG 수수료</a>
-      <a href="/calculator">PG 수수료 계산기</a>
+      <a href="/calculator">수수료 계산기</a>
       <a href="news.html">가맹점 정보</a>
+      <a href="must-know.html">필수 가이드</a>
     </nav>
-    <form class="header-search" action="news.html" method="get" role="search" aria-label="사이트 검색">
-      <label for="header-search-q" class="sr-only">뉴스·가이드 검색</label>
-      <input type="search" id="header-search-q" name="q" placeholder="뉴스·가이드 검색" autocomplete="off" aria-label="검색어">
-      <button type="submit" class="btn btn-outline btn-sm">검색</button>
-    </form>
-    <div class="header-auth" id="headerAuth" aria-label="로그인 상태">
-      <div id="auth-actions"></div>
-    </div>
+    <div class="header-auth" id="headerAuth"><div id="auth-actions"></div></div>
   </header>
 
   <main id="main" class="page">
@@ -297,7 +240,7 @@
   </main>
 
 
-  <footer>
+    <footer>
     <div class="footer-inner">
       <div>
         <p class="footer-title">가맹점숲</p>
@@ -307,19 +250,18 @@
         <p class="footer-title">바로가기</p>
         <div class="footer-links">
           <a href="about.html">가맹점숲이란?</a>
+          <a href="pg.html">PG 수수료 비교</a>
+          <a href="/calculator">수수료 계산기</a>
           <a href="news.html">가맹점 정보</a>
-          <a href="/calculator">PG 수수료 계산기</a>
-          <a href="pg.html">PG 수수료 표</a>
-          <a href="terms.html">이용약관</a>
-          <a href="privacy.html">개인정보처리방침</a>
         </div>
       </div>
       <div class="footer-contact">
         <p class="footer-title">문의</p>
-        <p>이메일: <a href="mailto:leesk0130@naver.com?subject=가맹점숲 문의">leesk0130@naver.com</a></p>
-        <p class="footer-hours">운영 시간: 평일 09:00–18:00 (답변은 1–2 영업일 내)</p>
+        <p><a href="contact.html">문의하기</a></p>
+        <p class="footer-hours">평일 09:00-18:00</p>
+        <div class="footer-links" style="margin-top:12px"><a href="terms.html">이용약관</a><a href="privacy.html">개인정보처리방침</a></div>
       </div>
-      <p class="footer-copy">© 2025–2026 가맹점숲. 온라인 가맹점 정보. All rights reserved.</p>
+      <p class="footer-copy">&copy; 2025 가맹점숲. All rights reserved.</p>
     </div>
   </footer>
 
@@ -329,21 +271,21 @@
   <script src="js/app.js"></script>
   <script src="js/auth.js"></script>
   <!-- 모바일 드로어 -->
+  
   <div id="drawerOverlay" hidden aria-hidden="true"></div>
   <aside id="mobileDrawer" hidden aria-hidden="true" role="dialog" aria-modal="true" aria-label="메뉴">
     <div class="drawer-header">
       <span class="drawer-logo">가맹점숲</span>
-      <button type="button" class="drawer-close" aria-label="메뉴 닫기">
-        <svg width="20" height="20" viewBox="0 0 20 20" fill="none" aria-hidden="true"><path d="M4 4L16 16M16 4L4 16" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg>
-      </button>
+      <button type="button" class="drawer-close" aria-label="메뉴 닫기"><svg width="20" height="20" viewBox="0 0 20 20" fill="none"><path d="M4 4L16 16M16 4L4 16" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg></button>
     </div>
     <nav class="drawer-nav" aria-label="모바일 메뉴">
-      <a href="pg.html"         class="drawer-link active">PG 수수료 표</a>
-      <a href="/calculator" class="drawer-link">PG 수수료 계산기</a>
-      <a href="news.html"       class="drawer-link">가맹점 정보</a>
-      <a href="must-know.html" class="drawer-link">꼭 알아야 할 것</a>
+      <a href="pg.html" class="drawer-link active">PG 수수료</a>
+      <a href="/calculator" class="drawer-link">수수료 계산기</a>
+      <a href="news.html" class="drawer-link">가맹점 정보</a>
+      <a href="must-know.html" class="drawer-link">필수 가이드</a>
       <a href="contact.html" class="drawer-link">문의하기</a>
     </nav>
+    <div id="drawerAuth"></div>
   </aside>
   <script src="js/drawer.js"></script>
 </body>

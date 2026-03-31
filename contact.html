@@ -2,7 +2,6 @@
 <html lang="ko">
 <head>
   <meta charset="UTF-8">
-  <meta http-equiv="X-UA-Compatible" content="IE=edge">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <meta name="theme-color" content="#0f172a">
   <title>문의하기 | 가맹점숲</title>
@@ -13,15 +12,16 @@
 </head>
 <body>
   <a href="#main" class="skip-link">본문으로 건너뛰기</a>
-  <header>
-    <div class="site-logo"><a href="index.html" title="홈으로">가맹점숲</a></div>
+    <header>
+    <div class="site-logo"><a href="index.html">가맹점숲</a></div>
     <button type="button" class="nav-toggle" aria-label="메뉴 열기" aria-expanded="false" data-toggle-nav><span></span><span></span><span></span></button>
     <nav class="header-nav" id="headerNav" aria-label="메인 메뉴">
       <a href="pg.html">PG 수수료</a>
-      <a href="/calculator">PG 수수료 계산기</a>
+      <a href="/calculator">수수료 계산기</a>
       <a href="news.html">가맹점 정보</a>
-      <a href="contact.html" class="active">문의하기</a>
+      <a href="must-know.html">필수 가이드</a>
     </nav>
+    <div class="header-auth" id="headerAuth"><div id="auth-actions"></div></div>
   </header>
   <main id="main" class="page">
     <div class="container">
@@ -136,5 +136,22 @@
       }
     })();
   </script>
+
+  <div id="drawerOverlay" hidden aria-hidden="true"></div>
+  <aside id="mobileDrawer" hidden aria-hidden="true" role="dialog" aria-modal="true" aria-label="메뉴">
+    <div class="drawer-header">
+      <span class="drawer-logo">가맹점숲</span>
+      <button type="button" class="drawer-close" aria-label="메뉴 닫기"><svg width="20" height="20" viewBox="0 0 20 20" fill="none"><path d="M4 4L16 16M16 4L4 16" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg></button>
+    </div>
+    <nav class="drawer-nav" aria-label="모바일 메뉴">
+      <a href="pg.html" class="drawer-link">PG 수수료</a>
+      <a href="/calculator" class="drawer-link">수수료 계산기</a>
+      <a href="news.html" class="drawer-link">가맹점 정보</a>
+      <a href="must-know.html" class="drawer-link">필수 가이드</a>
+      <a href="contact.html" class="drawer-link active">문의하기</a>
+    </nav>
+    <div id="drawerAuth"></div>
+  </aside>
+  <script src="js/drawer.js"></script>
 </body>
 </html>
