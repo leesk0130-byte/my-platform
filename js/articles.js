@@ -1,7 +1,7 @@
 (function () {
   "use strict";
 
-  var ADMIN_EMAIL = "leesk0130@naver.com";
+  var ADMIN_EMAIL = "leesk0130@point3.team";
   var ADMIN_UIDS = [];
 
   // UID 없어도 이메일 기반으로 관리자 판별 (isAdminUser 참조)
