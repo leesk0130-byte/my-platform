@@ -79,9 +79,9 @@ header {
 .header-search .btn { color: var(--c-text-muted); border-color: #F0F0F5; padding: 8px 14px; border-radius: var(--r-full); }
 .header-search .btn:hover { color: var(--c-text); background: var(--c-bg-alt); }
 
-.header-auth { margin-left: var(--s-3); display: flex; align-items: center; }
-.header-auth .btn { color: var(--c-text-muted); border-color: #F0F0F5; font-size: var(--fs-xs); padding: 6px 14px; border-radius: var(--r-full); }
-.header-auth .btn:hover { color: var(--c-text); background: var(--c-bg-alt); }
+.header-auth { margin-left: var(--s-4); display: flex; align-items: center; }
+.header-auth .btn { color: var(--c-primary); border: 1.5px solid var(--c-primary-border); font-size: var(--fs-xs); font-weight: 700; padding: 7px 16px; border-radius: var(--r-full); background: var(--c-primary-soft); }
+.header-auth .btn:hover { color: #fff; background: var(--c-primary); border-color: var(--c-primary); }
 
 header h1 { font-size: var(--fs-lg); font-weight: 900; letter-spacing: -.04em; }
 header h1 a { color: var(--c-text); }
@@ -323,11 +323,11 @@ footer {
 .drawer-auth-label { font-size: var(--fs-xs); color: var(--c-text-muted); margin-bottom: var(--s-2); text-transform: uppercase; letter-spacing: .05em; font-weight: 600; }
 .drawer-auth-btn {
   display: block; width: 100%; padding: 12px; text-align: center;
-  background: var(--c-bg-alt); color: var(--c-text-sub); border: 1px solid #F0F0F5;
-  border-radius: var(--r-md); font-family: var(--font); font-size: var(--fs-sm);
+  background: var(--c-primary-soft); color: var(--c-primary); border: 1.5px solid var(--c-primary-border);
+  border-radius: var(--r-full); font-family: var(--font); font-size: var(--fs-sm); font-weight: 700;
   cursor: pointer; transition: all var(--duration);
 }
-.drawer-auth-btn:hover { background: #E8E8EE; color: var(--c-text); }
+.drawer-auth-btn:hover { background: var(--c-primary); color: #fff; border-color: var(--c-primary); }
 
 /* ═══════════════════════════════════════
    PG PAGE
