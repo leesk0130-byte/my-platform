@@ -96,21 +96,30 @@ header h1 a:hover { color: #fff; opacity: .9; }
 
 /* ===== Homepage Hero ===== */
 .hero {
-  background: linear-gradient(135deg, #059669 0%, #047857 55%, #065f46 100%);
+  background: linear-gradient(135deg, #059669 0%, #047857 40%, #065f46 80%, #064e3b 100%);
   color: #fff;
-  border-radius: var(--r-xl);
-  padding: var(--s-10) var(--s-6);
-  margin: var(--s-6) 0 var(--s-8);
+  border-radius: var(--r-2xl);
+  padding: var(--s-12) var(--s-6);
+  margin: var(--s-6) 0 var(--s-10);
   text-align: center;
   position: relative;
   overflow: hidden;
+  box-shadow: 0 20px 60px rgba(5,150,105,.2);
 }
 .hero::before {
   content: '';
   position: absolute;
   top: -60%; right: -20%;
   width: 80%; height: 220%;
-  background: radial-gradient(circle, rgba(255,255,255,.07) 0%, transparent 55%);
+  background: radial-gradient(circle, rgba(255,255,255,.1) 0%, transparent 55%);
+  pointer-events: none;
+}
+.hero::after {
+  content: '';
+  position: absolute;
+  bottom: -30%; left: -10%;
+  width: 50%; height: 120%;
+  background: radial-gradient(circle, rgba(255,255,255,.05) 0%, transparent 50%);
   pointer-events: none;
 }
 .hero-tagline {
@@ -366,6 +375,40 @@ footer {
 /* ===== 404 ===== */
 .page-404 { text-align: center; padding: var(--s-16) var(--s-4); }
 .page-404 h1 { font-size: 4rem; font-weight: 900; color: var(--c-text-muted); margin-bottom: var(--s-4); }
+
+/* ===== Guide/Article Page Head ===== */
+.page-head { margin-bottom: var(--s-6); }
+.page-head h1 {
+  font-size: clamp(1.4rem, 3.5vw, 1.9rem);
+  font-weight: 900;
+  letter-spacing: -.03em;
+  line-height: var(--lh-tight);
+  color: var(--c-text);
+  margin-bottom: var(--s-2);
+}
+
+/* ===== Content page table overrides (for article-body) ===== */
+.pg-table-wrap table th {
+  background: var(--c-primary-dark);
+  color: #fff;
+  font-size: var(--fs-xs);
+  font-weight: 700;
+  letter-spacing: .03em;
+}
+.pg-table-wrap table tbody tr:nth-child(even) td { background: #fafcfe; }
+.pg-table-wrap table tbody tr:hover td { background: var(--c-primary-soft); }
+
+/* ===== Enhanced Info Cards ===== */
+.info-card {
+  box-shadow: var(--sh-sm);
+}
+.info-card:hover {
+  box-shadow: 0 8px 30px rgba(5,150,105,.12);
+}
+
+/* ===== Page transition ===== */
+main { animation: fadeIn .3s ease; }
+@keyframes fadeIn { from { opacity: 0; transform: translateY(8px); } to { opacity: 1; transform: translateY(0); } }
 
 /* ===== Print ===== */
 @media print {
