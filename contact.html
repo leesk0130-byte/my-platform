@@ -61,23 +61,11 @@
       </section>
     </div>
   </main>
-  <script src="https://www.gstatic.com/firebasejs/10.7.0/firebase-app-compat.js"></script>
-  <script src="https://www.gstatic.com/firebasejs/10.7.0/firebase-firestore-compat.js"></script>
-  <script src="js/config.js?v=2"></script>
   <script>
     (function () {
       var form = document.getElementById("contact-form");
       var msg = document.getElementById("contact-msg");
       var submitBtn = form.querySelector('button[type="submit"]');
-
-      // Firestore 초기화
-      var db = null;
-      try {
-        if (window.FIREBASE_CONFIG && window.firebase) {
-          if (!firebase.apps.length) firebase.initializeApp(window.FIREBASE_CONFIG);
-          if (typeof firebase.firestore === 'function') db = firebase.firestore();
-        }
-      } catch (e) { db = null; }
 
       form.addEventListener("submit", function (e) {
         e.preventDefault();
@@ -96,35 +84,9 @@
         submitBtn.textContent = "전송 중...";
         msg.textContent = "";
 
-        var inquiry = {
-          name: name,
-          email: email,
-          subject: subject,
-          message: body,
-          createdAt: new Date().toISOString(),
-          status: "new"
-        };
-
-        if (db) {
-          db.collection("inquiries").add(inquiry)
-            .then(function () {
-              msg.textContent = "문의가 접수되었습니다. 1-2 영업일 내 답변드리겠습니다.";
-              msg.style.color = "#047857";
-              form.reset();
-            })
-            .catch(function () {
-              // Firestore 실패 시 mailto 폴백
-              fallbackMailto(name, email, subject, body);
-            })
-            .finally(function () {
-              submitBtn.disabled = false;
-              submitBtn.textContent = "문의 보내기";
-            });
-        } else {
-          fallbackMailto(name, email, subject, body);
-          submitBtn.disabled = false;
-          submitBtn.textContent = "문의 보내기";
-        }
+        fallbackMailto(name, email, subject, body);
+        submitBtn.disabled = false;
+        submitBtn.textContent = "문의 보내기";
       });
 
       function fallbackMailto(name, email, subject, body) {

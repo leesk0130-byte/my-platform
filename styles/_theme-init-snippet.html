@@ -1,0 +1,4 @@
+<!-- FOUC 방지용 인라인 테마 초기화 스니펫.
+     각 페이지 <head> 안 (CSS 로드 직전이 이상적) 에 그대로 복붙.
+     localStorage key: gmj-theme -->
+<script>(function(){try{var k='gmj-theme',s=localStorage.getItem(k),m=window.matchMedia&&matchMedia('(prefers-color-scheme: light)').matches,t=(s==='dark'||s==='light')?s:(m?'light':'dark');document.documentElement.setAttribute('data-theme',t);}catch(e){document.documentElement.setAttribute('data-theme','dark');}})();</script>

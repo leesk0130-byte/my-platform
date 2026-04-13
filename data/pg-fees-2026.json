@@ -1,0 +1,183 @@
+{
+  "updated_at": "2026-04-13",
+  "source": [
+    "금융위원회 보도자료 2026.02 — 2026년 상반기 영세·중소 신용카드 가맹점 우대수수료 적용 (https://www.fsc.go.kr/)",
+    "여신금융협회 가맹점 수수료율 공시 (https://www.crefia.or.kr/)",
+    "토스페이먼츠 수수료 안내 (https://docs.tosspayments.com/resources/glossary/smm)",
+    "NHN KCP 수수료 안내 (https://www.kcp.co.kr/)",
+    "KG이니시스 수수료 안내 (https://www.inicis.com/)",
+    "나이스페이먼츠 수수료 안내 (https://www.nicepay.co.kr/)",
+    "다날 수수료 안내 (https://www.danalpay.com/)",
+    "PortOne 2026 PG사 비교 (https://blog.portone.io/opi_pg-comparison2026/)"
+  ],
+  "notes": "표준 공시 기준이며 가맹점별 매출규모·협상에 따라 상이. 영세/중소 구간은 2026년 상반기 금융위 고시(신용카드 0.4%~1.45%, 체크카드 0.15%~1.15%). 일반가맹점 구간은 각 PG사 공개 안내 평균값.",
+  "disclaimer": "본 수수료는 참고용이며 실제 계약 수수료는 각 PG사와의 협상에 따라 달라질 수 있습니다. 정확한 수수료는 각 PG사에 직접 문의하세요.",
+  "verified_on": "2026-04-13",
+  "providers": [
+    {
+      "id": "toss",
+      "name": "토스페이먼츠",
+      "logo": null,
+      "website": "https://www.tosspayments.com/",
+      "card": {
+        "credit": {
+          "young":   0.40,
+          "small1":  1.10,
+          "small2":  1.25,
+          "small3":  1.45,
+          "general": 2.90
+        },
+        "check": {
+          "young":   0.15,
+          "general": 2.50
+        }
+      },
+      "easypay": {
+        "naverpay":  2.90,
+        "kakaopay":  2.90,
+        "payco":     2.80,
+        "tosspay":   2.70,
+        "samsungpay":2.80,
+        "applepay":  2.90
+      },
+      "bank":            1.20,
+      "virtual_account": 300,
+      "phone":           5.50,
+      "overseas":        3.80,
+      "monthly_fee":     9167,
+      "notes": "연 관리비 약 11만원(월 환산 9,167원). 표준 공시 기준, 가맹점별 상이."
+    },
+    {
+      "id": "kcp",
+      "name": "NHN KCP",
+      "logo": null,
+      "website": "https://www.kcp.co.kr/",
+      "card": {
+        "credit": {
+          "young":   0.40,
+          "small1":  1.10,
+          "small2":  1.25,
+          "small3":  1.45,
+          "general": 2.80
+        },
+        "check": {
+          "young":   0.15,
+          "general": 2.40
+        }
+      },
+      "easypay": {
+        "naverpay":  2.80,
+        "kakaopay":  2.90,
+        "payco":     2.70,
+        "tosspay":   2.70,
+        "samsungpay":2.70,
+        "applepay":  2.90
+      },
+      "bank":            1.10,
+      "virtual_account": 300,
+      "phone":           5.50,
+      "overseas":        3.70,
+      "monthly_fee":     0,
+      "notes": "연 관리비 면제. 표준 공시 기준, 가맹점별 상이."
+    },
+    {
+      "id": "inicis",
+      "name": "KG이니시스",
+      "logo": null,
+      "website": "https://www.inicis.com/",
+      "card": {
+        "credit": {
+          "young":   0.40,
+          "small1":  1.10,
+          "small2":  1.25,
+          "small3":  1.45,
+          "general": 2.90
+        },
+        "check": {
+          "young":   0.15,
+          "general": 2.50
+        }
+      },
+      "easypay": {
+        "naverpay":  2.90,
+        "kakaopay":  2.90,
+        "payco":     2.80,
+        "tosspay":   2.80,
+        "samsungpay":2.80,
+        "applepay":  2.90
+      },
+      "bank":            1.20,
+      "virtual_account": 300,
+      "phone":           5.50,
+      "overseas":        3.80,
+      "monthly_fee":     0,
+      "notes": "가입비 약 22만원. 표준 공시 기준, 가맹점별 상이."
+    },
+    {
+      "id": "nicepay",
+      "name": "나이스페이먼츠",
+      "logo": null,
+      "website": "https://www.nicepay.co.kr/",
+      "card": {
+        "credit": {
+          "young":   0.40,
+          "small1":  1.10,
+          "small2":  1.25,
+          "small3":  1.45,
+          "general": 2.80
+        },
+        "check": {
+          "young":   0.15,
+          "general": 2.40
+        }
+      },
+      "easypay": {
+        "naverpay":  2.80,
+        "kakaopay":  2.90,
+        "payco":     2.70,
+        "tosspay":   2.70,
+        "samsungpay":2.70,
+        "applepay":  2.90
+      },
+      "bank":            1.10,
+      "virtual_account": 300,
+      "phone":           5.50,
+      "overseas":        3.70,
+      "monthly_fee":     0,
+      "notes": "VAN 인프라 기반 오프라인 연동 강점. 표준 공시 기준, 가맹점별 상이."
+    },
+    {
+      "id": "danal",
+      "name": "다날",
+      "logo": null,
+      "website": "https://www.danalpay.com/",
+      "card": {
+        "credit": {
+          "young":   0.40,
+          "small1":  1.10,
+          "small2":  1.25,
+          "small3":  1.45,
+          "general": 2.90
+        },
+        "check": {
+          "young":   0.15,
+          "general": 2.50
+        }
+      },
+      "easypay": {
+        "naverpay":  2.90,
+        "kakaopay":  2.90,
+        "payco":     2.80,
+        "tosspay":   2.80,
+        "samsungpay":2.80,
+        "applepay":  null
+      },
+      "bank":            1.20,
+      "virtual_account": 300,
+      "phone":           4.50,
+      "overseas":        3.80,
+      "monthly_fee":     0,
+      "notes": "휴대폰결제 강점. 표준 공시 기준, 가맹점별 상이."
+    }
+  ]
+}

@@ -1,109 +1,62 @@
 /**
- * GET /api/news?limit=20&offset=0  -- public
- * POST /api/news                   -- operator only (Firebase token)
+ * Compatibility shim for legacy /api/news.
+ * New storage lives in `posts` table (type='news'). This endpoint re-uses
+ * /api/posts under the hood so old frontends keep working.
+ *
+ * GET    — proxies to posts listing (type=news)
+ * POST   — 410 Gone (use /api/posts)
+ * DELETE — 410 Gone (use /api/posts/:id)
  */
-
-function json(body, status) {
-  return new Response(JSON.stringify(body), {
-    status: status || 200,
-    headers: { 'Content-Type': 'application/json', 'Access-Control-Allow-Origin': '*' },
-  });
-}
-
-function randomId() {
-  return Date.now().toString(36) + Math.random().toString(36).slice(2, 8);
-}
+import { json, error } from '../../_lib/http.js';
 
 function formatDate(ts) {
   if (!ts) return '';
-  return new Date(Number(ts)).toLocaleDateString('ko-KR', { year: 'numeric', month: 'short', day: 'numeric' });
+  // posts.published_at / created_at is "YYYY-MM-DD HH:MM:SS"
+  try {
+    const d = new Date(String(ts).replace(' ', 'T') + 'Z');
+    return d.toLocaleDateString('ko-KR', { year: 'numeric', month: 'short', day: 'numeric' });
+  } catch (_) { return ''; }
 }
 
-function getEmailFromToken(token) {
+export async function onRequestGet({ env, request }) {
+  const url = new URL(request.url);
+  const limit = Math.min(Math.max(Number(url.searchParams.get('limit')) || 20, 1), 100);
+  const offset = Math.max(Number(url.searchParams.get('offset')) || 0, 0);
+  const category = url.searchParams.get('category');
+
+  const where = ["type = 'news'", "status = 'published'"];
+  const binds = [];
+  if (category) { where.push('category = ?'); binds.push(category); }
+  const whereSql = 'WHERE ' + where.join(' AND ');
+
   try {
-    var parts = token.split('.');
-    if (parts.length < 2) return '';
-    var payload = parts[1].replace(/-/g, '+').replace(/_/g, '/');
-    var pad = payload.length % 4;
-    if (pad) payload += new Array(5 - pad).join('=');
-    var json = atob(payload);
-    var data = JSON.parse(json);
-    return (data.email || '').toLowerCase();
+    const listStmt = env.DB.prepare(
+      `SELECT id, slug, title, category, excerpt, content_html, created_at, updated_at, published_at
+       FROM posts ${whereSql} ORDER BY pinned DESC, published_at DESC, id DESC LIMIT ? OFFSET ?`
+    ).bind(...binds, limit, offset);
+    const countStmt = env.DB.prepare(`SELECT COUNT(*) AS total FROM posts ${whereSql}`).bind(...binds);
+    const [listRes, countRow] = await Promise.all([listStmt.all(), countStmt.first()]);
+    const items = (listRes.results || []).map(r => ({
+      id: r.id,
+      slug: r.slug,
+      title: r.title,
+      category: r.category || 'general',
+      content: r.content_html,
+      excerpt: r.excerpt,
+      date: formatDate(r.published_at || r.created_at),
+      created_at: r.created_at,
+      updated_at: r.updated_at,
+    }));
+    return json({ items, total: (countRow && countRow.total) || 0 });
   } catch (e) {
-    return '';
+    return error(e.message, 500);
   }
 }
 
-async function verifyOperator(request, env) {
-  var auth = request.headers.get('Authorization') || '';
-  var token = auth.startsWith('Bearer ') ? auth.slice(7) : '';
-  if (!token) return false;
-  var email = getEmailFromToken(token);
-  var operatorEmail = (env.OPERATOR_EMAIL || 'leesk0130@point3.team').toLowerCase();
-  return email && email === operatorEmail;
+export async function onRequestPost() {
+  return error('Deprecated. Use POST /api/posts with type="news".', 410);
 }
 
-export async function onRequestOptions() {
-  return new Response(null, {
-    headers: {
-      'Access-Control-Allow-Origin': '*',
-      'Access-Control-Allow-Methods': 'GET, POST, DELETE, OPTIONS',
-      'Access-Control-Allow-Headers': 'Content-Type, Authorization',
-    },
-  });
-}
-
-export async function onRequestGet(context) {
-  var env = context.env;
-  var request = context.request;
-  var url = new URL(request.url);
-  var limit = Math.min(Number(url.searchParams.get('limit')) || 20, 100);
-  var offset = Number(url.searchParams.get('offset')) || 0;
-  try {
-    var stmt = await env.DB.prepare(
-      'SELECT id, title, category, content, created_at, updated_at FROM news ORDER BY created_at DESC LIMIT ? OFFSET ?'
-    ).bind(limit, offset).all();
-    var countRow = await env.DB.prepare('SELECT COUNT(*) as total FROM news').first();
-    var items = (stmt.results || []).map(function(r) {
-      return { id: r.id, title: r.title, category: r.category, content: r.content, date: formatDate(r.created_at), created_at: r.created_at, updated_at: r.updated_at };
-    });
-    return json({ items: items, total: (countRow && countRow.total) || 0 });
-  } catch (e) {
-    return json({ error: e.message }, 500);
-  }
-}
-
-export async function onRequestDelete(context) {
-  var env = context.env;
-  var request = context.request;
-  var ok = await verifyOperator(request, env);
-  if (!ok) return json({ error: 'Unauthorized' }, 401);
-  try {
-    await env.DB.prepare('DELETE FROM news').run();
-    return json({ success: true, message: 'All news deleted' });
-  } catch (e) {
-    return json({ error: e.message }, 500);
-  }
-}
-
-export async function onRequestPost(context) {
-  var env = context.env;
-  var request = context.request;
-  var ok = await verifyOperator(request, env);
-  if (!ok) return json({ error: 'Unauthorized' }, 401);
-  try {
-    var body = await request.json();
-    var title = body.title;
-    var category = body.category || 'general';
-    var content = body.content;
-    if (!title || !content) return json({ error: 'title and content required' }, 400);
-    var id = randomId();
-    var now = Date.now();
-    await env.DB.prepare(
-      'INSERT INTO news (id, title, category, content, created_at, updated_at) VALUES (?, ?, ?, ?, ?, ?)'
-    ).bind(id, title, category, content, now, now).run();
-    return json({ id: id, title: title, category: category, content: content, date: formatDate(now), created_at: now }, 201);
-  } catch (e) {
-    return json({ error: e.message }, 500);
-  }
+export async function onRequestDelete() {
+  return error('Deprecated. Use DELETE /api/posts/:id.', 410);
 }

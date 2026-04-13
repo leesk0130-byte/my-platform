@@ -1,98 +1,125 @@
-/* ===== Design Tokens · 가맹점숲 v2 ===== */
+/* styles/tokens.css — 가맹점숲 디자인 토큰 (블라인드 × 오르비 × 프리미엄)
+   다른 CSS 보다 먼저 로드되어야 함. */
+
 :root {
-  /* ── Brand Color ── */
-  --c-primary: #4F46E5;
-  --c-primary-hover: #4338CA;
-  --c-primary-dark: #3730A3;
-  --c-primary-darker: #312E81;
-  --c-primary-soft: #EEF2FF;
-  --c-primary-border: #C7D2FE;
-  --c-primary-glow: rgba(79,70,229,.15);
+  /* ---- 색상 (다크 기본) ---- */
+  --bg: #0b1020;
+  --surface: #121a33;
+  --surface-2: #1a2444;
+  --surface-3: #222d55;
+  --border: rgba(255, 255, 255, .08);
+  --border-strong: rgba(255, 255, 255, .16);
+  --text: #e8ecf5;
+  --text-strong: #ffffff;
+  --muted: #9aa3b8;
+  --primary: #6366f1;
+  --primary-2: #818cf8;
+  --primary-ink: #ffffff;
+  --accent: #22d3ee;
+  --danger: #ef4444;
+  --warn: #f59e0b;
+  --ok: #10b981;
 
-  /* ── Accent ── */
-  --c-accent: #06B6D4;
-  --c-accent-soft: #ECFEFF;
+  --overlay: rgba(5, 8, 20, .72);
+  --glass: rgba(18, 26, 51, .72);
 
-  /* ── Semantic ── */
-  --c-danger: #EF4444;
-  --c-danger-soft: #FEF2F2;
-  --c-warning: #F59E0B;
-  --c-warning-soft: #FFFBEB;
-  --c-info: #3B82F6;
-  --c-info-soft: #EFF6FF;
-  --c-success: #10B981;
-  --c-success-soft: #ECFDF5;
+  /* ---- Spacing scale ---- */
+  --space-1: 4px;
+  --space-2: 8px;
+  --space-3: 12px;
+  --space-4: 16px;
+  --space-5: 24px;
+  --space-6: 32px;
+  --space-7: 48px;
+  --space-8: 64px;
 
-  /* ── Neutral ── */
-  --c-bg: #FFFFFF;
-  --c-bg-alt: #F7F8FA;
-  --c-surface: #FFFFFF;
-  --c-border: #E2E8F0;
-  --c-border-soft: #F1F5F9;
-  --c-text: #0F172A;
-  --c-text-sub: #475569;
-  --c-text-muted: #94A3B8;
-  --c-header: #0F172A;
-  --c-header-border: #1E293B;
+  /* ---- Typography ---- */
+  --font: "Pretendard Variable", "Pretendard", -apple-system, BlinkMacSystemFont, "Segoe UI", system-ui, "Apple SD Gothic Neo", sans-serif;
+  --font-mono: ui-monospace, SFMono-Regular, "SF Mono", Menlo, Consolas, monospace;
 
-  /* ── Typography ── */
-  --font: "Pretendard", -apple-system, BlinkMacSystemFont, system-ui, "Malgun Gothic", sans-serif;
-  --fs-xs: 0.8125rem;      /* 13px */
-  --fs-sm: 0.875rem;       /* 14px */
-  --fs-base: 1rem;         /* 16px */
-  --fs-md: 1.125rem;       /* 18px */
-  --fs-lg: 1.3125rem;      /* 21px */
-  --fs-xl: 1.5rem;         /* 24px */
-  --fs-2xl: 1.875rem;      /* 30px */
-  --fs-3xl: 2.5rem;        /* 40px */
-  --fs-display: 3.25rem;   /* 52px */
-  --lh: 1.7;
-  --lh-tight: 1.25;
-  --lh-snug: 1.4;
+  --fs-12: 12px;
+  --fs-14: 14px;
+  --fs-15: 15px;
+  --fs-17: 17px;
+  --fs-20: 20px;
+  --fs-24: 24px;
+  --fs-32: 32px;
+  --fs-44: 44px;
 
-  /* ── Spacing ── */
-  --s-1: 4px; --s-2: 8px; --s-3: 12px; --s-4: 16px;
-  --s-5: 20px; --s-6: 24px; --s-8: 32px; --s-10: 40px;
-  --s-12: 48px; --s-16: 64px; --s-20: 80px; --s-24: 96px;
+  --fw-400: 400;
+  --fw-500: 500;
+  --fw-700: 700;
 
-  /* ── Radius ── */
-  --r-xs: 4px;
-  --r-sm: 6px;
-  --r-md: 10px;
-  --r-lg: 16px;
-  --r-xl: 24px;
-  --r-2xl: 32px;
-  --r-full: 9999px;
+  --lh-tight: 1.4;
+  --lh-base: 1.6;
+  --lh-prose: 1.75;
 
-  /* ── Shadow ── */
-  --sh-xs: 0 1px 2px rgba(0,0,0,.04);
-  --sh-sm: 0 1px 3px rgba(0,0,0,.06), 0 1px 2px rgba(0,0,0,.04);
-  --sh-md: 0 4px 6px -1px rgba(0,0,0,.07), 0 2px 4px -2px rgba(0,0,0,.05);
-  --sh-lg: 0 10px 15px -3px rgba(0,0,0,.08), 0 4px 6px -4px rgba(0,0,0,.04);
-  --sh-xl: 0 20px 25px -5px rgba(0,0,0,.08), 0 8px 10px -6px rgba(0,0,0,.04);
-  --sh-2xl: 0 25px 50px -12px rgba(0,0,0,.15);
-  --sh-card: 0 1px 2px rgba(0,0,0,.03);
-  --sh-card-hover: 0 12px 40px rgba(0,0,0,.06);
-  --sh-hero: 0 0 0 transparent;
+  /* ---- Radius ---- */
+  --radius-xs: 4px;
+  --radius-sm: 8px;
+  --radius-md: 12px;
+  --radius: 14px;
+  --radius-lg: 20px;
+  --radius-full: 9999px;
 
-  /* ── Layout ── */
-  --max-w: 1200px;
-  --max-w-article: 780px;
-  --px: 16px;
+  /* ---- Shadows ---- */
+  --shadow-1: 0 1px 2px rgba(0, 0, 0, .4), 0 8px 24px rgba(0, 0, 0, .3);
+  --shadow-2: 0 2px 6px rgba(0, 0, 0, .45), 0 16px 40px rgba(0, 0, 0, .35);
+  --shadow-3: 0 6px 16px rgba(0, 0, 0, .5), 0 32px 80px rgba(0, 0, 0, .45);
 
-  /* ── Transition ── */
-  --ease: cubic-bezier(.4,0,.2,1);
-  --duration: .2s;
+  /* ---- Layout ---- */
+  --maxw: 1200px;
+  --header-h: 64px;
+
+  /* ---- Motion ---- */
+  --ease: cubic-bezier(.2, .7, .2, 1);
+  --dur-1: 120ms;
+  --dur-2: 200ms;
+  --dur-3: 320ms;
+
+  /* ---- Z-index layers ---- */
+  --z-base: 0;
+  --z-sticky: 100;
+  --z-header: 200;
+  --z-drawer: 300;
+  --z-modal: 400;
+  --z-toast: 500;
+
+  color-scheme: dark;
 }
 
-@media (min-width: 768px) {
-  :root {
-    --px: 24px;
-    --fs-base: 1.0625rem;
-    --fs-3xl: 2.75rem;
-    --fs-display: 3.5rem;
+[data-theme="light"] {
+  --bg: #f7f8fb;
+  --surface: #ffffff;
+  --surface-2: #f1f3f9;
+  --surface-3: #e5e9f4;
+  --border: rgba(10, 14, 30, .08);
+  --border-strong: rgba(10, 14, 30, .16);
+  --text: #0b1020;
+  --text-strong: #000000;
+  --muted: #51607a;
+  --primary: #4f46e5;
+  --primary-2: #6366f1;
+  --primary-ink: #ffffff;
+  --overlay: rgba(10, 14, 30, .48);
+  --glass: rgba(255, 255, 255, .78);
+  --shadow-1: 0 1px 2px rgba(10, 14, 30, .06), 0 8px 24px rgba(10, 14, 30, .08);
+  --shadow-2: 0 2px 6px rgba(10, 14, 30, .08), 0 16px 40px rgba(10, 14, 30, .10);
+  --shadow-3: 0 6px 16px rgba(10, 14, 30, .10), 0 32px 80px rgba(10, 14, 30, .14);
+  color-scheme: light;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after {
+    animation-duration: .001ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: .001ms !important;
+    scroll-behavior: auto !important;
   }
 }
-@media (min-width: 1024px) {
-  :root { --px: 32px; }
+
+:focus-visible {
+  outline: 2px solid var(--primary-2);
+  outline-offset: 2px;
+  border-radius: var(--radius-xs);
 }

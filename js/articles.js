@@ -1,16 +1,18 @@
+/*
+ * js/articles.js — 리모델링 후 얇은 posts API 래퍼 (Agent 4 정리)
+ *
+ * 이전 버전은 Firestore `articles` 컬렉션에 직접 붙었으나, v2 에서는
+ * Cloudflare D1 `posts` 테이블을 `/api/posts` 엔드포인트로 래핑한다.
+ * 작성/수정/삭제는 어드민 세션 쿠키(admin_session)가 있을 때만 동작한다.
+ *
+ * 남은 페이지에서 호출하는 기존 시그니처와의 호환을 위해
+ * window.articlesApi 네임스페이스는 유지한다.
+ */
 (function () {
   "use strict";
 
-  var ADMIN_EMAIL = "leesk0130@point3.team";
-  var ADMIN_UIDS = [];
-
-  // UID 없어도 이메일 기반으로 관리자 판별 (isAdminUser 참조)
-
-  function getDb() {
-    if (!window.firebase || !window.firebase.apps || !window.firebase.apps.length) return null;
-    if (typeof window.firebase.firestore !== "function") return null;
-    return window.firebase.firestore();
-  }
+  var POSTS_ENDPOINT = "/api/posts";
+  var DEFAULT_TYPE = "article";
 
   function slugify(input) {
     return String(input || "")
@@ -24,9 +26,7 @@
 
   function estimateReadTimeMinutes(text) {
     var clean = String(text || "").replace(/<[^>]*>/g, " ").replace(/\s+/g, " ").trim();
-    var length = clean.length;
-    var perMin = 500; // Korean rough reading speed by chars
-    return Math.max(1, Math.ceil(length / perMin));
+    return Math.max(1, Math.ceil(clean.length / 500));
   }
 
   function plainExcerpt(html, max) {
@@ -35,216 +35,129 @@
     return s.slice(0, max) + "...";
   }
 
-  function isAdminUser(user) {
-    if (!user) return false;
-    var email = (user.email || "").toLowerCase().trim();
-    if (email === ADMIN_EMAIL.toLowerCase()) return true;
-    if (ADMIN_UIDS.indexOf(user.uid || "") !== -1) return true;
-    return false;
-  }
-
-  function toMillis(ts) {
-    if (!ts) return 0;
-    if (typeof ts.toDate === "function") return ts.toDate().getTime();
-    if (ts.seconds) return ts.seconds * 1000;
-    if (typeof ts === "number") return ts;
-    if (typeof ts === "string") return new Date(ts).getTime();
-    return 0;
-  }
-
-  function toIso(ts) {
-    var ms = toMillis(ts);
-    return ms ? new Date(ms).toISOString() : "";
-  }
-
-  function normalizeArticle(doc) {
-    var d = doc.data ? doc.data() : doc || {};
-    var publishedMs = toMillis(d.publishedAt);
-    var updatedMs = toMillis(d.updatedAt);
+  function normalizePost(row) {
+    if (!row) return null;
     return {
-      id: doc.id || d.id || "",
-      title: d.title || "",
-      slug: d.slug || "",
-      category: d.category || "일반",
-      content: d.content || "",
-      tags: Array.isArray(d.tags) ? d.tags : [],
-      isPublished: !!d.isPublished,
-      author: d.author || "",
-      viewCount: typeof d.viewCount === "number" ? d.viewCount : 0,
-      readTime: typeof d.readTime === "number" ? d.readTime : estimateReadTimeMinutes(d.content || ""),
-      excerpt: d.excerpt || plainExcerpt(d.content || "", 140),
-      publishedAt: publishedMs,
-      updatedAt: updatedMs,
-      publishedAtIso: toIso(d.publishedAt),
-      updatedAtIso: toIso(d.updatedAt),
+      id: row.id,
+      title: row.title || "",
+      slug: row.slug || "",
+      category: row.category || "일반",
+      tags: row.tags ? String(row.tags).split(",").map(function (t) { return t.trim(); }).filter(Boolean) : [],
+      content: row.content_html || "",
+      excerpt: row.excerpt || plainExcerpt(row.content_html || "", 140),
+      coverImage: row.cover_image || "",
+      isPublished: row.status === "published",
+      viewCount: row.views || 0,
+      pinned: !!row.pinned,
+      readTime: estimateReadTimeMinutes(row.content_html || ""),
+      author: "운영자",
+      publishedAtIso: row.published_at || "",
+      updatedAtIso: row.updated_at || "",
+      publishedAt: row.published_at ? new Date(row.published_at).getTime() : 0,
+      updatedAt: row.updated_at ? new Date(row.updated_at).getTime() : 0
+    };
+  }
+
+  function request(method, url, body) {
+    var opts = {
+      method: method,
+      credentials: "same-origin",
+      headers: { "Accept": "application/json" }
+    };
+    if (body) {
+      opts.headers["Content-Type"] = "application/json";
+      opts.body = JSON.stringify(body);
+    }
+    return fetch(url, opts).then(function (res) {
+      return res.json().catch(function () { return {}; }).then(function (data) {
+        if (!res.ok) throw new Error((data && data.error) || ("HTTP " + res.status));
+        return data;
+      });
+    });
+  }
+
+  function listArticles(options, callback) {
+    options = options || {};
+    var params = new URLSearchParams();
+    params.set("type", options.type || DEFAULT_TYPE);
+    params.set("limit", String(options.limit || 50));
+    if (options.offset) params.set("offset", String(options.offset));
+    if (options.category) params.set("category", options.category);
+    if (options.q) params.set("q", options.q);
+    request("GET", POSTS_ENDPOINT + "?" + params.toString())
+      .then(function (data) {
+        var rows = (data && data.items ? data.items : []).map(normalizePost).filter(Boolean);
+        if (options.onlyPublished) rows = rows.filter(function (r) { return r.isPublished; });
+        callback(null, rows);
+      })
+      .catch(function (e) { callback((e && e.message) || "목록 조회 실패", []); });
+  }
+
+  function getArticleBySlug(slug, callback) {
+    if (!slug) return callback(null, null);
+    request("GET", POSTS_ENDPOINT + "/" + encodeURIComponent(slug))
+      .then(function (data) { callback(null, normalizePost(data && data.item ? data.item : data)); })
+      .catch(function () { callback(null, null); });
+  }
+
+  function getArticleById(id, callback) {
+    // v2 에서는 slug 기반 조회만 사용. id 단건 조회는 slug 로 먼저 받아와야 함.
+    // 호환 stub: listArticles 로 찾아서 반환.
+    listArticles({ limit: 200 }, function (err, rows) {
+      if (err) return callback(err);
+      var found = (rows || []).filter(function (r) { return String(r.id) === String(id); })[0] || null;
+      callback(null, found);
+    });
+  }
+
+  function buildPayload(payload) {
+    var title = String(payload.title || "").trim();
+    var content = String(payload.content || "").trim();
+    return {
+      type: payload.type || DEFAULT_TYPE,
+      slug: slugify(payload.slug || title),
+      title: title,
+      category: payload.category || "일반",
+      tags: Array.isArray(payload.tags) ? payload.tags.join(",") : (payload.tags || ""),
+      excerpt: payload.excerpt || plainExcerpt(content, 160),
+      content_html: content,
+      cover_image: payload.coverImage || "",
+      status: payload.isPublished ? "published" : "draft",
+      pinned: payload.pinned ? 1 : 0
     };
   }
 
   function createArticle(payload, callback) {
-    var db = getDb();
-    if (!db) return callback("Firestore 연결 실패");
-    var title = String(payload.title || "").trim();
-    if (!title) return callback("제목이 필요합니다.");
-    var content = String(payload.content || "").trim();
-    if (!content) return callback("본문이 필요합니다.");
-    var slug = slugify(payload.slug || title);
-    var tags = (payload.tags || []).map(function (t) { return String(t).trim(); }).filter(Boolean);
-    var article = {
-      title: title,
-      slug: slug,
-      category: payload.category || "일반",
-      content: content,
-      tags: tags,
-      isPublished: !!payload.isPublished,
-      excerpt: plainExcerpt(content, 160),
-      readTime: estimateReadTimeMinutes(content),
-      author: payload.author || "관리자",
-      viewCount: 0,
-      publishedAt: payload.isPublished ? window.firebase.firestore.FieldValue.serverTimestamp() : null,
-      updatedAt: window.firebase.firestore.FieldValue.serverTimestamp(),
-    };
-    db.collection("articles").add(article)
-      .then(function (ref) { callback(null, ref.id); })
+    request("POST", POSTS_ENDPOINT, buildPayload(payload))
+      .then(function (data) { callback(null, data && data.id); })
       .catch(function (e) { callback((e && e.message) || "저장 실패"); });
   }
 
   function updateArticle(id, payload, callback) {
-    var db = getDb();
-    if (!db) return callback("Firestore 연결 실패");
-    var update = {
-      title: String(payload.title || "").trim(),
-      slug: slugify(payload.slug || payload.title),
-      category: payload.category || "일반",
-      content: String(payload.content || "").trim(),
-      tags: (payload.tags || []).map(function (t) { return String(t).trim(); }).filter(Boolean),
-      isPublished: !!payload.isPublished,
-      excerpt: plainExcerpt(payload.content || "", 160),
-      readTime: estimateReadTimeMinutes(payload.content || ""),
-      updatedAt: window.firebase.firestore.FieldValue.serverTimestamp(),
-    };
-    if (payload.isPublished && !payload.wasPublished) {
-      update.publishedAt = window.firebase.firestore.FieldValue.serverTimestamp();
-    }
-    db.collection("articles").doc(id).update(update)
+    request("PUT", POSTS_ENDPOINT + "/" + encodeURIComponent(id), buildPayload(payload))
       .then(function () { callback(null); })
       .catch(function (e) { callback((e && e.message) || "수정 실패"); });
   }
 
   function deleteArticle(id, callback) {
-    var db = getDb();
-    if (!db) return callback("Firestore 연결 실패");
-    db.collection("articles").doc(id).delete()
+    request("DELETE", POSTS_ENDPOINT + "/" + encodeURIComponent(id))
       .then(function () { callback(null); })
       .catch(function (e) { callback((e && e.message) || "삭제 실패"); });
   }
 
-  function listArticles(options, callback) {
-    var db = getDb();
-    if (!db) return callback(null, []);
-    options = options || {};
-    var limit = options.limit || 50;
-    var onlyPublished = !!options.onlyPublished;
-    var q = db.collection("articles");
-    if (onlyPublished) q = q.where("isPublished", "==", true);
-    q.orderBy("updatedAt", "desc").limit(limit).get()
-      .then(function (snap) {
-        var rows = [];
-        snap.forEach(function (doc) { rows.push(normalizeArticle(doc)); });
-        callback(null, rows);
-      })
-      .catch(function () {
-        // Fallback for missing composite/field indexes
-        db.collection("articles").limit(limit).get()
-          .then(function (snap2) {
-            var rows2 = [];
-            snap2.forEach(function (doc) { rows2.push(normalizeArticle(doc)); });
-            rows2.sort(function (a, b) { return (b.updatedAt || 0) - (a.updatedAt || 0); });
-            if (onlyPublished) rows2 = rows2.filter(function (r) { return r.isPublished; });
-            callback(null, rows2);
-          })
-          .catch(function (e) { callback((e && e.message) || "목록 조회 실패"); });
-      });
-  }
+  // 조회수는 GET /api/posts/:slug 가 서버에서 +1 처리하므로 noop
+  function incrementView() {}
 
-  function getArticleById(id, callback) {
-    var db = getDb();
-    if (!db) return callback(null, null);
-    db.collection("articles").doc(id).get()
-      .then(function (doc) {
-        if (!doc.exists) return callback(null, null);
-        callback(null, normalizeArticle(doc));
-      })
-      .catch(function (e) { callback((e && e.message) || "조회 실패"); });
-  }
+  // "도움이 돼요" / legacy news 삭제 등은 v2 에서 제거됨 — no-op stub
+  function toggleHelpful(_id, callback) { if (callback) callback(null, false); }
+  function helpfulCount(_id, callback) { if (callback) callback(null, 0); }
+  function deleteAllLegacyNews(callback) { if (callback) callback(null); }
+  function deleteAllArticles(callback) { if (callback) callback(null); }
 
-  function getArticleBySlug(slug, callback) {
-    var db = getDb();
-    if (!db) return callback(null, null);
-    db.collection("articles").where("slug", "==", String(slug || "").trim()).limit(1).get()
-      .then(function (snap) {
-        if (snap.empty) return callback(null, null);
-        callback(null, normalizeArticle(snap.docs[0]));
-      })
-      .catch(function () { callback(null, null); });
-  }
-
-  function incrementView(id) {
-    var db = getDb();
-    if (!db || !id) return;
-    db.collection("articles").doc(id).update({
-      viewCount: window.firebase.firestore.FieldValue.increment(1),
-      updatedAt: window.firebase.firestore.FieldValue.serverTimestamp(),
-    }).catch(function () {});
-  }
-
-  function toggleHelpful(articleId, callback) {
-    var db = getDb();
-    if (!db || !articleId) return callback("Firestore 연결 실패");
-    var uid = (window.app && window.app.getUser && window.app.getUser() && window.app.getUser().uid) || localStorage.getItem("bizimshop_helpful_uid");
-    if (!uid) {
-      uid = "anon_" + Date.now() + "_" + Math.random().toString(36).slice(2);
-      localStorage.setItem("bizimshop_helpful_uid", uid);
-    }
-    var ref = db.collection("articles").doc(articleId).collection("helpful").doc(uid);
-    ref.get().then(function (doc) {
-      if (doc.exists) {
-        return ref.delete().then(function () { callback(null, false); });
-      }
-      return ref.set({ at: window.firebase.firestore.FieldValue.serverTimestamp() }).then(function () { callback(null, true); });
-    }).catch(function (e) { callback((e && e.message) || "반영 실패"); });
-  }
-
-  function helpfulCount(articleId, callback) {
-    var db = getDb();
-    if (!db || !articleId) return callback(null, 0);
-    db.collection("articles").doc(articleId).collection("helpful").get()
-      .then(function (snap) { callback(null, snap.size || 0); })
-      .catch(function () { callback(null, 0); });
-  }
-
-  function deleteAllLegacyNews(callback) {
-    var db = getDb();
-    if (!db) return callback("Firestore 연결 실패");
-    db.collection("news").get().then(function (snap) {
-      var batch = db.batch();
-      snap.forEach(function (doc) { batch.delete(doc.ref); });
-      return batch.commit();
-    }).then(function () { callback(null); }).catch(function (e) { callback((e && e.message) || "news 삭제 실패"); });
-  }
-
-  function deleteAllArticles(callback) {
-    var db = getDb();
-    if (!db) return callback("Firestore 연결 실패");
-    db.collection("articles").get().then(function (snap) {
-      var batch = db.batch();
-      snap.forEach(function (doc) { batch.delete(doc.ref); });
-      return batch.commit();
-    }).then(function () { callback(null); }).catch(function (e) { callback((e && e.message) || "articles 삭제 실패"); });
-  }
+  // 관리자 판별은 이제 서버 쿠키로 결정되지만, 레거시 UI 호환을 위해 false 기본.
+  function isAdminUser() { return false; }
 
   window.articlesApi = {
-    ADMIN_EMAIL: ADMIN_EMAIL,
-    ADMIN_UIDS: ADMIN_UIDS,
     slugify: slugify,
     estimateReadTimeMinutes: estimateReadTimeMinutes,
     isAdminUser: isAdminUser,
@@ -258,6 +171,6 @@
     toggleHelpful: toggleHelpful,
     helpfulCount: helpfulCount,
     deleteAllLegacyNews: deleteAllLegacyNews,
-    deleteAllArticles: deleteAllArticles,
+    deleteAllArticles: deleteAllArticles
   };
 })();

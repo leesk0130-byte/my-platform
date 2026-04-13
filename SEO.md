@@ -1,142 +1,56 @@
-# SEO(검색엔진 최적화) & 구글에 내 사이트 뜨게 하기
+# SEO & AdSense 재신청 체크리스트
 
-**공개·검색용 주소**: **https://bizimshop.co.kr** 만 사용합니다. (이전 \*.pages.dev 주소는 검색에서 제한될 수 있어 사용하지 않습니다.)
+**공개 주소**: https://bizimshop.co.kr (pages.dev 주소는 canonical 에서 제외)
 
----
-
-## 1. SEO가 뭔가요?
-
-**SEO = Search Engine Optimization = 검색엔진 최적화**
-
-- **검색엔진**(구글, 네이버 등)이 **당신 사이트를 잘 읽고**, **검색 결과에 잘 노출**되도록 만드는 작업이에요.
-- “PG 수수료” 같은 단어로 검색했을 때 **가맹점숲**이 나오게 하려면, 사이트 구조·제목·설명·주소 목록을 검색엔진이 이해하기 쉽게 맞춰 두는 게 SEO예요.
+이전 AdSense 심사에서 "가치없는 콘텐츠" 로 거부됨. 원인 추정: 얇은 콘텐츠 / 메타·OG 부실 / 광고 스크립트 미삽입. 아래 항목을 모두 통과한 뒤 재신청한다.
 
 ---
 
-## 2. 이미 적용해 둔 것 (코드 쪽)
+## 기술 SEO 기반 (완료)
 
-| 항목 | 설명 |
-|------|------|
-| **제목(title)** | 각 페이지마다 `<title>` 있어요. 메인은 "PG 수수료 계산기 \| 가맹점숲". |
-| **메타 설명(description)** | 메인 페이지에 "PG 수수료, 수수료 계산기, 쇼핑몰 뉴스…" 같은 **짧은 설명**을 넣어 두었어요. 구글 검색 결과에서 제목 아래에 보이는 문장이에요. |
-| **키워드(meta keywords)** | "PG 수수료, 결제 수수료, 가맹점…" 같이 **검색에 쓰일 만한 단어**를 넣어 두었어요. |
-| **canonical** | "이 페이지의 대표 주소는 이거예요"라고 알려 주는 주소. 중복 노출을 줄여요. |
-| **Open Graph(og)** | 카카오·페이스북 등에 링크 공유할 때 **제목·설명·주소**가 예쁘게 나오게 해요. |
-| **robots.txt** | 검색 로봇에게 "전체 허용, 사이트맵은 여기 있어"라고 알려 주는 파일이에요. |
-| **sitemap.xml** | **사이트에 있는 페이지 주소 목록**이에요. 구글에게 "이 주소들 크롤링해 주세요"라고 제출할 때 씁니다. |
+- [x] `robots.txt` — `/admin.html`, `/admin/`, `/api/` Disallow, 사이트맵 선언
+- [x] `sitemap.xml` — 홈/리스트/정책/가이드/필수가이드 전부 포함, `lastmod` 오늘 기준
+- [x] `ads.txt` — Google 기본 라인 (pub ID 는 승인 후 교체)
+- [x] `js/meta.js` — 모든 페이지에 OG/Twitter/Description/Organization JSON-LD 자동 주입
+- [x] 글 상세에 Article JSON-LD (`<body data-post-type="...">` 판별)
+- [x] `<html lang="ko">` 강제
+- [x] OG 이미지 `/og-image.svg` (1200x630)
+- [x] Google Search Console 인증 파일 (`google7b693d8f9106f814.html`) 유지
 
----
+## 재신청 전 필수 체크 (운영자 액션)
 
-## 3. 구글에 뜨게 하려면 — 당신이 할 일
+- [ ] 모든 페이지에 `<script src="/js/meta.js" defer></script>` 포함 확인 (홈/리스트/뷰어/어드민 제외 전체)
+- [ ] 각 페이지별 **고유한 `<meta name="description">`** 수동 세팅 (meta.js 는 폴백)
+- [ ] 각 페이지별 **고유한 `<title>`** (브랜드 suffix 통일: `... | 가맹점숲`)
+- [ ] 글 뷰어에서 `data-post-type`, `data-post-published` 속성 렌더
+- [ ] 이미지 `alt` 텍스트 전부 채우기
+- [ ] 내부 링크 (홈 ↔ 리스트 ↔ 글 상세) 양방향 연결
+- [ ] 404/빈 페이지 없음 (기존 정적 HTML 은 pretty URL 로 리다이렉트)
 
-### 3-1. Google Search Console 등록 (가장 중요)
+## 콘텐츠 요건 (AdSense 핵심)
 
-1. **https://search.google.com/search-console** 접속  
-2. Google 계정으로 로그인  
-3. **속성 추가** → **URL 접두어** 선택  
-4. 사이트 주소 입력: **https://bizimshop.co.kr**  
-5. 소유권 확인: **HTML 태그** 또는 **HTML 파일** 방식 중 하나 선택해서 안내대로 하면 돼요.  
-   - **HTML 태그**라면: `<meta name="google-site-verification" content="여기_나오는_값" />` 를 **index.html**의 `<head>` 안에 넣어 주세요. (한 줄만 추가하면 됨)  
-6. 확인이 끝나면 **Search Console에 사이트가 등록**된 거예요.
+- [ ] **최소 20개 이상** 공개된 실질 콘텐츠 (가이드+필수가이드+뉴스 합산)
+- [ ] 각 글 **1,500자 이상**, 목차/소제목/예시/표 포함
+- [ ] 중복·AI 양산 느낌 금지 — 실제 사례, 수치, 출처 포함
+- [ ] About / Contact / 개인정보처리방침 / 이용약관 모두 실제 내용으로 채워짐
+- [ ] 연락 가능한 이메일 노출
 
-### 3-2. 사이트맵 제출
+## AdSense 승인 후
 
-1. Search Console에서 해당 속성(사이트) 선택  
-2. 왼쪽 메뉴 **색인 생성** → **Sitemaps**  
-3. **새 사이트맵 추가**에 **sitemap.xml** 입력 (또는 `https://bizimshop.co.kr/sitemap.xml`)  
-4. **제출** 클릭  
+- [ ] `ads.txt` 의 `pub-XXXXXXXXXXXXXXXX` 를 실제 퍼블리셔 ID 로 교체
+- [ ] AdSense 본 스크립트 `<head>` 삽입 (`adsbygoogle.js?client=ca-pub-...`)
+- [ ] 자동광고 또는 수동 광고 슬롯 배치 (본문 상/중/하)
+- [ ] 광고/제휴 고지 페이지 추가
 
-→ 구글이 **sitemap.xml**에 적어 둔 주소들을 주기적으로 방문해서 검색 결과에 반영해요.
+## 검색엔진 등록
 
-**사이트맵이 "가져올 수 없음"으로 나올 때**
+- [ ] Google Search Console → `sitemap.xml` 제출, 색인 생성 요청
+- [ ] Naver Search Advisor → `sitemap.xml` 제출, `BingSiteAuth.xml` 유지
+- [ ] Bing Webmaster Tools → 사이트 추가
 
-- **구글에 사이트맵 알리기 (핑):** 브라우저에서 아래 주소를 **그대로** 열어 보세요. 구글이 사이트맵을 가져오라고 요청하는 주소예요.  
-  `https://www.google.com/ping?sitemap=https://bizimshop.co.kr/sitemap.xml`  
-- **URL 검사:** Search Console 왼쪽 상단 **URL 검사**에 `https://bizimshop.co.kr/sitemap.xml` 붙여 넣고 **Enter** → 구글이 보는 결과와 오류 메시지를 확인할 수 있어요.  
-- 사이트맵이 계속 실패해도 **메인·뉴스·가이드 링크**를 따라 구글이 페이지를 찾아갈 수 있어요. 사이트맵은 “빨리/많이” 알려 주는 용도라, **색인 자체는 시간이 지나면 될 수 있어요.**
+## 성능/코어 웹 바이탈
 
-### 3-3. 나머지는 시간이 걸림
-
-- 등록·사이트맵 제출 후 **며칠~몇 주** 지나면 구글 검색에 조금씩 나타나기 시작해요.  
-- **"가맹점숲"**, **"bizimshop"** 같이 사이트 이름으로 검색해 보면 더 빨리 나올 수 있어요.  
-- **PG 수수료**, **결제 수수료 계산기** 같은 키워드로는 글을 더 쓰고, 메인/뉴스/가맹점 정보에 좋은 글이 많을수록 점점 잘 뜨는 편이에요.
-
----
-
-## 4. 알아 두면 좋은 개념 (지식)
-
-| 용어 | 뜻 |
-|------|-----|
-| **크롤링** | 구글 로봇이 인터넷을 돌아다니며 **페이지를 읽고 주소를 수집**하는 것. |
-| **색인(인덱싱)** | 수집한 페이지를 **검색 결과에 쓸 수 있도록 저장**해 두는 것. 색인된 페이지만 검색에 나와요. |
-| **sitemap** | "이 사이트에는 이런 URL들이 있어요"라고 정리한 **목록 파일**. 크롤링을 도와줘요. |
-| **robots.txt** | "이 경로는 크롤링하지 마세요" 같은 **규칙**을 적어 두는 파일. 우리는 전체 허용 + sitemap 위치만 알려 줌. |
-| **canonical** | 같은 내용이 여러 주소에 있어도 **대표 주소 하나**만 정해 주면, 검색엔진이 그걸 기준으로 노출해요. |
-| **메타 설명** | 검색 결과에서 **제목 아래 한 줄 설명**. 클릭률에 영향을 줄 수 있어요. |
-
----
-
-## 5. 요약
-
-- **코드 쪽**: 제목, 메타 설명, 키워드, canonical, Open Graph, **robots.txt**, **sitemap.xml** 적용해 두었어요.  
-- **당신이 할 일**:  
-  1) **Google Search Console**에 **https://bizimshop.co.kr** 등록하고 소유권 확인  
-  2) **Sitemaps** 메뉴에서 **sitemap.xml** 제출  
-  3) 며칠~몇 주 기다리면 구글 검색에 조금씩 노출됨  
-
-현재 **공식 도메인은 https://bizimshop.co.kr** 이며, canonical·og:url·sitemap 모두 이 주소로 맞춰 두었습니다.
-
----
-
-## 6. 네이버 검색 노출 체크리스트 (미노출 시 확인)
-
-네이버에 사이트가 안 나올 때 점검할 5가지입니다.
-
-| # | 항목 | bizimshop.co.kr 상태 | 당신이 할 일 |
-|---|------|----------------------|--------------|
-| 1 | **robots.txt / noindex** | ✅ robots.txt에 `Allow: /` 설정, 네이버 로봇(Yeti) 허용 추가. 주요 페이지는 `index, follow`. | 없음. (admin·verify 등 noindex 페이지는 의도적.) |
-| 2 | **서버에서 네이버 로봇 차단** | 코드로 확인 불가. | Cloudflare·방화벽에서 **Yeti**(네이버 검색로봇) 차단 여부 확인. [검색로봇 확인 가이드](https://searchadvisor.naver.com/guide) 참고. |
-| 3 | **웹 표준 / 대표 URL** | ✅ 각 페이지에 `<link rel="canonical">` 설정. | **네이버 서치어드바이저**에서 사이트 등록 후 **대표 URL**이 `https://bizimshop.co.kr/` 로 인식되는지 확인. sitemap에 canonical 주소만 넣어 두었음 (예: `/calculator`). |
-| 4 | **중복 문서** | ✅ canonical로 대표 URL 통일. sitemap을 canonical 주소 기준으로 수정함 (calculator → /calculator). | 다른 도메인·서브도메인에 같은 콘텐츠 올리지 않기. www와 비www 중 하나로 리다이렉트 권장. |
-| 5 | **콘텐츠 품질** | PG 수수료 계산기·가이드 등 정상 정보 제공. 성인·불법·스팸 아님. | 게시판이 있다면 스팸·도배 방지. |
-
-### 적용해 둔 수정 사항 (네이버용)
-
-- **robots.txt**: `User-agent: Yeti` + `Allow: /` 추가 (네이버 검색로봇 명시 허용).
-- **sitemap.xml**: 계산기 페이지 URL을 `https://bizimshop.co.kr/calculator` 로 통일 (canonical과 동일).
-- **canonical**: 메인 `/`, 계산기 `/calculator` 등 대표 URL 일치 확인됨.
-
-### 네이버에 직접 요청
-
-1. **네이버 서치어드바이저** (https://searchadvisor.naver.com) 에서 사이트 등록 및 소유 인증 (이미 네이버 사이트 인증 메타 태그 적용됨).
-2. **URL 제출** 또는 **사이트맵 제출**로 `https://bizimshop.co.kr/sitemap.xml` 제출.
-3. 수집·색인까지 **며칠~몇 주** 걸릴 수 있음.
-
-### sitemap.xml 400 오류 시 (크롤러/감사 도구)
-
-검색 결과에는 sitemap이 보이는데 요청 시 400이 나오면, **서버/WAF(Cloudflare 등)** 에서 XML 또는 특정 User-Agent를 막고 있을 수 있습니다.
-
-- **Cloudflare**: 방화벽 규칙에서 `sitemap.xml` GET 요청을 허용하는지 확인. Page Rules 또는 Transform Rules로 `Content-Type: application/xml` 응답 추가.
-- **정적 호스팅**: `sitemap.xml` 파일이 루트에 있고, 해당 경로가 200 OK로 서빙되는지 `curl -I https://bizimshop.co.kr/sitemap.xml` 로 확인.
-- **웹서버(NGINX/Apache)**: sitemap.xml 경로에 대해 `application/xml` MIME 타입과 200 응답이 나가도록 설정.
-
----
-
-## 7. UI/UX 전면 개편 실행 (2026-03 기준)
-
-보고서 “bizimshop.co.kr UI/UX 전면 개편 실행 보고서” 기준으로 코드에 반영한 항목입니다.
-
-| 우선순위 | 항목 | 적용 내용 |
-|----------|------|-----------|
-| **P0** | 글로벌 IA/네이밍 통일 | 모든 페이지 헤더·드로어 내비에서 계산기 링크 텍스트를 **"PG 수수료 계산기"**로 통일. (기존 "수수료 비교 계산기" / "수수료 계산기" 제거) |
-| **P0** | 계산기 검증·버튼 UX | 저장/공유/이미지 저장 버튼은 **계산 실행 전 비활성(disabled)** + `title="계산을 먼저 실행해 주세요."` 툴팁. 계산 성공 시에만 활성화. |
-| **P0** | 계산기 에러 포커스 | 비율·거래액 검증 실패 시 **첫 번째 에러 필드로 자동 포커스** 이동 (`focusFirstErrorField`). |
-| **P0** | 계산기 0.4% 문구 | "0.4% 적용 시 0.4% 적용" 중복 제거 → "0.4% 적용" 버튼만 유지. |
-| **P1** | must-know 아코디언 접근성 | 각 아코디언 버튼에 **aria-expanded**, **aria-controls**, **id** 부여. 패널에 **role="region"**, **aria-labelledby** 추가. 아이콘에 **aria-hidden="true"**. (키보드/스크린리더 대응) |
-
-### 추가로 권장되는 작업 (수동/백엔드)
-
-- **뉴스 검색**: `/news?q=` 검색 시 결과 수·0건 상태·검색어 칩 등 검색 결과 UI 정비 (이미 클라이언트 필터 구현된 페이지는 유지).
-- **아티클 템플릿 v2**: 가이드/뉴스 상세에 공통 헤더(메타·TOC)·공유 버튼 표준화.
-- **contact**: 문의 페이지를 Search Console에서 별도 URL 검사해 색인 확인.
-- **404**: 사용자 유입 손실 방지를 위해 커스텀 404 페이지 유지.
+- [ ] Lighthouse Performance ≥ 90
+- [ ] LCP < 2.5s, CLS < 0.1
+- [ ] 이미지 lazy-load, CSS/JS minify
+- [ ] Cloudflare 캐시 룰 확인 (`_headers`)

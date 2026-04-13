@@ -1,2 +1,8 @@
-/newsfeed   /news.html       301
-/pg-fee-calculator   /calculator   301
+/newsfeed             /news.html                 301
+/pg-fee-calculator    /calculator                301
+
+# Pretty URLs → dynamic post viewer (rewrite, not redirect)
+/guides/:slug         /post.html?slug=:slug      200
+/must-know/:slug      /post.html?slug=:slug      200
+/article/:slug        /post.html?slug=:slug      200
+/news/:id             /post.html?slug=news-:id   200

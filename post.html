@@ -1,0 +1,72 @@
+<!doctype html>
+<html lang="ko">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="theme-color" content="#0b1020">
+  <meta name="description" content="가맹점 운영을 위한 PG 수수료/정산/환불/심사 실무 글을 확인하세요.">
+  <title>글 불러오는 중 | 가맹점숲</title>
+  <script>(function(){try{var k='gmj-theme',s=localStorage.getItem(k),m=window.matchMedia&&matchMedia('(prefers-color-scheme: light)').matches,t=(s==='dark'||s==='light')?s:(m?'light':'dark');document.documentElement.setAttribute('data-theme',t);}catch(e){document.documentElement.setAttribute('data-theme','dark');}})();</script>
+  <link rel="stylesheet" href="/styles/tokens.css">
+  <link rel="stylesheet" href="/styles/components.css">
+  <link rel="stylesheet" href="/css/common.css?v=20260413">
+  <style>
+    .skeleton{background:linear-gradient(90deg,var(--surface-2) 25%,var(--surface) 50%,var(--surface-2) 75%);background-size:200% 100%;animation:sk 1.2s infinite;border-radius:var(--radius-sm)}
+    @keyframes sk{0%{background-position:200% 0}100%{background-position:-200% 0}}
+    .sk-title{height:40px;width:70%;margin:0 0 16px}
+    .sk-meta{height:18px;width:40%;margin:0 0 24px}
+    .sk-line{height:16px;margin:10px 0}
+    .sk-line.w90{width:90%}.sk-line.w80{width:80%}.sk-line.w95{width:95%}
+    #post-cover{max-width:100%;border-radius:var(--radius);margin:16px 0 24px;display:block}
+    .post-meta{display:flex;gap:12px;align-items:center;flex-wrap:wrap;color:var(--muted);font-size:14px;margin:12px 0 20px}
+    .post-meta .chip{margin-right:4px}
+    #post-tags{display:flex;gap:8px;flex-wrap:wrap;margin:24px 0}
+    .breadcrumb{color:var(--muted);font-size:14px;margin-bottom:16px}
+    .breadcrumb a{color:var(--muted)}
+    .breadcrumb span.sep{margin:0 6px;opacity:.5}
+    .error-state{text-align:center;padding:60px 20px}
+    .error-state h1{font-size:28px;margin-bottom:12px}
+    .related-grid{display:grid;gap:16px;grid-template-columns:repeat(auto-fill,minmax(260px,1fr));margin-top:16px}
+  </style>
+</head>
+<body data-post-type="">
+  <div data-gmj-header></div>
+  <main class="container section" id="main">
+    <nav class="breadcrumb" id="post-breadcrumb" aria-label="경로">
+      <a href="/">홈</a>
+    </nav>
+    <article class="prose" id="post-root" aria-busy="true">
+      <div id="post-loading">
+        <div class="skeleton sk-title"></div>
+        <div class="skeleton sk-meta"></div>
+        <div class="skeleton sk-line w95"></div>
+        <div class="skeleton sk-line w90"></div>
+        <div class="skeleton sk-line w80"></div>
+        <div class="skeleton sk-line w95"></div>
+        <div class="skeleton sk-line w90"></div>
+      </div>
+      <div id="post-content" hidden>
+        <h1 id="post-title"></h1>
+        <div class="post-meta" id="post-meta"></div>
+        <img id="post-cover" alt="" hidden>
+        <div id="post-body"></div>
+        <div id="post-tags"></div>
+      </div>
+      <div id="post-error" class="error-state" hidden>
+        <h1>글을 찾을 수 없습니다</h1>
+        <p>요청하신 글이 존재하지 않거나 이동되었습니다.</p>
+        <p><a class="btn btn-primary" href="/">홈으로 돌아가기</a></p>
+      </div>
+    </article>
+    <section class="section" id="related-root" hidden>
+      <h2>관련 글</h2>
+      <div class="related-grid" id="related-grid"></div>
+    </section>
+  </main>
+  <div data-gmj-footer></div>
+  <script defer src="/js/theme.js"></script>
+  <script defer src="/js/layout.js"></script>
+  <script defer src="/js/meta.js"></script>
+  <script defer src="/js/viewer.js"></script>
+</body>
+</html>

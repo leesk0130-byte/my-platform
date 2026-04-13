@@ -1,85 +1,48 @@
-function json(body, status) {
-  return new Response(JSON.stringify(body), {
-    status: status || 200,
-    headers: { 'Content-Type': 'application/json', 'Access-Control-Allow-Origin': '*' },
-  });
-}
+/**
+ * Compat shim for /api/news/:id  (GET only).
+ * Writes are 410 Gone — use /api/posts/:id.
+ */
+import { json, error } from '../../_lib/http.js';
 
 function formatDate(ts) {
   if (!ts) return '';
-  return new Date(Number(ts)).toLocaleDateString('ko-KR', { year: 'numeric', month: 'short', day: 'numeric' });
-}
-
-function getEmailFromToken(token) {
   try {
-    var parts = token.split('.');
-    if (parts.length < 2) return '';
-    var payload = parts[1].replace(/-/g, '+').replace(/_/g, '/');
-    var pad = payload.length % 4;
-    if (pad) payload += new Array(5 - pad).join('=');
-    var json = atob(payload);
-    var data = JSON.parse(json);
-    return (data.email || '').toLowerCase();
-  } catch (e) {
-    return '';
-  }
-}
-
-async function verifyOperator(request, env) {
-  var auth = request.headers.get('Authorization') || '';
-  var token = auth.startsWith('Bearer ') ? auth.slice(7) : '';
-  if (!token) return false;
-  var email = getEmailFromToken(token);
-  var operatorEmail = (env.OPERATOR_EMAIL || 'leesk0130@point3.team').toLowerCase();
-  return email && email === operatorEmail;
+    const d = new Date(String(ts).replace(' ', 'T') + 'Z');
+    return d.toLocaleDateString('ko-KR', { year: 'numeric', month: 'short', day: 'numeric' });
+  } catch (_) { return ''; }
 }
 
 export async function onRequestGet({ env, params }) {
+  const key = params.id;
   try {
-    var row = await env.DB.prepare(
-      'SELECT id, title, category, content, created_at, updated_at FROM news WHERE id = ?'
-    ).bind(params.id).first();
-    if (!row) return json({ error: 'Not found' }, 404);
-    return json(Object.assign({}, row, { date: formatDate(row.created_at) }));
-  } catch (e) { return json({ error: e.message }, 500); }
+    let row;
+    if (/^\d+$/.test(String(key))) {
+      row = await env.DB.prepare("SELECT * FROM posts WHERE id = ? AND type = 'news'").bind(Number(key)).first();
+    } else {
+      row = await env.DB.prepare("SELECT * FROM posts WHERE slug = ? AND type = 'news'").bind(String(key)).first();
+    }
+    if (!row || row.status !== 'published') return error('Not found', 404);
+    try { await env.DB.prepare('UPDATE posts SET views = views + 1 WHERE id = ?').bind(row.id).run(); } catch (_) {}
+    return json({
+      id: row.id,
+      slug: row.slug,
+      title: row.title,
+      category: row.category || 'general',
+      content: row.content_html,
+      excerpt: row.excerpt,
+      date: formatDate(row.published_at || row.created_at),
+      created_at: row.created_at,
+      updated_at: row.updated_at,
+    });
+  } catch (e) {
+    return error(e.message, 500);
+  }
 }
 
-export async function onRequestPut({ env, request, params }) {
-  var ok = await verifyOperator(request, env);
-  if (!ok) return json({ error: 'Unauthorized' }, 401);
-  try {
-    var body = await request.json();
-    var title = body.title;
-    var category = body.category != null ? body.category : undefined;
-    var content = body.content;
-    if (!title || !content) return json({ error: 'title and content required' }, 400);
-    var now = Date.now();
-    await env.DB.prepare(
-      'UPDATE news SET title = ?, category = ?, content = ?, updated_at = ? WHERE id = ?'
-    ).bind(title, category || 'general', content, now, params.id).run();
-    var row = await env.DB.prepare(
-      'SELECT id, title, category, content, created_at, updated_at FROM news WHERE id = ?'
-    ).bind(params.id).first();
-    if (!row) return json({ error: 'Not found' }, 404);
-    return json(Object.assign({}, row, { date: formatDate(row.created_at) }));
-  } catch (e) { return json({ error: e.message }, 500); }
+export async function onRequestPut() {
+  return error('Deprecated. Use PUT /api/posts/:id.', 410);
 }
 
-export async function onRequestDelete({ env, request, params }) {
-  var ok = await verifyOperator(request, env);
-  if (!ok) return json({ error: 'Unauthorized' }, 401);
-  try {
-    await env.DB.prepare('DELETE FROM news WHERE id = ?').bind(params.id).run();
-    return json({ success: true });
-  } catch (e) { return json({ error: e.message }, 500); }
-}
-
-export async function onRequestOptions() {
-  return new Response(null, {
-    headers: {
-      'Access-Control-Allow-Origin': '*',
-      'Access-Control-Allow-Methods': 'GET, PUT, DELETE, OPTIONS',
-      'Access-Control-Allow-Headers': 'Content-Type, Authorization',
-    },
-  });
+export async function onRequestDelete() {
+  return error('Deprecated. Use DELETE /api/posts/:id.', 410);
 }

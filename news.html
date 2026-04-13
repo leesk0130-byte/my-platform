@@ -3,97 +3,56 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <meta name="theme-color" content="#0f172a">
-  <title>쇼핑몰 뉴스 | 가맹점숲</title>
-  <meta name="description" content="온라인 쇼핑몰 가맹점주를 위한 심층 가이드. PG 수수료, 정산, 환불, 심사, 법규를 실무 중심으로 제공합니다.">
+  <meta name="theme-color" content="#0b1020">
+  <title>가맹점 뉴스 | 가맹점숲</title>
+  <meta name="description" content="PG 수수료, 정산, 환불, 세금, 법규 등 온라인 가맹점주를 위한 최신 뉴스와 실무 이슈를 모았습니다.">
   <meta name="robots" content="index, follow">
   <link rel="canonical" href="https://bizimshop.co.kr/news.html">
-  <meta property="og:title" content="쇼핑몰 뉴스 | 가맹점숲">
-  <meta property="og:description" content="PG 수수료, 정산, 환불, 심사, 법규를 다루는 가맹점 실무 콘텐츠.">
+  <meta property="og:title" content="가맹점 뉴스 | 가맹점숲">
+  <meta property="og:description" content="PG 수수료, 정산, 환불, 세금, 법규 최신 이슈.">
   <meta property="og:url" content="https://bizimshop.co.kr/news.html">
   <meta property="og:image" content="https://bizimshop.co.kr/og-image.svg">
-  <link rel="icon" type="image/svg+xml" href="og-image.svg">
-  <link rel="stylesheet" href="css/common.css?v=20260331b">
+  <link rel="icon" type="image/svg+xml" href="/og-image.svg">
+  <script>(function(){try{var k='gmj-theme',s=localStorage.getItem(k),m=window.matchMedia&&matchMedia('(prefers-color-scheme: light)').matches,t=(s==='dark'||s==='light')?s:(m?'light':'dark');document.documentElement.setAttribute('data-theme',t);}catch(e){document.documentElement.setAttribute('data-theme','dark');}})();</script>
+  <link rel="stylesheet" href="/styles/tokens.css">
+  <link rel="stylesheet" href="/styles/components.css">
+  <link rel="stylesheet" href="/css/common.css?v=20260413">
+  <script src="/js/theme.js" defer></script>
+  <script src="/js/layout.js" defer></script>
+  <script src="/js/meta.js" defer></script>
+  <script src="/js/list.js" defer></script>
 </head>
 <body>
   <a href="#main" class="skip-link">본문으로 건너뛰기</a>
-  <header>
-    <div class="site-logo"><a href="index.html">가맹점숲</a></div>
-    <button type="button" class="nav-toggle" aria-label="메뉴 열기" aria-expanded="false" data-toggle-nav><span></span><span></span><span></span></button>
-    <nav class="header-nav" id="headerNav" aria-label="메인 메뉴">
-      <a href="pg.html">PG 수수료</a>
-      <a href="/calculator">수수료 계산기</a>
-      <a href="news.html" class="active">쇼핑몰 뉴스</a>
-      <a href="must-know.html">필수 가이드</a>
-    </nav>
-    <div class="header-auth" id="headerAuth"><div id="auth-actions"></div></div>
-  </header>
+  <header data-gmj-header></header>
 
   <main id="main" class="page">
     <div class="container">
-      <nav class="breadcrumb" aria-label="breadcrumb"><a href="index.html">홈</a> <span class="bc-sep">/</span> <strong>쇼핑몰 뉴스</strong></nav>
-      <section class="hero-green">
-        <h1>가맹점 운영 실무 콘텐츠</h1>
-        <p>PG 수수료, 정산, 환불, 심사 등 가맹점 운영에 필요한 깊이 있는 콘텐츠를 제공합니다.</p>
-      </section>
       <section class="section">
-        <div class="card">
-          <h2 class="section-title">최신 글</h2>
-          <p id="news-search-result" class="section-desc" style="display:none" aria-live="polite"></p>
-          <div id="page-root"></div>
-        </div>
+        <h1 class="page-title">가맹점 뉴스</h1>
+        <p class="page-desc muted">PG 수수료, 정산, 환불, 세금, 법규까지 가맹점 운영에 필요한 실무 뉴스를 모았습니다.</p>
+      </section>
+
+      <section class="section">
+        <div id="list-controls"></div>
+        <div id="list-root"></div>
       </section>
     </div>
   </main>
 
-  <footer>
-    <div class="footer-inner">
-      <div>
-        <p class="footer-title">가맹점숲</p>
-        <p>온라인 가맹점주를 위한 PG 수수료 정보, 계산기, 실무 가이드를 제공합니다.</p>
-      </div>
-      <div>
-        <p class="footer-title">바로가기</p>
-        <div class="footer-links">
-          <a href="about.html">가맹점숲이란?</a>
-          <a href="pg.html">PG 수수료 비교</a>
-          <a href="/calculator">수수료 계산기</a>
-        </div>
-      </div>
-      <div class="footer-contact">
-        <p class="footer-title">문의</p>
-        <p><a href="contact.html">문의하기</a></p>
-        <p class="footer-hours">평일 09:00-18:00</p>
-        <div class="footer-links" style="margin-top:12px"><a href="terms.html">이용약관</a><a href="privacy.html">개인정보처리방침</a></div>
-      </div>
-      <p class="footer-copy">&copy; 2025 가맹점숲. All rights reserved.</p>
-    </div>
-  </footer>
+  <footer data-gmj-footer></footer>
+  <div id="toast-region" aria-live="polite" aria-atomic="true"></div>
 
-  <div id="drawerOverlay" hidden aria-hidden="true"></div>
-  <aside id="mobileDrawer" hidden aria-hidden="true" role="dialog" aria-modal="true" aria-label="메뉴">
-    <div class="drawer-header">
-      <span class="drawer-logo">가맹점숲</span>
-      <button type="button" class="drawer-close" aria-label="메뉴 닫기"><svg width="20" height="20" viewBox="0 0 20 20" fill="none"><path d="M4 4L16 16M16 4L4 16" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg></button>
-    </div>
-    <nav class="drawer-nav" aria-label="모바일 메뉴">
-      <a href="pg.html" class="drawer-link">PG 수수료</a>
-      <a href="/calculator" class="drawer-link">수수료 계산기</a>
-      <a href="news.html" class="drawer-link active">쇼핑몰 뉴스</a>
-      <a href="must-know.html" class="drawer-link">필수 가이드</a>
-      <a href="contact.html" class="drawer-link">문의하기</a>
-    </nav>
-    <div id="drawerAuth"></div>
-  </aside>
-
-  <script src="https://www.gstatic.com/firebasejs/10.7.0/firebase-app-compat.js"></script>
-  <script src="https://www.gstatic.com/firebasejs/10.7.0/firebase-auth-compat.js"></script>
-  <script src="https://www.gstatic.com/firebasejs/10.7.0/firebase-firestore-compat.js"></script>
-  <script src="js/config.js?v=2"></script>
-  <script src="js/app.js?v=2"></script>
-  <script src="js/auth.js?v=2"></script>
-  <script src="js/articles.js?v=2"></script>
-  <script src="js/news-render.js?v=2"></script>
-  <script src="js/drawer.js?v=2"></script>
+  <script>
+    document.addEventListener('DOMContentLoaded', function () {
+      if (window.GMJList) {
+        window.GMJList.init({
+          type: 'news',
+          categories: ['전체','PG 수수료','정산','환불','세금','법규','운영팁','기타'],
+          perPage: 20
+        });
+      }
+    });
+  </script>
 </body>
 </html>
